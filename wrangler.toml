@@ -2,7 +2,7 @@ name = "medlife-website"
 
 pages_build_output_dir = "."
 
-compatibility_date = "2026-08-14"
+compatibility_date = "2026-08-13"
 
 [[d1_databases]]
 binding = "DB"
