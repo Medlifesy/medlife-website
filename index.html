@@ -557,6 +557,47 @@
         gap: 30px;
       }
     }
+
+    /* ===== MEDLIFE 2026 PREMIUM LAYER ===== */
+    :root { --teal:#087f8c; --teal-2:#13a6a6; --navy:#102f46; --muted:#687d8d; --line:#e5eef3; --shadow:0 24px 70px rgba(16,47,70,.10); }
+    body { overflow-x:hidden; }
+    .nav { min-height:82px; }
+    .logo-mark { background:white; color:var(--teal); border:1px solid #dceff1; box-shadow:0 8px 25px rgba(8,127,140,.12); }
+    .hero { min-height:700px; background:radial-gradient(circle at 85% 15%,rgba(19,166,166,.16),transparent 25%),radial-gradient(circle at 10% 80%,rgba(8,127,140,.10),transparent 28%),linear-gradient(135deg,#f0fbfc 0%,#fff 58%,#f7fbfd 100%); }
+    .hero h1 { max-width:760px; font-weight:900; }
+    .hero p { line-height:1.95; }
+    .hero-card { min-height:500px; border:8px solid rgba(255,255,255,.65); box-shadow:0 35px 90px rgba(8,127,140,.18); }
+    .stats { margin-top:-65px; }
+    .stats-grid { border:1px solid var(--line); box-shadow:var(--shadow); }
+    .stat { padding:34px 20px; }
+    .section-heading { margin-bottom:60px; }
+    .section-heading h2 { font-weight:900; }
+    .program-card { position:relative; min-height:220px; overflow:hidden; }
+    .program-card::before { content:""; position:absolute; top:0; right:0; width:70px; height:4px; background:linear-gradient(90deg,var(--teal),var(--teal-2)); border-radius:0 0 0 8px; }
+    .projects-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+    .project-card { background:linear-gradient(145deg,#fff,#f7fbfc); border:1px solid var(--line); border-radius:24px; padding:28px; transition:.3s; }
+    .project-card:hover { transform:translateY(-6px); box-shadow:var(--shadow); }
+    .project-card h3 { margin:12px 0 8px; font-size:21px; }
+    .project-card p { color:var(--muted); font-size:15px; }
+    .project-icon { font-size:30px; }
+    .ai-section { background:#102f46; color:white; }
+    .ai-shell { display:grid; grid-template-columns:1fr 1.15fr; gap:40px; align-items:center; }
+    .ai-copy h2 { font-size:42px; line-height:1.3; margin:10px 0 18px; }
+    .ai-copy p { color:#c4d5df; font-size:17px; }
+    .ai-badge { color:#75e1df; font-weight:900; }
+    .ai-card { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); border-radius:28px; padding:24px; backdrop-filter:blur(14px); }
+    .ai-window { background:white; color:var(--navy); border-radius:20px; overflow:hidden; }
+    .ai-head { padding:16px 20px; border-bottom:1px solid var(--line); font-weight:900; }
+    .ai-message { padding:22px; min-height:150px; color:var(--muted); }
+    .ai-pills { display:flex; flex-wrap:wrap; gap:8px; padding:0 20px 20px; }
+    .ai-pill { border:1px solid #d8e9ed; background:#f5fbfc; color:var(--teal); border-radius:999px; padding:8px 12px; font-size:12px; cursor:pointer; }
+    .ai-note { margin-top:15px; font-size:12px; color:#9eb4c1; }
+    .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+    .contact-card { background:white; border:1px solid var(--line); border-radius:24px; padding:30px; box-shadow:0 15px 45px rgba(20,70,90,.06); }
+    .contact-card h3 { margin-bottom:10px; }
+    .contact-card p { color:var(--muted); }
+    .ai-fab { position:fixed; bottom:22px; left:22px; z-index:1500; width:58px; height:58px; border:0; border-radius:50%; background:linear-gradient(135deg,var(--teal),var(--teal-2)); color:white; font-size:24px; box-shadow:0 15px 35px rgba(8,127,140,.28); cursor:pointer; }
+    @media (max-width:900px) { .projects-grid,.ai-shell,.contact-grid { grid-template-columns:1fr; } .hero-card { min-height:390px; } .ai-copy h2 { font-size:32px; } }
   </style>
 </head>
 
@@ -743,6 +784,46 @@
 
     </section>
 
+    <!-- PROJECTS -->
+    <section id="projects" class="about">
+      <div class="container">
+        <div class="section-heading">
+          <div class="eyebrow">من الميدان</div>
+          <h2>مشاريع تصنع أثرًا حقيقيًا</h2>
+          <p>من التوعية والتدريب إلى المبادرات الإنسانية والصحية، نعمل مع المجتمع لا من أجله فقط.</p>
+        </div>
+        <div class="projects-grid">
+          <article class="project-card"><div class="project-icon">🤝</div><h3>مشروع أثر</h3><p>ربط الداعمين بالأشخاص المحتاجين للدعم الطبي والإنساني، بما يشمل الأدوية والاستشارات ومستلزمات الأطفال ودعم تكاليف العمليات بحسب الإمكانيات.</p></article>
+          <article class="project-card"><div class="project-icon">🩺</div><h3>درهم وقاية</h3><p>مبادرات ميدانية للتوعية والوقاية، شملت قياس الضغط والسكري والأكسجة وتقديم الإرشادات الصحية للمجتمع.</p></article>
+          <article class="project-card"><div class="project-icon">🎓</div><h3>التعليم والتدريب</h3><p>دورات في الإسعافات الأولية ومهارات التمريض والتوعية الصحية، مع تطبيق عملي وتقييم للمتدربين.</p></article>
+          <article class="project-card"><div class="project-icon">💗</div><h3>دعم الأطفال المرضى</h3><p>مبادرات إنسانية وترفيهية للأطفال في المشافي بهدف تخفيف أثر المرض وتعزيز الدعم النفسي والمعنوي.</p></article>
+          <article class="project-card"><div class="project-icon">🚑</div><h3>الاستجابة الإنسانية</h3><p>المشاركة في الاستجابة للاحتياجات الطبية والإنسانية خلال الأزمات والكوارث وتعزيز الوصول إلى الفئات الأكثر حاجة.</p></article>
+          <article class="project-card"><div class="project-icon">📚</div><h3>التثقيف الطبي</h3><p>محتوى طبي مبسط وموثوق يهدف إلى رفع الوعي الصحي، إلى جانب المقالات والمواد التعليمية المتخصصة.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI ASSISTANT -->
+    <section class="ai-section" id="assistant">
+      <div class="container ai-shell">
+        <div class="ai-copy"><div class="ai-badge">✦ مساعد ميدلايف الذكي</div><h2>اسأل ميدلايف… واعرف أكثر</h2><p>واجهة مساعد ذكي مخصصة للموقع يمكن ربطها بقاعدة معرفة ميدلايف ومقالاتها وبرامجها وبيانات التواصل، مع إمكانية إضافة الذكاء الاصطناعي عبر Cloudflare Worker دون وضع أي مفتاح سري داخل الموقع.</p><div class="ai-note">المساعد لا يقدم تشخيصًا أو علاجًا طبيًا شخصيًا، ويجب الرجوع إلى مختص عند الحاجة.</div></div>
+        <div class="ai-card"><div class="ai-window"><div class="ai-head">🤖 مساعد ميدلايف</div><div class="ai-message" id="aiMessage">مرحبًا! أنا مساعد ميدلايف. اختر سؤالًا لأعرّفك بالمؤسسة أو بمشاريعها.</div><div class="ai-pills"><button class="ai-pill" onclick="askAI('من هي ميدلايف؟')">من هي ميدلايف؟</button><button class="ai-pill" onclick="askAI('ما هو مشروع أثر؟')">ما هو مشروع أثر؟</button><button class="ai-pill" onclick="askAI('ما هي مجالات عملكم؟')">مجالات العمل</button><button class="ai-pill" onclick="askAI('كيف أتطوع؟')">كيف أتطوع؟</button></div></div></div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact-info">
+      <div class="container">
+        <div class="section-heading"><div class="eyebrow">تواصل وشراكة</div><h2>لنصنع أثرًا أكبر معًا</h2><p>ميدلايف تعمل عبر شبكة من المتطوعين والكوادر الصحية وتسعى لبناء شراكات تخدم المجتمع.</p></div>
+        <div class="contact-grid">
+          <div class="contact-card"><h3>📍 المقر الرئيسي</h3><p>طرطوس، سوريا</p></div>
+          <div class="contact-card"><h3>🌐 الموقع الرسمي</h3><p><a href="https://medlifesy.org" target="_blank">medlifesy.org</a></p></div>
+          <div class="contact-card"><h3>🤝 شراكات وتعاون</h3><p>للتعاون الطبي والإنساني والتدريب والمبادرات المجتمعية، تواصلوا مع المؤسسة عبر قنواتها الرسمية.</p></div>
+          <div class="contact-card"><h3>👥 التطوع</h3><p>نرحب بالأطباء والطلاب والمختصين والمصممين والإعلاميين وفرق التقنية وكل من يرغب بصناعة أثر.</p></div>
+        </div>
+      </div>
+    </section>
+
 
     <!-- ABOUT -->
     <section class="about" id="about">
@@ -846,6 +927,8 @@
           <a href="#about">من نحن</a>
           <a href="#programs">برامجنا</a>
           <a href="#impact">أثرنا</a>
+          <a href="#projects">مشاريعنا</a>
+          <a href="#assistant">مساعد ميدلايف</a>
 
         </div>
 
@@ -871,6 +954,20 @@
     </div>
 
   </footer>
+
+  <button class="ai-fab" aria-label="فتح مساعد ميدلايف" onclick="document.getElementById('assistant').scrollIntoView({behavior:'smooth'})">✦</button>
+  <script>
+    function askAI(question) {
+      const box=document.getElementById('aiMessage');
+      const answers={
+        'من هي ميدلايف؟':'ميدلايف مؤسسة طبية خيرية تطوعية في سوريا، انطلقت فكرتها عام 2019 وتم إشهارها رسميًا عام 2023. تعمل على الدعم الطبي والإنساني والتثقيف الصحي والتطوع.',
+        'ما هو مشروع أثر؟':'مشروع أثر يهدف إلى إيصال الخدمات والمساعدات الطبية والإنسانية من الداعمين إلى الأشخاص المحتاجين، ومنها الأدوية والاستشارات ومستلزمات الأطفال ودعم العمليات بحسب الإمكانيات.',
+        'ما هي مجالات عملكم؟':'تشمل مجالات ميدلايف الرعاية الصحية، التثقيف الطبي، التدريب، المبادرات المجتمعية، العمل الإنساني، الاستجابة للطوارئ، والتطوع والابتكار التقني.',
+        'كيف أتطوع؟':'يمكنك متابعة قنوات ميدلايف الرسمية لمعرفة فرص الانضمام الحالية. تشمل مجالات التطوع المحتوى الطبي، التصميم، الإعلام، العمل الميداني، IT وإدارة المنصات وغيرها.'
+      };
+      box.textContent=answers[question]||'يمكنني مساعدتك بالتعرف على ميدلايف وبرامجها ومشاريعها.';
+    }
+  </script>
 
 </body>
 </html>
