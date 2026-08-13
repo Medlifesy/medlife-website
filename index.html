@@ -5710,6 +5710,258 @@
 
     </section>
 
+    /* =========================================================
+   MEDLIFE PHOTO GALLERY
+========================================================= */
+
+.photo-section {
+
+    background:
+        var(--light);
+
+    overflow:
+        hidden;
+}
+
+
+/* عنوان القسم */
+
+.photo-section .section-header {
+
+    margin-bottom:
+        40px;
+}
+
+
+/* منطقة الحركة */
+
+.photo-track-wrap {
+
+    width:
+        100%;
+
+    overflow:
+        hidden;
+
+    position:
+        relative;
+}
+
+
+/* Fade edges */
+
+.photo-track-wrap::before,
+.photo-track-wrap::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    top:
+        0;
+
+    bottom:
+        0;
+
+    width:
+        110px;
+
+    z-index:
+        5;
+
+    pointer-events:
+        none;
+}
+
+
+.photo-track-wrap::before {
+
+    inset-inline-start:
+        0;
+
+    background:
+        linear-gradient(
+            to right,
+            var(--light),
+            transparent
+        );
+}
+
+
+.photo-track-wrap::after {
+
+    inset-inline-end:
+        0;
+
+    background:
+        linear-gradient(
+            to left,
+            var(--light),
+            transparent
+        );
+}
+
+
+/* الصور */
+
+.photo-track {
+
+    display:
+        flex;
+
+    width:
+        max-content;
+
+    gap:
+        18px;
+
+    animation:
+        medlifePhotoMove
+        45s
+        linear
+        infinite;
+
+    will-change:
+        transform;
+}
+
+
+/* توقف عند مرور الماوس */
+
+.photo-track:hover {
+
+    animation-play-state:
+        paused;
+}
+
+
+/* بطاقة الصورة */
+
+.photo-card {
+
+    width:
+        300px;
+
+    height:
+        210px;
+
+    flex:
+        0 0 300px;
+
+    border-radius:
+        22px;
+
+    overflow:
+        hidden;
+
+    background:
+        var(--white);
+
+    border:
+        1px solid var(--border);
+
+    box-shadow:
+        var(--shadow);
+
+    position:
+        relative;
+}
+
+
+/* الصورة نفسها */
+
+.photo-card img {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    display:
+        block;
+
+    object-fit:
+        cover;
+
+    transition:
+        transform
+        .55s
+        ease;
+}
+
+
+/* Zoom */
+
+.photo-card:hover img {
+
+    transform:
+        scale(1.07);
+}
+
+
+/* حركة مستمرة */
+
+@keyframes medlifePhotoMove {
+
+    from {
+
+        transform:
+            translateX(0);
+
+    }
+
+    to {
+
+        transform:
+            translateX(-50%);
+
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .photo-track {
+
+        gap:
+            12px;
+
+        animation-duration:
+            32s;
+    }
+
+
+    .photo-card {
+
+        width:
+            235px;
+
+        height:
+            165px;
+
+        flex-basis:
+            235px;
+
+        border-radius:
+            17px;
+    }
+
+
+    .photo-track-wrap::before,
+    .photo-track-wrap::after {
+
+        width:
+            45px;
+    }
+
+}
 
     <!-- =========================================================
          CONSULTATION
@@ -7305,7 +7557,7 @@
                 {
                     threshold:
                         .12
-                }
+                } 
             );
 
 
