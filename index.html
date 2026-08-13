@@ -1,34 +1,53 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ميدلايف | MedLife Syria</title>
-<meta name="description" content="مؤسسة ميدلايف الطبية الخيرية التطوعية - We save life, we are med.life">
 
-<!-- Google Fonts -->
+<title>ميدلايف | MedLife Syria</title>
+
+<meta name="description"
+content="مؤسسة ميدلايف الطبية الخيرية التطوعية — نعمل من أجل مجتمع أكثر صحة ووعيًا، ونؤمن بأن الرعاية الصحية والمعرفة الطبية حق للجميع.">
+
+<meta name="keywords"
+content="MedLife Syria, MedLife, ميدلايف, مؤسسة ميدلايف, مؤسسة طبية, تطوع, سوريا">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<!-- FontAwesome Icons for International Look -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap"
+rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
+
 :root {
-    /* مستخرجة بدقة من هوية اللوغو الرسمي */
-    --brand-red: #FF2A54;      /* أحمر/وردي اللوغو - كلمة Life والقلب */
-    --brand-navy: #151D36;     /* الكحلي الداكن - الشخص الهلالي */
-    --brand-dark: #2B2D38;     /* الكحلي/الرمادي الداكن - اليد وكلمة Med */
-    --brand-light-bg: #F8FAFC; /* خلفية فاتحة ومريحة للعين */
-    --brand-soft-red: #FFF0F3;/* خلفية وردية خفيفة للبطاقات */
-    --white: #FFFFFF;
-    --text-dark: #1E293B;
-    --text-muted: #64748B;
-    --border-color: #E2E8F0;
-    --shadow-sm: 0 4px 15px rgba(21, 29, 54, 0.05);
-    --shadow-lg: 0 20px 40px rgba(21, 29, 54, 0.1);
+
+    --red: #FF2A54;
+    --red-dark: #E51D45;
+
+    --navy: #151D36;
+    --dark: #252B3D;
+
+    --white: #ffffff;
+    --light: #F8FAFC;
+    --soft-red: #FFF0F3;
+
+    --text: #1E293B;
+    --muted: #64748B;
+
+    --border: #E2E8F0;
+
+    --shadow:
+        0 20px 50px rgba(21,29,54,0.10);
+
+    --shadow-small:
+        0 8px 25px rgba(21,29,54,0.07);
 }
+
 
 * {
     margin: 0;
@@ -36,676 +55,2220 @@
     box-sizing: border-box;
 }
 
+
 html {
     scroll-behavior: smooth;
 }
 
+
 body {
+
     font-family: "Cairo", sans-serif;
+
     background: var(--white);
-    color: var(--text-dark);
-    line-height: 1.7;
+
+    color: var(--text);
+
+    line-height: 1.8;
+
 }
+
 
 a {
     text-decoration: none;
     color: inherit;
 }
 
+
 .container {
+
     width: min(1200px, 92%);
+
     margin: auto;
+
 }
+
 
 /* ================= HEADER ================= */
+
 header {
+
     position: sticky;
+
     top: 0;
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(15px);
-    border-bottom: 1px solid rgba(21, 29, 54, 0.08);
+
+    z-index: 9999;
+
+    background:
+        rgba(255,255,255,0.96);
+
+    backdrop-filter:
+        blur(15px);
+
+    border-bottom:
+        1px solid rgba(21,29,54,0.08);
+
 }
+
 
 .nav {
-    height: 85px;
+
+    min-height: 82px;
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
+
 }
+
 
 .logo-brand {
+
     display: flex;
+
     align-items: center;
-    gap: 12px;
+
 }
+
 
 .logo-img {
-    height: 55px;
+
+    height: 58px;
+
     width: auto;
+
     object-fit: contain;
+
 }
+
 
 .nav-links {
+
     display: flex;
+
     align-items: center;
-    gap: 25px;
+
+    gap: 26px;
+
     list-style: none;
+
     font-size: 15px;
+
     font-weight: 700;
-    color: var(--brand-navy);
+
+    color: var(--navy);
+
 }
+
 
 .nav-links a {
-    transition: 0.25s;
+
+    transition:
+        0.25s ease;
+
 }
+
 
 .nav-links a:hover {
-    color: var(--brand-red);
+
+    color: var(--red);
+
 }
+
 
 .nav-button {
-    background: var(--brand-red);
-    color: var(--white) !important;
-    padding: 10px 22px;
-    border-radius: 10px;
-    box-shadow: 0 6px 18px rgba(255, 42, 84, 0.25);
-    transition: 0.3s !important;
+
+    background: var(--red);
+
+    color: white !important;
+
+    padding:
+        10px 20px;
+
+    border-radius: 11px;
+
+    box-shadow:
+        0 8px 20px rgba(255,42,84,0.22);
+
 }
+
 
 .nav-button:hover {
-    transform: translateY(-2px);
-    background: #E01E45;
+
+    background:
+        var(--red-dark);
+
+    transform:
+        translateY(-2px);
+
 }
+
 
 /* ================= HERO ================= */
+
 .hero {
+
     position: relative;
-    padding: 90px 0;
-    background: 
-        radial-gradient(circle at 90% 10%, rgba(255, 42, 84, 0.06), transparent 35%),
-        radial-gradient(circle at 10% 90%, rgba(21, 29, 54, 0.05), transparent 35%),
-        linear-gradient(135deg, #FFFFFF 0%, var(--brand-light-bg) 100%);
+
+    overflow: hidden;
+
+    padding:
+        100px 0;
+
+    background:
+
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(255,42,84,0.08),
+            transparent 35%
+        ),
+
+        radial-gradient(
+            circle at 10% 90%,
+            rgba(21,29,54,0.06),
+            transparent 35%
+        ),
+
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #F8FAFC
+        );
+
 }
+
 
 .hero-grid {
+
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 60px;
+
+    grid-template-columns:
+        1.1fr 0.9fr;
+
+    gap: 70px;
+
     align-items: center;
+
 }
+
 
 .hero-badge {
+
     display: inline-flex;
+
     align-items: center;
-    gap: 8px;
-    padding: 6px 16px;
-    background: var(--brand-soft-red);
-    color: var(--brand-red);
-    border-radius: 50px;
-    font-size: 13px;
-    font-weight: 800;
-    margin-bottom: 20px;
-    border: 1px solid rgba(255, 42, 84, 0.15);
+
+    gap: 9px;
+
+    padding:
+        7px 17px;
+
+    border-radius:
+        50px;
+
+    background:
+        var(--soft-red);
+
+    border:
+        1px solid rgba(255,42,84,0.15);
+
+    color:
+        var(--red);
+
+    font-size:
+        13px;
+
+    font-weight:
+        800;
+
+    margin-bottom:
+        22px;
+
 }
+
 
 .hero h1 {
-    color: var(--brand-navy);
-    font-size: clamp(38px, 5vw, 58px);
-    line-height: 1.25;
-    font-weight: 900;
-    margin-bottom: 18px;
+
+    color:
+        var(--navy);
+
+    font-size:
+        clamp(40px, 5vw, 64px);
+
+    line-height:
+        1.2;
+
+    font-weight:
+        900;
+
+    margin-bottom:
+        20px;
+
 }
+
 
 .hero h1 span {
-    color: var(--brand-red);
+
+    color:
+        var(--red);
+
 }
+
 
 .hero-slogan {
-    font-size: 16px;
-    color: var(--brand-dark);
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
-    display: block;
-    direction: ltr;
-    text-align: right;
+
+    display:
+        block;
+
+    color:
+        var(--dark);
+
+    font-weight:
+        700;
+
+    font-size:
+        17px;
+
+    direction:
+        ltr;
+
+    text-align:
+        right;
+
+    margin-bottom:
+        15px;
+
 }
+
 
 .hero-description {
-    font-size: 17px;
-    color: var(--text-muted);
-    margin-bottom: 30px;
-    max-width: 600px;
+
+    max-width:
+        650px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        17px;
+
+    margin-bottom:
+        32px;
+
 }
+
 
 .hero-buttons {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
+
+    display:
+        flex;
+
+    gap:
+        14px;
+
+    flex-wrap:
+        wrap;
+
 }
+
 
 .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 28px;
-    border-radius: 12px;
-    font-weight: 800;
-    transition: 0.3s;
-    font-size: 15px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        9px;
+
+    padding:
+        14px 26px;
+
+    border-radius:
+        12px;
+
+    font-weight:
+        800;
+
+    font-size:
+        15px;
+
+    transition:
+        0.3s ease;
+
 }
+
 
 .btn-primary {
-    background: var(--brand-red);
-    color: var(--white);
-    box-shadow: 0 10px 25px rgba(255, 42, 84, 0.25);
+
+    background:
+        var(--red);
+
+    color:
+        white;
+
+    box-shadow:
+        0 10px 25px rgba(255,42,84,0.22);
+
 }
+
 
 .btn-primary:hover {
-    transform: translateY(-3px);
-    background: #E01E45;
+
+    background:
+        var(--red-dark);
+
+    transform:
+        translateY(-3px);
+
 }
+
 
 .btn-outline {
-    background: var(--white);
-    color: var(--brand-navy);
-    border: 2px solid var(--border-color);
+
+    background:
+        white;
+
+    color:
+        var(--navy);
+
+    border:
+        2px solid var(--border);
+
 }
+
 
 .btn-outline:hover {
-    border-color: var(--brand-navy);
-    transform: translateY(-3px);
+
+    border-color:
+        var(--navy);
+
+    transform:
+        translateY(-3px);
+
 }
+
+
+/* HERO IMAGE */
 
 .hero-image-wrapper {
-    position: relative;
-    text-align: center;
+
+    position:
+        relative;
+
+    text-align:
+        center;
+
 }
+
 
 .hero-main-img {
-    width: 100%;
-    max-width: 480px;
-    border-radius: 30px;
-    box-shadow: var(--shadow-lg);
-    border: 6px solid var(--white);
+
+    width:
+        100%;
+
+    max-width:
+        470px;
+
+    border-radius:
+        30px;
+
+    border:
+        6px solid white;
+
+    box-shadow:
+        var(--shadow);
+
 }
+
+
+.hero-image-decoration {
+
+    position:
+        absolute;
+
+    width:
+        110px;
+
+    height:
+        110px;
+
+    background:
+        var(--red);
+
+    opacity:
+        0.08;
+
+    border-radius:
+        50%;
+
+    top:
+        -25px;
+
+    right:
+        -20px;
+
+}
+
 
 /* ================= STATS ================= */
+
 .stats {
-    margin-top: -40px;
-    position: relative;
-    z-index: 10;
+
+    margin-top:
+        -45px;
+
+    position:
+        relative;
+
+    z-index:
+        10;
+
 }
+
 
 .stats-box {
-    background: var(--white);
-    border-radius: 20px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border-color);
-    overflow: hidden;
+
+    background:
+        white;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        22px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    box-shadow:
+        var(--shadow);
+
+    overflow:
+        hidden;
+
 }
+
 
 .stat {
-    text-align: center;
-    padding: 25px 15px;
-    border-left: 1px solid var(--border-color);
+
+    text-align:
+        center;
+
+    padding:
+        27px 15px;
+
+    border-left:
+        1px solid var(--border);
+
 }
+
 
 .stat:last-child {
-    border-left: none;
+
+    border-left:
+        none;
+
 }
+
 
 .stat-number {
-    color: var(--brand-red);
-    font-size: 34px;
-    font-weight: 900;
+
+    color:
+        var(--red);
+
+    font-size:
+        35px;
+
+    font-weight:
+        900;
+
 }
+
 
 .stat-title {
-    color: var(--text-muted);
-    font-size: 14px;
-    font-weight: 600;
+
+    color:
+        var(--muted);
+
+    font-size:
+        14px;
+
+    font-weight:
+        600;
+
 }
+
 
 /* ================= SECTIONS ================= */
+
 section {
-    padding: 90px 0;
+
+    padding:
+        95px 0;
+
 }
+
 
 .section-title {
-    text-align: center;
-    max-width: 700px;
-    margin: 0 auto 50px;
+
+    max-width:
+        720px;
+
+    text-align:
+        center;
+
+    margin:
+        0 auto 55px;
+
 }
+
 
 .eyebrow {
-    color: var(--brand-red);
-    font-size: 13px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
+
+    color:
+        var(--red);
+
+    font-size:
+        13px;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        1px;
+
+    margin-bottom:
+        8px;
+
 }
+
 
 .section-title h2 {
-    color: var(--brand-navy);
-    font-size: 38px;
-    line-height: 1.3;
-    margin-bottom: 12px;
+
+    color:
+        var(--navy);
+
+    font-size:
+        40px;
+
+    line-height:
+        1.3;
+
+    margin-bottom:
+        14px;
+
 }
 
-/* ================= TEAM (اعضاء الميدلايف) ================= */
-.team {
-    background: var(--brand-light-bg);
+
+.section-title p {
+
+    color:
+        var(--muted);
+
+    font-size:
+        17px;
+
 }
 
-.team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 25px;
+
+/* ================= ABOUT ================= */
+
+.about {
+
+    background:
+        var(--light);
+
 }
 
-.team-card {
-    background: var(--white);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-    transition: 0.3s;
-    text-align: center;
+
+.about-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        0.9fr 1.1fr;
+
+    gap:
+        70px;
+
+    align-items:
+        center;
+
 }
 
-.team-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+
+.about-image {
+
+    min-height:
+        430px;
+
+    border-radius:
+        30px;
+
+    background:
+
+        linear-gradient(
+            rgba(21,29,54,0.08),
+            rgba(21,29,54,0.08)
+        ),
+
+        url("https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1000&q=85");
+
+    background-size:
+        cover;
+
+    background-position:
+        center;
+
+    box-shadow:
+        var(--shadow);
+
 }
 
-.team-img-box {
-    width: 100%;
-    height: 260px;
-    background: #E2E8F0;
-    overflow: hidden;
-    position: relative;
+
+.about-text h2 {
+
+    color:
+        var(--navy);
+
+    font-size:
+        40px;
+
+    line-height:
+        1.35;
+
+    margin:
+        10px 0 22px;
+
 }
 
-.team-img-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: 0.3s;
+
+.about-text p {
+
+    color:
+        var(--muted);
+
+    font-size:
+        17px;
+
+    margin-bottom:
+        17px;
+
 }
 
-.team-card:hover .team-img-box img {
-    transform: scale(1.05);
+
+/* ================= PROGRAMS ================= */
+
+.programs-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:
+        22px;
+
 }
 
-.team-info {
-    padding: 20px;
+
+.program-card {
+
+    background:
+        white;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        20px;
+
+    padding:
+        30px;
+
+    transition:
+        0.3s ease;
+
 }
 
-.team-info h3 {
-    color: var(--brand-navy);
-    font-size: 19px;
-    margin-bottom: 4px;
+
+.program-card:hover {
+
+    transform:
+        translateY(-7px);
+
+    box-shadow:
+        var(--shadow);
+
 }
 
-.team-info .role {
-    color: var(--brand-red);
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 10px;
-    display: block;
+
+.program-icon {
+
+    width:
+        58px;
+
+    height:
+        58px;
+
+    display:
+        grid;
+
+    place-items:
+        center;
+
+    border-radius:
+        17px;
+
+    background:
+        var(--soft-red);
+
+    color:
+        var(--red);
+
+    font-size:
+        25px;
+
+    margin-bottom:
+        20px;
+
 }
 
-.team-info p {
-    color: var(--text-muted);
-    font-size: 13px;
-    line-height: 1.5;
+
+.program-card h3 {
+
+    color:
+        var(--navy);
+
+    font-size:
+        20px;
+
+    margin-bottom:
+        9px;
+
 }
 
-/* ================= CONTACT & SOCIAL ================= */
+
+.program-card p {
+
+    color:
+        var(--muted);
+
+    font-size:
+        15px;
+
+}
+
+
+/* ================= CTA ================= */
+
+.cta {
+
+    padding:
+        70px 0;
+
+}
+
+
+.cta-box {
+
+    position:
+        relative;
+
+    overflow:
+        hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            #202B4A
+        );
+
+    border-radius:
+        30px;
+
+    padding:
+        65px;
+
+    text-align:
+        center;
+
+    color:
+        white;
+
+    box-shadow:
+        var(--shadow);
+
+}
+
+
+.cta-box::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        250px;
+
+    height:
+        250px;
+
+    background:
+        var(--red);
+
+    opacity:
+        0.12;
+
+    border-radius:
+        50%;
+
+    top:
+        -120px;
+
+    left:
+        -100px;
+
+}
+
+
+.cta-box h2 {
+
+    font-size:
+        40px;
+
+    margin-bottom:
+        15px;
+
+}
+
+
+.cta-box p {
+
+    max-width:
+        680px;
+
+    margin:
+        0 auto 28px;
+
+    color:
+        #CBD5E1;
+
+    font-size:
+        17px;
+
+}
+
+
+.cta-box .btn {
+
+    background:
+        white;
+
+    color:
+        var(--navy);
+
+}
+
+
+.cta-box .btn:hover {
+
+    color:
+        var(--red);
+
+    transform:
+        translateY(-3px);
+
+}
+
+
+/* ================= CONTACT ================= */
+
 .contact-section {
-    background: var(--brand-navy);
-    color: var(--white);
+
+    background:
+        var(--navy);
+
+    color:
+        white;
+
 }
+
 
 .contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 50px;
-    align-items: center;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:
+        60px;
+
+    align-items:
+        center;
+
 }
+
 
 .contact-info h2 {
-    font-size: 36px;
-    margin-bottom: 15px;
+
+    font-size:
+        38px;
+
+    margin-bottom:
+        15px;
+
 }
 
-.contact-info p {
-    color: #94A3B8;
-    margin-bottom: 30px;
+
+.contact-info > p {
+
+    color:
+        #AAB7C7;
+
+    margin-bottom:
+        30px;
+
 }
+
 
 .contact-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        20px;
+
 }
+
 
 .contact-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        15px;
+
 }
+
 
 .contact-icon {
-    width: 50px;
-    height: 50px;
-    background: rgba(255, 42, 84, 0.15);
-    color: var(--brand-red);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
+
+    width:
+        52px;
+
+    height:
+        52px;
+
+    border-radius:
+        13px;
+
+    background:
+        rgba(255,42,84,0.14);
+
+    color:
+        var(--red);
+
+    display:
+        grid;
+
+    place-items:
+        center;
+
+    font-size:
+        20px;
+
 }
+
 
 .contact-details span {
-    display: block;
-    color: #94A3B8;
-    font-size: 13px;
+
+    display:
+        block;
+
+    color:
+        #94A3B8;
+
+    font-size:
+        12px;
+
 }
 
-.contact-details a, .contact-details strong {
-    font-size: 17px;
-    color: var(--white);
-    font-weight: 700;
-    direction: ltr;
-    display: inline-block;
+
+.contact-details a {
+
+    color:
+        white;
+
+    font-weight:
+        700;
+
+    font-size:
+        17px;
+
+    direction:
+        ltr;
+
+    display:
+        inline-block;
+
 }
+
+
+.contact-visual {
+
+    text-align:
+        center;
+
+}
+
+
+.contact-logo {
+
+    width:
+        270px;
+
+    max-width:
+        80%;
+
+    filter:
+        drop-shadow(
+            0 20px 35px
+            rgba(255,42,84,0.20)
+        );
+
+}
+
 
 /* ================= FOOTER ================= */
+
 footer {
-    background: #0E1324;
-    color: var(--white);
-    padding: 60px 0 25px;
+
+    background:
+        #0E1324;
+
+    color:
+        white;
+
+    padding:
+        60px 0 25px;
+
 }
+
 
 .footer-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr;
-    gap: 40px;
-    margin-bottom: 40px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        1.5fr 1fr 1fr;
+
+    gap:
+        50px;
+
+    margin-bottom:
+        45px;
+
 }
+
 
 .footer-logo img {
-    height: 60px;
-    margin-bottom: 15px;
+
+    height:
+        58px;
+
+    margin-bottom:
+        15px;
+
 }
+
+
+.footer-description {
+
+    color:
+        #94A3B8;
+
+    max-width:
+        400px;
+
+    font-size:
+        14px;
+
+}
+
+
+.footer-column h4 {
+
+    font-size:
+        16px;
+
+    margin-bottom:
+        15px;
+
+}
+
+
+.footer-column a {
+
+    display:
+        block;
+
+    color:
+        #94A3B8;
+
+    font-size:
+        14px;
+
+    margin-bottom:
+        9px;
+
+    transition:
+        0.2s;
+
+}
+
+
+.footer-column a:hover {
+
+    color:
+        white;
+
+}
+
 
 .socials {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
+
+    display:
+        flex;
+
+    gap:
+        10px;
+
+    margin-top:
+        22px;
+
 }
+
 
 .social {
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    transition: 0.3s;
+
+    width:
+        42px;
+
+    height:
+        42px;
+
+    border-radius:
+        10px;
+
+    background:
+        rgba(255,255,255,0.07);
+
+    display:
+        grid;
+
+    place-items:
+        center;
+
+    color:
+        white;
+
+    font-size:
+        17px;
+
+    transition:
+        0.3s;
+
 }
+
 
 .social:hover {
-    background: var(--brand-red);
-    transform: translateY(-3px);
+
+    background:
+        var(--red);
+
+    transform:
+        translateY(-3px);
+
 }
+
 
 .copyright {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    padding-top: 20px;
-    text-align: center;
-    color: #64748B;
-    font-size: 13px;
+
+    border-top:
+        1px solid rgba(255,255,255,0.08);
+
+    padding-top:
+        22px;
+
+    text-align:
+        center;
+
+    color:
+        #64748B;
+
+    font-size:
+        13px;
+
 }
 
-/* Mobile responsive */
-@media (max-width: 900px) {
-    .nav-links { display: none; }
-    .hero-grid, .contact-grid, .footer-grid { grid-template-columns: 1fr; }
-    .stats-box { grid-template-columns: 1fr 1fr; }
+
+/* ================= MOBILE ================= */
+
+@media(max-width:900px) {
+
+    .nav-links {
+        display:
+            none;
+    }
+
+    .hero-grid,
+    .about-grid,
+    .contact-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .hero {
+
+        padding:
+            70px 0;
+
+    }
+
+    .hero-image-wrapper {
+
+        order:
+            -1;
+
+    }
+
+    .stats-box {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+    .programs-grid {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+    .footer-grid {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
 }
+
+
+@media(max-width:600px) {
+
+    .hero h1 {
+
+        font-size:
+            42px;
+
+    }
+
+    section {
+
+        padding:
+            70px 0;
+
+    }
+
+    .programs-grid,
+    .footer-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .stats-box {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+    .stat {
+
+        padding:
+            20px 8px;
+
+    }
+
+    .stat-number {
+
+        font-size:
+            28px;
+
+    }
+
+    .section-title h2,
+    .about-text h2,
+    .cta-box h2,
+    .contact-info h2 {
+
+        font-size:
+            31px;
+
+    }
+
+    .cta-box {
+
+        padding:
+            40px 22px;
+
+    }
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
-<!-- ================= HEADER ================= -->
-<header>
-    <div class="container nav">
-        <a href="#" class="logo-brand">
-            <!-- ضع اسم صورة اللوغو هنا -->
-            <img src="image_41c9a3.jpg" alt="MedLife Logo" class="logo-img">
-        </a>
 
-        <ul class="nav-links">
-            <li><a href="#home">الرئيسية</a></li>
-            <li><a href="#about">من نحن</a></li>
-            <li><a href="#team">كادر المؤسسة</a></li>
-            <li><a href="#contact">تواصل معنا</a></li>
-            <li><a href="#volunteer" class="nav-button">تطوع معنا</a></li>
-        </ul>
-    </div>
+<!-- ================= HEADER ================= -->
+
+<header>
+
+<div class="container nav">
+
+<a href="#home" class="logo-brand">
+
+<img
+src="logo.png"
+alt="MedLife Syria Logo"
+class="logo-img">
+
+</a>
+
+
+<ul class="nav-links">
+
+<li>
+<a href="#home">الرئيسية</a>
+</li>
+
+<li>
+<a href="#about">من نحن</a>
+</li>
+
+<li>
+<a href="#programs">برامجنا</a>
+</li>
+
+<li>
+<a href="#impact">أثرنا</a>
+</li>
+
+<li>
+<a href="#contact">تواصل معنا</a>
+</li>
+
+<li>
+<a href="#volunteer" class="nav-button">
+تطوع معنا
+</a>
+</li>
+
+</ul>
+
+</div>
+
 </header>
 
+
+
 <!-- ================= HERO ================= -->
+
 <main id="home">
+
 <section class="hero">
-    <div class="container hero-grid">
-        <div class="hero-text">
-            <div class="hero-badge">
-                <i class="fa-solid fa-heart-pulse"></i> مؤسسة طبية خيرية تطوعية
-            </div>
-            
-            <h1>بالعمل التطوعي<br>نصنع <span>الأثر</span></h1>
-            
-            <span class="hero-slogan">We save life, we are med.life</span>
-            
-            <p class="hero-description">
-                مؤسسة ميدلايف الطبية الخيرية التطوعية. نعمل من أجل مجتمع أكثر صحة ووعياً، ونؤمن بأن الرعاية الصحية والمعرفة الطبية حق للجميع.
-            </p>
 
-            <div class="hero-buttons">
-                <a href="#contact" class="btn btn-primary">
-                    <i class="fa-solid fa-envelope"></i> تواصل معنا
-                </a>
-                <a href="#team" class="btn btn-outline">
-                    <i class="fa-solid fa-user-group"></i> تعرف على فريقنا
-                </a>
-            </div>
-        </div>
+<div class="container hero-grid">
 
-        <div class="hero-image-wrapper">
-            <!-- صورة معبرة أو صورة الفريق الرئيسية -->
-            <img src="image_41c9a3.jpg" alt="MedLife Team" class="hero-main-img">
-        </div>
-    </div>
+
+<div>
+
+<div class="hero-badge">
+
+<i class="fa-solid fa-heart-pulse"></i>
+
+مؤسسة ميدلايف الطبية الخيرية التطوعية
+
+</div>
+
+
+<h1>
+
+بالعمل التطوعي
+
+<br>
+
+نصنع <span>الأثر</span>
+
+</h1>
+
+
+<span class="hero-slogan">
+
+We save life, we are med.life
+
+</span>
+
+
+<p class="hero-description">
+
+مؤسسة ميدلايف الطبية الخيرية التطوعية.
+نعمل من أجل مجتمع أكثر صحة ووعيًا،
+ونؤمن بأن الرعاية الصحية والمعرفة الطبية
+حق للجميع.
+
+</p>
+
+
+<div class="hero-buttons">
+
+<a href="#about" class="btn btn-primary">
+
+<i class="fa-solid fa-arrow-down"></i>
+
+اكتشف ميدلايف
+
+</a>
+
+
+<a href="#contact" class="btn btn-outline">
+
+<i class="fa-solid fa-envelope"></i>
+
+تواصل معنا
+
+</a>
+
+</div>
+
+</div>
+
+
+
+<div class="hero-image-wrapper">
+
+<div class="hero-image-decoration"></div>
+
+<img
+src="logo.png"
+alt="MedLife"
+class="hero-main-img">
+
+</div>
+
+
+</div>
+
 </section>
+
+
 
 <!-- ================= STATS ================= -->
-<section class="stats">
-    <div class="container">
-        <div class="stats-box">
-            <div class="stat">
-                <div class="stat-number">600+</div>
-                <div class="stat-title">متطوع ومتطوعة</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">400+</div>
-                <div class="stat-title">كادر طبي وصحي</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">6+</div>
-                <div class="stat-title">محافظات سورية</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">2019</div>
-                <div class="stat-title">عام الانطلاق</div>
-            </div>
-        </div>
-    </div>
+
+<section class="stats" id="impact">
+
+<div class="container">
+
+<div class="stats-box">
+
+
+<div class="stat">
+
+<div class="stat-number">
+
+600+
+
+</div>
+
+<div class="stat-title">
+
+متطوع ومتطوعة
+
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-number">
+
+400+
+
+</div>
+
+<div class="stat-title">
+
+طبيب وكادر صحي
+
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-number">
+
+6+
+
+</div>
+
+<div class="stat-title">
+
+محافظات سورية
+
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-number">
+
+2019
+
+</div>
+
+<div class="stat-title">
+
+عام الانطلاق
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
 </section>
 
-<!-- ================= TEAM (أعضاء ميدلايف) ================= -->
-<section class="team" id="team">
-    <div class="container">
-        <div class="section-title">
-            <div class="eyebrow">كادر المؤسسة</div>
-            <h2>الأعضاء والقيادات</h2>
-            <p>نخبة من الأطباء والشباب الشغوفين بالعمل الإنساني والتطوعي</p>
-        </div>
 
-        <div class="team-grid">
-            <!-- عضو 1 -->
-            <div class="team-card">
-                <div class="team-img-box">
-                    <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80" alt="عضو ميدلايف">
-                </div>
-                <div class="team-info">
-                    <h3>د. أحمد العلي</h3>
-                    <span class="role">المشرف الطبي العام</span>
-                    <p>طبيب بشري - خبرة في إدارة المبادرات الصحية والإغاثية.</p>
-                </div>
-            </div>
 
-            <!-- عضو 2 -->
-            <div class="team-card">
-                <div class="team-img-box">
-                    <img src="https://images.unsplash.com/photo-1594824813566-78a9c2d1b777?auto=format&fit=crop&w=600&q=80" alt="عضو ميدلايف">
-                </div>
-                <div class="team-info">
-                    <h3>سارة المحمود</h3>
-                    <span class="role">منسقة الفرق التطوعية</span>
-                    <p>إدارة ورعاية مشاريع الصحة المجتمعية في المحافظات.</p>
-                </div>
-            </div>
+<!-- ================= ABOUT ================= -->
 
-            <!-- عضو 3 -->
-            <div class="team-card">
-                <div class="team-img-box">
-                    <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=600&q=80" alt="عضو ميدلايف">
-                </div>
-                <div class="team-info">
-                    <h3>د. محمد الحمصي</h3>
-                    <span class="role">مسؤول التوعية الصحية</span>
-                    <p>صيدلي - يقود الحملات الميدانية والفحوصات الدورية.</p>
-                </div>
-            </div>
+<section class="about" id="about">
 
-            <!-- عضو 4 -->
-            <div class="team-card">
-                <div class="team-img-box">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="عضو ميدلايف">
-                </div>
-                <div class="team-info">
-                    <h3>نور الشام</h3>
-                    <span class="role">مسؤولة التواصل الإعلامي</span>
-                    <p>إدارة المنصات والهوية البصرية لمؤسسة ميدلايف.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="container about-grid">
+
+
+<div class="about-image"></div>
+
+
+<div class="about-text">
+
+<div class="eyebrow">
+
+من نحن
+
+</div>
+
+
+<h2>
+
+ميدلايف...
+لأن الصحة مسؤولية مشتركة
+
+</h2>
+
+
+<p>
+
+ميدلايف هي مؤسسة طبية خيرية تطوعية
+تهدف إلى المساهمة في تحسين الوصول
+إلى الرعاية الصحية وتعزيز الوعي الصحي
+ودعم التعليم والتدريب الطبي.
+
+</p>
+
+
+<p>
+
+نؤمن أن العمل الصحي لا يقتصر على
+تقديم الخدمة الطبية، بل يمتد إلى تمكين
+الأفراد والمجتمعات وبناء فرق قادرة
+على صناعة التغيير.
+
+</p>
+
+
+<p>
+
+من خلال شبكة من المتطوعين والكوادر
+الصحية، نعمل على تطوير مبادرات
+تستجيب للاحتياجات الصحية والإنسانية
+للمجتمع.
+
+</p>
+
+
+</div>
+
+</div>
+
 </section>
+
+
+
+<!-- ================= PROGRAMS ================= -->
+
+<section id="programs">
+
+<div class="container">
+
+
+<div class="section-title">
+
+<div class="eyebrow">
+
+مجالات عملنا
+
+</div>
+
+<h2>
+
+نعمل حيث تكون الحاجة أكبر
+
+</h2>
+
+<p>
+
+برامج ومبادرات صحية وإنسانية
+تضع الإنسان والمجتمع في المقدمة.
+
+</p>
+
+</div>
+
+
+
+<div class="programs-grid">
+
+
+<div class="program-card">
+
+<div class="program-icon">
+
+<i class="fa-solid fa-stethoscope"></i>
+
+</div>
+
+<h3>
+
+الرعاية الصحية
+
+</h3>
+
+<p>
+
+دعم الوصول إلى الخدمات
+والاستشارات الطبية وتعزيز
+الرعاية الصحية.
+
+</p>
+
+</div>
+
+
+
+<div class="program-card">
+
+<div class="program-icon">
+
+<i class="fa-solid fa-graduation-cap"></i>
+
+</div>
+
+<h3>
+
+التعليم والتدريب
+
+</h3>
+
+<p>
+
+برامج تدريبية وتعليمية تهدف
+إلى تطوير مهارات الكوادر
+الصحية والطلاب.
+
+</p>
+
+</div>
+
+
+
+<div class="program-card">
+
+<div class="program-icon">
+
+<i class="fa-solid fa-heart-pulse"></i>
+
+</div>
+
+<h3>
+
+الصحة المجتمعية
+
+</h3>
+
+<p>
+
+حملات ومبادرات توعوية
+ووقائية لدعم الصحة العامة
+في المجتمع.
+
+</p>
+
+</div>
+
+
+
+<div class="program-card">
+
+<div class="program-icon">
+
+<i class="fa-solid fa-truck-medical"></i>
+
+</div>
+
+<h3>
+
+الاستجابة للطوارئ
+
+</h3>
+
+<p>
+
+المساهمة في الاستجابة
+للاحتياجات الصحية والإنسانية
+في حالات الطوارئ.
+
+</p>
+
+</div>
+
+
+
+<div class="program-card">
+
+<div class="program-icon">
+
+<i class="fa-solid fa-people-group"></i>
+
+</div>
+
+<h3>
+
+التطوع
+
+</h3>
+
+<p>
+
+فتح المجال أمام المتطوعين
+للمشاركة في مبادرات صحية
+وإنسانية مؤثرة.
+
+</p>
+
+</div>
+
+
+
+<div class="program-card">
+
+<div class="program-icon">
+
+<i class="fa-solid fa-lightbulb"></i>
+
+</div>
+
+<h3>
+
+الابتكار الصحي
+
+</h3>
+
+<p>
+
+توظيف التكنولوجيا والأفكار
+الجديدة لتطوير حلول صحية
+أكثر وصولًا وفعالية.
+
+</p>
+
+</div>
+
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= VOLUNTEER ================= -->
+
+<section class="cta" id="volunteer">
+
+<div class="container">
+
+<div class="cta-box">
+
+<h2>
+
+كن جزءًا من الأثر
+
+</h2>
+
+
+<p>
+
+سواء كنت طبيبًا، طالبًا، مختصًا،
+مصممًا، مهندسًا، أو شخصًا يؤمن
+بأهمية العمل التطوعي...
+هناك دائمًا مكان لك في ميدلايف.
+
+</p>
+
+
+<a href="#contact" class="btn">
+
+<i class="fa-solid fa-hand-holding-heart"></i>
+
+انضم إلى ميدلايف
+
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+
 
 <!-- ================= CONTACT ================= -->
+
 <section class="contact-section" id="contact">
-    <div class="container contact-grid">
-        <div class="contact-info">
-            <h2>تواصل مع ميدلايف</h2>
-            <p>يسعدنا تواصلكم واستفساراتكم للانضمام أو لدعم مبادراتنا الصحية الإنسانية.</p>
 
-            <div class="contact-list">
-                <div class="contact-item">
-                    <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
-                    <div class="contact-details">
-                        <span>البريد الإلكتروني الرسمي</span>
-                        <a href="mailto:info@medlifesy.org">info@medlifesy.org</a>
-                    </div>
-                </div>
+<div class="container contact-grid">
 
-                <div class="contact-item">
-                    <div class="contact-icon"><i class="fa-solid fa-phone"></i></div>
-                    <div class="contact-details">
-                        <span>الهاتف / واتساب</span>
-                        <a href="tel:+963998942124">+963 998 942 124</a>
-                    </div>
-                </div>
 
-                <div class="contact-item">
-                    <div class="contact-icon"><i class="fa-solid fa-hashtag"></i></div>
-                    <div class="contact-details">
-                        <span>معرف التواصل الاجتماعي</span>
-                        <strong>medlifesy</strong>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="contact-info">
 
-        <div style="text-align: center;">
-            <img src="image_41c9a3.jpg" alt="MedLife Official" style="max-width: 320px; border-radius: 50%; box-shadow: 0 0 50px rgba(255,42,84,0.2);">
-        </div>
-    </div>
+<div class="eyebrow">
+
+تواصل معنا
+
+</div>
+
+
+<h2>
+
+نحن هنا من أجلكم
+
+</h2>
+
+
+<p>
+
+للاستفسارات، الشراكات، التطوع،
+أو التواصل حول مبادرات ميدلايف.
+
+</p>
+
+
+<div class="contact-list">
+
+
+<div class="contact-item">
+
+<div class="contact-icon">
+
+<i class="fa-solid fa-globe"></i>
+
+</div>
+
+<div class="contact-details">
+
+<span>
+
+الموقع الإلكتروني
+
+</span>
+
+<a href="https://medlifesy.org">
+
+medlifesy.org
+
+</a>
+
+</div>
+
+</div>
+
+
+<div class="contact-item">
+
+<div class="contact-icon">
+
+<i class="fa-solid fa-envelope"></i>
+
+</div>
+
+<div class="contact-details">
+
+<span>
+
+البريد الإلكتروني
+
+</span>
+
+<a href="mailto:info@medlifesy.org">
+
+info@medlifesy.org
+
+</a>
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<div class="contact-visual">
+
+<img
+src="logo.png"
+alt="MedLife Syria"
+class="contact-logo">
+
+</div>
+
+
+</div>
+
 </section>
+
 </main>
 
+
+
 <!-- ================= FOOTER ================= -->
+
 <footer>
-    <div class="container">
-        <div class="footer-grid">
-            <div>
-                <div class="footer-logo">
-                    <img src="image_41c9a3.jpg" alt="MedLife Logo" style="height:55px;">
-                </div>
-                <p style="color: #94A3B8; font-size: 14px; max-width: 380px;">
-                    مؤسسة ميدلايف الطبية الخيرية التطوعية. نعمل من أجل صحة أفضل ومجتمع أكثر وعياً.
-                </p>
-                
-                <div class="socials">
-                    <a href="https://facebook.com/medlifesy" class="social" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="https://instagram.com/medlifesy" class="social" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://linkedin.com/company/medlifesy" class="social" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-                    <a href="https://wa.me/963998942124" class="social" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                </div>
-            </div>
 
-            <div>
-                <h4 style="margin-bottom: 15px; font-size: 16px;">روابط السريعة</h4>
-                <p><a href="#home" style="color:#94A3B8; font-size:14px;">الرئيسية</a></p>
-                <p><a href="#team" style="color:#94A3B8; font-size:14px;">كادرنا الطبي</a></p>
-                <p><a href="#contact" style="color:#94A3B8; font-size:14px;">تواصل معنا</a></p>
-            </div>
+<div class="container">
 
-            <div>
-                <h4 style="margin-bottom: 15px; font-size: 16px;">المقر والتواجد</h4>
-                <p style="color:#94A3B8; font-size:14px;">الجمهورية العربية السورية</p>
-                <p style="color:#94A3B8; font-size:14px; margin-top:5px;">طرطوس - دمشق - حمص - اللاذقية - حلب - الحسكة</p>
-            </div>
-        </div>
 
-        <div class="copyright">
-            © 2026 MedLife Syria — مؤسسة ميدلايف الطبية الخيرية التطوعية. جميع الحقوق محفوظة.
-        </div>
-    </div>
+<div class="footer-grid">
+
+
+<div>
+
+<div class="footer-logo">
+
+<img
+src="logo.png"
+alt="MedLife Syria">
+
+</div>
+
+
+<p class="footer-description">
+
+مؤسسة ميدلايف الطبية الخيرية التطوعية.
+نعمل من أجل صحة أفضل،
+ومجتمع أكثر وعيًا.
+
+</p>
+
+
+<!-- ضع هنا روابط الحسابات الرسمية بعد التأكد منها -->
+
+<div class="socials">
+
+
+<a
+href="https://medlifesy.org"
+class="social"
+title="Website"
+aria-label="Website">
+
+<i class="fa-solid fa-globe"></i>
+
+</a>
+
+
+<a
+href="#contact"
+class="social"
+title="Email"
+aria-label="Email">
+
+<i class="fa-solid fa-envelope"></i>
+
+</a>
+
+
+</div>
+
+</div>
+
+
+
+<div class="footer-column">
+
+<h4>
+
+روابط سريعة
+
+</h4>
+
+
+<a href="#home">
+
+الرئيسية
+
+</a>
+
+
+<a href="#about">
+
+من نحن
+
+</a>
+
+
+<a href="#programs">
+
+برامجنا
+
+</a>
+
+
+<a href="#impact">
+
+أثرنا
+
+</a>
+
+
+<a href="#contact">
+
+تواصل معنا
+
+</a>
+
+</div>
+
+
+
+<div class="footer-column">
+
+<h4>
+
+ميدلايف
+
+</h4>
+
+
+<a href="#volunteer">
+
+التطوع
+
+</a>
+
+
+<a href="#programs">
+
+المبادرات
+
+</a>
+
+
+<a href="#contact">
+
+الشراكات والتواصل
+
+</a>
+
+</div>
+
+
+</div>
+
+
+
+<div class="copyright">
+
+© 2026 MedLife Syria —
+مؤسسة ميدلايف الطبية الخيرية التطوعية.
+جميع الحقوق محفوظة.
+
+</div>
+
+
+</div>
+
 </footer>
 
+
 </body>
+
 </html>
