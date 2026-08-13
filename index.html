@@ -1,63 +1,44 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>ميدلايف | MedLife Syria</title>
 
 <meta name="description"
-content="مؤسسة ميدلايف الطبية الخيرية التطوعية — بالعمل التطوعي نصنع الأثر.">
+content="مؤسسة ميدلايف الطبية الخيرية التطوعية — مساحة للعمل التطوعي والإبداع وصناعة الأثر.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link
-href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap"
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap"
 rel="stylesheet">
 
-<link
-rel="stylesheet"
+<link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
 
 /* =========================================================
-   MEDLIFE BRAND
-========================================================= */
+   MEDLIFE — OFFICIAL WEBSITE
+   ========================================================= */
 
 :root {
-
     --red: #FF2A54;
     --red-dark: #E51E46;
-
     --navy: #151D36;
-    --navy-light: #252B48;
-
     --dark: #252B3D;
-
     --light: #F8FAFC;
     --soft-red: #FFF0F3;
-
     --white: #FFFFFF;
-
     --text: #1E293B;
     --muted: #64748B;
-
     --border: #E2E8F0;
 
-    --shadow-sm:
-        0 5px 20px rgba(21,29,54,.06);
-
-    --shadow-lg:
-        0 25px 60px rgba(21,29,54,.12);
+    --shadow-sm: 0 5px 20px rgba(21,29,54,.06);
+    --shadow-lg: 0 25px 60px rgba(21,29,54,.12);
 }
-
-
-/* =========================================================
-   RESET
-========================================================= */
 
 * {
     margin: 0;
@@ -70,13 +51,9 @@ html {
 }
 
 body {
-
     font-family: "Cairo", sans-serif;
-
     background: var(--white);
-
     color: var(--text);
-
     line-height: 1.8;
 }
 
@@ -85,196 +62,132 @@ a {
     color: inherit;
 }
 
-button {
-    font-family: inherit;
-}
-
 .container {
-
     width: min(1200px, 92%);
-
     margin: auto;
 }
 
 
 /* =========================================================
    HEADER
-========================================================= */
+   ========================================================= */
 
 header {
-
     position: sticky;
-
     top: 0;
-
     z-index: 1000;
 
     background: rgba(255,255,255,.96);
-
     backdrop-filter: blur(15px);
 
-    border-bottom:
-        1px solid rgba(21,29,54,.08);
+    border-bottom: 1px solid rgba(21,29,54,.08);
 }
 
 .nav {
-
-    min-height: 88px;
+    height: 88px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
-    gap: 20px;
 }
 
-
-/* LOGO */
-
 .logo-brand {
-
     display: flex;
-
     align-items: center;
 }
 
 .logo-img {
-
     height: 64px;
-
     width: auto;
-
     display: block;
-
     object-fit: contain;
 }
 
-
-/* NAVIGATION */
-
 .nav-links {
-
     display: flex;
-
     align-items: center;
-
-    gap: 24px;
+    gap: 25px;
 
     list-style: none;
 
     font-size: 14px;
-
     font-weight: 700;
 
     color: var(--navy);
 }
 
 .nav-links a {
-
     transition: .25s;
 }
 
 .nav-links a:hover {
-
     color: var(--red);
 }
 
-
-/* NAV BUTTONS */
-
 .nav-actions {
-
     display: flex;
-
     align-items: center;
-
     gap: 10px;
 }
 
-.login-btn-nav {
-
+.login-btn {
     background: transparent;
 
     color: var(--navy);
 
-    border:
-        1.5px solid var(--border);
+    border: 1px solid var(--border);
 
-    padding:
-        9px 16px;
+    padding: 9px 16px;
 
-    border-radius: 11px;
+    border-radius: 10px;
 
+    font-family: inherit;
     font-weight: 700;
 
     cursor: pointer;
 
     transition: .3s;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 7px;
 }
 
-.login-btn-nav:hover {
-
-    border-color: var(--navy);
-
+.login-btn:hover {
     background: var(--light);
+    border-color: var(--navy);
 }
 
-.nav-button {
-
+.volunteer-nav {
     background: var(--red);
-
     color: white !important;
 
-    padding:
-        11px 20px;
+    padding: 10px 20px;
 
-    border-radius: 11px;
+    border-radius: 10px;
 
-    box-shadow:
-        0 8px 22px rgba(255,42,84,.25);
+    box-shadow: 0 8px 22px rgba(255,42,84,.22);
 
     transition: .3s;
-
-    cursor: pointer;
-
-    border: none;
-
-    font-weight: 800;
 }
 
-.nav-button:hover {
-
+.volunteer-nav:hover {
     background: var(--red-dark);
-
     transform: translateY(-2px);
 }
 
 
 /* =========================================================
    HERO
-========================================================= */
+   ========================================================= */
 
 .hero {
-
     position: relative;
 
-    padding: 100px 0;
+    padding: 105px 0;
 
     overflow: hidden;
 
     background:
-
         radial-gradient(
             circle at 90% 10%,
-            rgba(255,42,84,.09),
+            rgba(255,42,84,.10),
             transparent 35%
         ),
 
@@ -292,11 +205,9 @@ header {
 }
 
 .hero-grid {
-
     display: grid;
 
-    grid-template-columns:
-        1.1fr .9fr;
+    grid-template-columns: 1.1fr .9fr;
 
     gap: 70px;
 
@@ -304,21 +215,17 @@ header {
 }
 
 .hero-badge {
-
     display: inline-flex;
 
     align-items: center;
 
     gap: 9px;
 
-    padding:
-        7px 17px;
+    padding: 7px 17px;
 
-    background:
-        var(--soft-red);
+    background: var(--soft-red);
 
-    color:
-        var(--red);
+    color: var(--red);
 
     border-radius: 50px;
 
@@ -328,31 +235,26 @@ header {
 
     margin-bottom: 22px;
 
-    border:
-        1px solid rgba(255,42,84,.15);
+    border: 1px solid rgba(255,42,84,.15);
 }
 
 .hero h1 {
-
     color: var(--navy);
 
-    font-size:
-        clamp(40px,5vw,62px);
+    font-size: clamp(40px,5vw,62px);
 
     line-height: 1.25;
 
     font-weight: 900;
 
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 }
 
 .hero h1 span {
-
     color: var(--red);
 }
 
 .hero-slogan {
-
     display: block;
 
     direction: ltr;
@@ -369,8 +271,7 @@ header {
 }
 
 .hero-description {
-
-    max-width: 620px;
+    max-width: 650px;
 
     color: var(--muted);
 
@@ -380,7 +281,6 @@ header {
 }
 
 .hero-buttons {
-
     display: flex;
 
     flex-wrap: wrap;
@@ -389,31 +289,22 @@ header {
 }
 
 .btn {
-
     display: inline-flex;
 
     align-items: center;
 
-    justify-content: center;
-
     gap: 10px;
 
-    padding:
-        14px 27px;
+    padding: 14px 27px;
 
     border-radius: 12px;
 
     font-weight: 800;
 
     transition: .3s;
-
-    cursor: pointer;
-
-    border: none;
 }
 
 .btn-primary {
-
     background: var(--red);
 
     color: white;
@@ -423,24 +314,20 @@ header {
 }
 
 .btn-primary:hover {
-
     background: var(--red-dark);
 
     transform: translateY(-3px);
 }
 
 .btn-outline {
-
     background: white;
 
     color: var(--navy);
 
-    border:
-        2px solid var(--border);
+    border: 2px solid var(--border);
 }
 
 .btn-outline:hover {
-
     border-color: var(--navy);
 
     transform: translateY(-3px);
@@ -449,10 +336,9 @@ header {
 
 /* =========================================================
    HERO LOGO
-========================================================= */
+   ========================================================= */
 
 .hero-image-wrapper {
-
     display: flex;
 
     justify-content: center;
@@ -461,7 +347,6 @@ header {
 }
 
 .hero-logo-card {
-
     width: 100%;
 
     max-width: 470px;
@@ -485,8 +370,7 @@ header {
             #fff7f9
         );
 
-    border:
-        1px solid #f2dfe4;
+    border: 1px solid #f2dfe4;
 
     box-shadow: var(--shadow-lg);
 
@@ -496,47 +380,38 @@ header {
 }
 
 .hero-logo-card::before {
-
     content: "";
 
     position: absolute;
 
     width: 280px;
-
     height: 280px;
 
-    background:
-        rgba(255,42,84,.07);
+    background: rgba(255,42,84,.07);
 
     border-radius: 50%;
 
     top: -120px;
-
     right: -100px;
 }
 
 .hero-logo-card::after {
-
     content: "";
 
     position: absolute;
 
     width: 220px;
-
     height: 220px;
 
-    background:
-        rgba(21,29,54,.04);
+    background: rgba(21,29,54,.04);
 
     border-radius: 50%;
 
     bottom: -100px;
-
     left: -80px;
 }
 
 .hero-logo {
-
     width: 85%;
 
     max-width: 350px;
@@ -551,10 +426,9 @@ header {
 
 /* =========================================================
    STATS
-========================================================= */
+   ========================================================= */
 
 .stats {
-
     margin-top: -45px;
 
     position: relative;
@@ -563,41 +437,34 @@ header {
 }
 
 .stats-box {
-
     background: white;
 
     border-radius: 22px;
 
     display: grid;
 
-    grid-template-columns:
-        repeat(4,1fr);
+    grid-template-columns: repeat(4,1fr);
 
     box-shadow: var(--shadow-lg);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     overflow: hidden;
 }
 
 .stat {
-
     text-align: center;
 
     padding: 28px 15px;
 
-    border-left:
-        1px solid var(--border);
+    border-left: 1px solid var(--border);
 }
 
 .stat:last-child {
-
     border-left: none;
 }
 
 .stat-number {
-
     color: var(--red);
 
     font-size: 34px;
@@ -606,7 +473,6 @@ header {
 }
 
 .stat-title {
-
     color: var(--muted);
 
     font-size: 14px;
@@ -616,26 +482,22 @@ header {
 
 
 /* =========================================================
-   SECTIONS
-========================================================= */
+   GENERAL SECTIONS
+   ========================================================= */
 
 section {
-
     padding: 95px 0;
 }
 
 .section-title {
-
     text-align: center;
 
-    max-width: 720px;
+    max-width: 760px;
 
-    margin:
-        0 auto 55px;
+    margin: 0 auto 55px;
 }
 
 .eyebrow {
-
     color: var(--red);
 
     font-size: 13px;
@@ -646,7 +508,6 @@ section {
 }
 
 .section-title h2 {
-
     color: var(--navy);
 
     font-size: 38px;
@@ -657,7 +518,6 @@ section {
 }
 
 .section-title p {
-
     color: var(--muted);
 
     font-size: 16px;
@@ -665,164 +525,17 @@ section {
 
 
 /* =========================================================
-   HISTORY
-========================================================= */
-
-.history {
-
-    background: white;
-}
-
-.timeline {
-
-    position: relative;
-
-    max-width: 850px;
-
-    margin: auto;
-
-    padding: 20px 0;
-}
-
-.timeline::before {
-
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-
-    bottom: 0;
-
-    width: 3px;
-
-    background: var(--border);
-
-    right: 50%;
-
-    transform: translateX(50%);
-}
-
-.timeline-item {
-
-    margin-bottom: 40px;
-
-    position: relative;
-
-    width: 50%;
-}
-
-.timeline-item:nth-child(odd) {
-
-    right: 0;
-
-    padding-left: 40px;
-
-    text-align: left;
-}
-
-.timeline-item:nth-child(even) {
-
-    right: 50%;
-
-    padding-right: 40px;
-
-    text-align: right;
-}
-
-.timeline-dot {
-
-    position: absolute;
-
-    top: 15px;
-
-    width: 18px;
-
-    height: 18px;
-
-    background: var(--red);
-
-    border:
-        4px solid white;
-
-    border-radius: 50%;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(255,42,84,.2);
-
-    z-index: 2;
-}
-
-.timeline-item:nth-child(odd)
-.timeline-dot {
-
-    left: -9px;
-}
-
-.timeline-item:nth-child(even)
-.timeline-dot {
-
-    right: -9px;
-}
-
-.timeline-content {
-
-    background: var(--light);
-
-    padding: 25px;
-
-    border-radius: 20px;
-
-    border:
-        1px solid var(--border);
-}
-
-.timeline-date {
-
-    display: inline-block;
-
-    color: var(--red);
-
-    font-weight: 900;
-
-    font-size: 18px;
-
-    margin-bottom: 8px;
-}
-
-.timeline-content h3 {
-
-    color: var(--navy);
-
-    font-size: 19px;
-
-    margin-bottom: 8px;
-}
-
-.timeline-content p {
-
-    color: var(--muted);
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
    ABOUT
-========================================================= */
+   ========================================================= */
 
 .about {
-
     background: var(--light);
 }
 
 .about-grid {
-
     display: grid;
 
-    grid-template-columns:
-        .9fr 1.1fr;
+    grid-template-columns: .9fr 1.1fr;
 
     gap: 70px;
 
@@ -830,7 +543,6 @@ section {
 }
 
 .about-card {
-
     background: white;
 
     border-radius: 30px;
@@ -839,31 +551,26 @@ section {
 
     box-shadow: var(--shadow-lg);
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 }
 
 .about-logo {
-
     display: block;
 
     width: 180px;
 
-    margin:
-        0 auto 25px;
+    margin: 0 auto 30px;
 }
 
 .about-text h2 {
-
     color: var(--navy);
 
-    font-size: 38px;
+    font-size: 36px;
 
     margin-bottom: 18px;
 }
 
 .about-text p {
-
     color: var(--muted);
 
     font-size: 16px;
@@ -873,30 +580,215 @@ section {
 
 
 /* =========================================================
+   JOURNEY
+   ========================================================= */
+
+.journey {
+    background: white;
+}
+
+.journey-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4,1fr);
+
+    gap: 22px;
+}
+
+.journey-card {
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 22px;
+
+    padding: 30px;
+
+    transition: .3s;
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+.journey-card:hover {
+    transform: translateY(-7px);
+
+    box-shadow: var(--shadow-lg);
+}
+
+.journey-year {
+    color: var(--red);
+
+    font-size: 30px;
+
+    font-weight: 900;
+
+    margin-bottom: 10px;
+}
+
+.journey-card h3 {
+    color: var(--navy);
+
+    font-size: 19px;
+
+    margin-bottom: 10px;
+}
+
+.journey-card p {
+    color: var(--muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   VOLUNTEERING / CREATIVITY
+   ========================================================= */
+
+.volunteer-section {
+    background: var(--light);
+}
+
+.creative-box {
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            #242c4b
+        );
+
+    color: white;
+
+    border-radius: 32px;
+
+    padding: 75px 55px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    box-shadow: var(--shadow-lg);
+}
+
+.creative-box::before {
+    content: "";
+
+    position: absolute;
+
+    width: 400px;
+    height: 400px;
+
+    border-radius: 50%;
+
+    background: rgba(255,42,84,.10);
+
+    top: -220px;
+
+    right: -130px;
+}
+
+.creative-box::after {
+    content: "";
+
+    position: absolute;
+
+    width: 280px;
+    height: 280px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.03);
+
+    bottom: -150px;
+
+    left: -100px;
+}
+
+.creative-content {
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 850px;
+
+    margin: auto;
+
+    text-align: center;
+}
+
+.creative-icon {
+    width: 70px;
+    height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin: 0 auto 20px;
+
+    background: rgba(255,42,84,.15);
+
+    color: var(--red);
+
+    border-radius: 20px;
+
+    font-size: 30px;
+}
+
+.creative-content h2 {
+    font-size: 40px;
+
+    margin-bottom: 18px;
+}
+
+.creative-content h2 span {
+    color: var(--red);
+}
+
+.creative-content p {
+    color: #CBD5E1;
+
+    font-size: 17px;
+
+    line-height: 2;
+
+    margin-bottom: 15px;
+}
+
+.creative-highlight {
+    color: white;
+
+    font-size: 19px;
+
+    font-weight: 800;
+
+    margin: 25px 0;
+}
+
+
+/* =========================================================
    PROGRAMS
-========================================================= */
+   ========================================================= */
 
 .programs {
-
     background: white;
 }
 
 .programs-grid {
-
     display: grid;
 
-    grid-template-columns:
-        repeat(3,1fr);
+    grid-template-columns: repeat(3,1fr);
 
     gap: 22px;
 }
 
 .program-card {
-
     background: white;
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
     border-radius: 22px;
 
@@ -906,16 +798,13 @@ section {
 }
 
 .program-card:hover {
-
     transform: translateY(-7px);
 
     box-shadow: var(--shadow-lg);
 }
 
 .program-icon {
-
     width: 58px;
-
     height: 58px;
 
     border-radius: 17px;
@@ -936,7 +825,6 @@ section {
 }
 
 .program-card h3 {
-
     color: var(--navy);
 
     margin-bottom: 8px;
@@ -945,7 +833,6 @@ section {
 }
 
 .program-card p {
-
     color: var(--muted);
 
     font-size: 14px;
@@ -953,56 +840,46 @@ section {
 
 
 /* =========================================================
-   MEDICAL CONSULTATION
-========================================================= */
+   CONSULTATIONS
+   ========================================================= */
 
-.consultation {
-
-    background:
-        linear-gradient(
-            135deg,
-            #fff7f9,
-            #f8fafc
-        );
+.consultations {
+    background: var(--light);
 }
 
 .consultation-card {
-
     max-width: 900px;
 
     margin: auto;
 
     background: white;
 
-    border:
-        1px solid var(--border);
-
     border-radius: 30px;
 
-    padding: 45px;
+    padding: 50px;
+
+    border: 1px solid var(--border);
+
+    box-shadow: var(--shadow-lg);
 
     display: grid;
 
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 100px 1fr;
 
-    gap: 35px;
+    gap: 30px;
 
     align-items: center;
-
-    box-shadow: var(--shadow-lg);
 }
 
-.consultation-icon {
+.telegram-icon {
+    width: 90px;
+    height: 90px;
 
-    width: 75px;
+    border-radius: 25px;
 
-    height: 75px;
+    background: #229ED9;
 
-    border-radius: 22px;
-
-    background: var(--soft-red);
-
-    color: var(--red);
+    color: white;
 
     display: flex;
 
@@ -1010,22 +887,18 @@ section {
 
     justify-content: center;
 
-    font-size: 32px;
-
-    margin-bottom: 20px;
+    font-size: 42px;
 }
 
-.consultation-card h3 {
-
+.consultation-card h2 {
     color: var(--navy);
 
-    font-size: 27px;
+    font-size: 30px;
 
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .consultation-card p {
-
     color: var(--muted);
 
     font-size: 15px;
@@ -1033,8 +906,7 @@ section {
     margin-bottom: 20px;
 }
 
-.telegram-button {
-
+.telegram-btn {
     display: inline-flex;
 
     align-items: center;
@@ -1045,38 +917,67 @@ section {
 
     color: white;
 
-    padding:
-        13px 23px;
+    padding: 12px 22px;
 
-    border-radius: 12px;
+    border-radius: 11px;
 
     font-weight: 800;
 
     transition: .3s;
 }
 
-.telegram-button:hover {
-
+.telegram-btn:hover {
     transform: translateY(-3px);
 
-    box-shadow:
-        0 10px 25px rgba(34,158,217,.25);
+    box-shadow: 0 10px 25px rgba(34,158,217,.25);
 }
 
-.telegram-box {
 
-    width: 170px;
+/* =========================================================
+   SOCIAL MEDIA
+   ========================================================= */
 
-    height: 170px;
+.social-section {
+    background: white;
+}
 
-    border-radius: 50%;
+.social-grid {
+    display: grid;
 
-    background:
-        linear-gradient(
-            135deg,
-            #229ED9,
-            #36B7EF
-        );
+    grid-template-columns: repeat(3,1fr);
+
+    gap: 22px;
+
+    max-width: 950px;
+
+    margin: auto;
+}
+
+.social-card {
+    border: 1px solid var(--border);
+
+    border-radius: 22px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    transition: .3s;
+}
+
+.social-card:hover {
+    transform: translateY(-6px);
+
+    box-shadow: var(--shadow-lg);
+}
+
+.social-card-icon {
+    width: 65px;
+    height: 65px;
+
+    margin: auto auto 15px;
+
+    border-radius: 18px;
 
     display: flex;
 
@@ -1084,32 +985,52 @@ section {
 
     justify-content: center;
 
-    color: white;
+    font-size: 28px;
 
-    font-size: 75px;
+    background: var(--soft-red);
 
-    box-shadow:
-        0 20px 45px
-        rgba(34,158,217,.25);
+    color: var(--red);
+}
+
+.social-card h3 {
+    color: var(--navy);
+
+    font-size: 18px;
+
+    margin-bottom: 7px;
+}
+
+.social-card p {
+    color: var(--muted);
+
+    font-size: 13px;
+
+    margin-bottom: 15px;
+}
+
+.social-card a {
+    color: var(--red);
+
+    font-weight: 800;
+
+    font-size: 14px;
 }
 
 
 /* =========================================================
    CTA
-========================================================= */
+   ========================================================= */
 
 .cta {
-
     padding: 80px 0;
 }
 
 .cta-box {
-
     background:
         linear-gradient(
             135deg,
-            var(--navy),
-            var(--navy-light)
+            var(--red),
+            #ff4c70
         );
 
     color: white;
@@ -1121,80 +1042,65 @@ section {
     text-align: center;
 
     box-shadow: var(--shadow-lg);
-
-    position: relative;
-
-    overflow: hidden;
-}
-
-.cta-box::before {
-
-    content: "";
-
-    position: absolute;
-
-    width: 300px;
-
-    height: 300px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(255,42,84,.12);
-
-    top: -150px;
-
-    right: -100px;
 }
 
 .cta-box h2 {
-
     font-size: 40px;
 
     margin-bottom: 15px;
-
-    position: relative;
 }
 
 .cta-box p {
+    max-width: 720px;
 
-    max-width: 700px;
+    margin: auto auto 30px;
 
-    margin:
-        0 auto 30px;
+    color: rgba(255,255,255,.88);
 
-    color: #CBD5E1;
-
-    position: relative;
+    font-size: 16px;
 }
 
-.cta-box .btn {
+.cta-button {
+    display: inline-flex;
 
-    background: var(--red);
+    align-items: center;
 
-    color: white;
+    gap: 10px;
 
-    position: relative;
+    background: white;
+
+    color: var(--red);
+
+    padding: 14px 27px;
+
+    border-radius: 12px;
+
+    font-weight: 900;
+
+    transition: .3s;
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+
+    box-shadow: 0 12px 30px rgba(0,0,0,.12);
 }
 
 
 /* =========================================================
    CONTACT
-========================================================= */
+   ========================================================= */
 
 .contact-section {
-
     background: var(--navy);
 
     color: white;
 }
 
 .contact-grid {
-
     display: grid;
 
-    grid-template-columns:
-        1fr 1fr;
+    grid-template-columns: 1fr 1fr;
 
     gap: 70px;
 
@@ -1202,21 +1108,18 @@ section {
 }
 
 .contact-info h2 {
-
     font-size: 38px;
 
     margin-bottom: 15px;
 }
 
 .contact-info > p {
-
     color: #94A3B8;
 
     margin-bottom: 30px;
 }
 
 .contact-list {
-
     display: flex;
 
     flex-direction: column;
@@ -1225,7 +1128,6 @@ section {
 }
 
 .contact-item {
-
     display: flex;
 
     align-items: center;
@@ -1234,17 +1136,14 @@ section {
 }
 
 .contact-icon {
-
     width: 52px;
-
     height: 52px;
 
     flex-shrink: 0;
 
     border-radius: 13px;
 
-    background:
-        rgba(255,42,84,.13);
+    background: rgba(255,42,84,.13);
 
     color: var(--red);
 
@@ -1258,7 +1157,6 @@ section {
 }
 
 .contact-details span {
-
     display: block;
 
     color: #94A3B8;
@@ -1267,7 +1165,6 @@ section {
 }
 
 .contact-details a {
-
     color: white;
 
     font-size: 16px;
@@ -1280,230 +1177,41 @@ section {
 }
 
 .contact-logo {
-
     display: flex;
 
     align-items: center;
 
     justify-content: center;
-
-    min-height: 330px;
 }
 
 .contact-logo img {
-
-    width: 280px;
+    width: 300px;
 
     max-width: 90%;
 
     filter:
         drop-shadow(
-            0 20px 35px
-            rgba(0,0,0,.2)
+            0 20px 35px rgba(0,0,0,.2)
         );
-}
-
-
-/* SOCIAL */
-
-.social-title {
-
-    margin-top: 35px;
-
-    margin-bottom: 15px;
-
-    font-weight: 800;
-}
-
-.socials {
-
-    display: flex;
-
-    gap: 12px;
-
-    flex-wrap: wrap;
-}
-
-.social {
-
-    width: 45px;
-
-    height: 45px;
-
-    border-radius: 12px;
-
-    background:
-        rgba(255,255,255,.08);
-
-    color: white;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 19px;
-
-    transition: .3s;
-}
-
-.social:hover {
-
-    background: var(--red);
-
-    transform: translateY(-4px);
-}
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-.modal-overlay {
-
-    position: fixed;
-
-    inset: 0;
-
-    background:
-        rgba(21,29,54,.65);
-
-    backdrop-filter: blur(6px);
-
-    z-index: 2000;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    opacity: 0;
-
-    pointer-events: none;
-
-    transition: .3s;
-
-    padding: 20px;
-}
-
-.modal-overlay.active {
-
-    opacity: 1;
-
-    pointer-events: all;
-}
-
-.modal {
-
-    background: white;
-
-    width:
-        min(450px,100%);
-
-    padding: 40px;
-
-    border-radius: 25px;
-
-    box-shadow: var(--shadow-lg);
-
-    text-align: center;
-
-    transform:
-        translateY(20px);
-
-    transition: .3s;
-
-    position: relative;
-}
-
-.modal-overlay.active .modal {
-
-    transform:
-        translateY(0);
-}
-
-.modal-icon {
-
-    width: 75px;
-
-    height: 75px;
-
-    margin:
-        0 auto 20px;
-
-    border-radius: 50%;
-
-    background: var(--soft-red);
-
-    color: var(--red);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 30px;
-}
-
-.modal h3 {
-
-    color: var(--navy);
-
-    font-size: 25px;
-
-    margin-bottom: 10px;
-}
-
-.modal p {
-
-    color: var(--muted);
-
-    font-size: 14px;
-
-    margin-bottom: 25px;
-}
-
-.modal-close {
-
-    border: none;
-
-    background: var(--navy);
-
-    color: white;
-
-    padding:
-        11px 25px;
-
-    border-radius: 10px;
-
-    cursor: pointer;
-
-    font-weight: 800;
 }
 
 
 /* =========================================================
    FOOTER
-========================================================= */
+   ========================================================= */
 
 footer {
-
     background: #0D1222;
 
     color: white;
 
-    padding: 60px 0 25px;
+    padding: 55px 0 25px;
 }
 
 .footer-grid {
-
     display: grid;
 
-    grid-template-columns:
-        1.5fr 1fr 1fr;
+    grid-template-columns: 1.4fr 1fr 1fr;
 
     gap: 45px;
 
@@ -1511,16 +1219,12 @@ footer {
 }
 
 .footer-logo img {
-
     width: 170px;
-
-    height: auto;
 
     margin-bottom: 18px;
 }
 
 .footer-description {
-
     color: #94A3B8;
 
     font-size: 14px;
@@ -1529,14 +1233,12 @@ footer {
 }
 
 .footer-column h4 {
-
     margin-bottom: 18px;
 
     font-size: 16px;
 }
 
 .footer-column a {
-
     display: block;
 
     color: #94A3B8;
@@ -1549,14 +1251,44 @@ footer {
 }
 
 .footer-column a:hover {
-
     color: white;
 }
 
-.copyright {
+.footer-socials {
+    display: flex;
 
-    border-top:
-        1px solid rgba(255,255,255,.08);
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+.footer-social {
+    width: 43px;
+    height: 43px;
+
+    border-radius: 11px;
+
+    background: rgba(255,255,255,.07);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 18px;
+
+    transition: .3s;
+}
+
+.footer-social:hover {
+    background: var(--red);
+
+    transform: translateY(-3px);
+}
+
+.copyright {
+    border-top: 1px solid rgba(255,255,255,.08);
 
     padding-top: 20px;
 
@@ -1569,147 +1301,231 @@ footer {
 
 
 /* =========================================================
-   MOBILE
-========================================================= */
+   MODAL
+   ========================================================= */
 
-@media(max-width:900px) {
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(21,29,54,.65);
+
+    backdrop-filter: blur(5px);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 3000;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-box {
+    width: min(430px,90%);
+
+    background: white;
+
+    border-radius: 25px;
+
+    padding: 40px;
+
+    text-align: center;
+
+    box-shadow: var(--shadow-lg);
+
+    position: relative;
+}
+
+.modal-icon {
+    width: 70px;
+    height: 70px;
+
+    border-radius: 20px;
+
+    background: var(--soft-red);
+
+    color: var(--red);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin: auto auto 20px;
+
+    font-size: 28px;
+}
+
+.modal-box h2 {
+    color: var(--navy);
+
+    margin-bottom: 10px;
+}
+
+.modal-box p {
+    color: var(--muted);
+
+    font-size: 14px;
+
+    margin-bottom: 25px;
+}
+
+.modal-close {
+    border: none;
+
+    background: var(--light);
+
+    color: var(--navy);
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    font-size: 20px;
+
+    position: absolute;
+
+    top: 15px;
+
+    left: 15px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:950px) {
 
     .nav-links {
-
         display: none;
     }
 
     .hero-grid,
     .about-grid,
-    .contact-grid,
-    .consultation-card {
-
+    .contact-grid {
         grid-template-columns: 1fr;
     }
 
-    .hero {
-
-        padding: 70px 0;
+    .journey-grid {
+        grid-template-columns: repeat(2,1fr);
     }
 
-    .hero-logo-card {
-
-        min-height: 300px;
-    }
-
-    .stats-box,
     .programs-grid,
+    .social-grid {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    .stats-box {
+        grid-template-columns: repeat(2,1fr);
+    }
+
     .footer-grid {
-
-        grid-template-columns:
-            1fr 1fr;
-    }
-
-    .timeline::before {
-
-        right: 20px;
-    }
-
-    .timeline-item {
-
-        width: 100%;
-
-        right: 0 !important;
-
-        padding-left: 0 !important;
-
-        padding-right: 50px !important;
-
-        text-align: right !important;
-    }
-
-    .timeline-dot {
-
-        right: 11px !important;
-
-        left: auto !important;
-    }
-
-    .telegram-box {
-
-        margin: auto;
+        grid-template-columns: 1fr 1fr;
     }
 }
 
+@media(max-width:650px) {
 
-@media(max-width:600px) {
+    .nav {
+        height: 75px;
+    }
 
     .logo-img {
-
         height: 52px;
     }
 
-    .hero h1 {
+    .nav-actions {
+        gap: 5px;
+    }
 
+    .login-btn {
+        font-size: 11px;
+        padding: 8px 10px;
+    }
+
+    .volunteer-nav {
+        font-size: 11px;
+        padding: 8px 10px;
+    }
+
+    .hero {
+        padding: 70px 0;
+    }
+
+    .hero h1 {
         font-size: 40px;
     }
 
     .hero-description {
-
         font-size: 15px;
     }
 
-    section {
+    .hero-logo-card {
+        min-height: 300px;
+    }
 
+    section {
         padding: 70px 0;
     }
 
     .stats-box,
+    .journey-grid,
     .programs-grid,
+    .social-grid,
     .footer-grid {
-
         grid-template-columns: 1fr;
     }
 
     .about-card {
-
         padding: 30px 22px;
     }
 
     .about-text h2,
     .section-title h2 {
-
         font-size: 30px;
     }
 
-    .cta-box {
+    .creative-box {
+        padding: 55px 22px;
+    }
 
-        padding: 55px 20px;
+    .creative-content h2 {
+        font-size: 30px;
+    }
+
+    .consultation-card {
+        grid-template-columns: 1fr;
+
+        text-align: center;
+
+        padding: 35px 22px;
+    }
+
+    .telegram-icon {
+        margin: auto;
+    }
+
+    .contact-logo {
+        margin-top: 30px;
     }
 
     .cta-box h2 {
-
         font-size: 30px;
-    }
-
-    .nav-actions .login-btn-nav {
-
-        font-size: 0;
-
-        padding: 11px 13px;
-    }
-
-    .nav-actions .login-btn-nav i {
-
-        font-size: 17px;
-    }
-
-    .nav-button {
-
-        padding:
-            10px 13px;
-
-        font-size: 13px;
     }
 }
 
 </style>
-
 </head>
 
 
@@ -1718,7 +1534,7 @@ footer {
 
 <!-- =========================================================
      HEADER
-========================================================= -->
+     ========================================================= -->
 
 <header>
 
@@ -1738,39 +1554,27 @@ footer {
     <ul class="nav-links">
 
         <li>
-            <a href="#home">
-                الرئيسية
-            </a>
+            <a href="#home">الرئيسية</a>
         </li>
 
         <li>
-            <a href="#history">
-                تاريخنا
-            </a>
+            <a href="#about">من نحن</a>
         </li>
 
         <li>
-            <a href="#about">
-                من نحن
-            </a>
+            <a href="#journey">رحلتنا</a>
         </li>
 
         <li>
-            <a href="#programs">
-                مبادراتنا
-            </a>
+            <a href="#volunteer">التطوع والإبداع</a>
         </li>
 
         <li>
-            <a href="#consultation">
-                الاستشارات
-            </a>
+            <a href="#consultations">الاستشارات</a>
         </li>
 
         <li>
-            <a href="#contact">
-                تواصل معنا
-            </a>
+            <a href="#contact">تواصل معنا</a>
         </li>
 
     </ul>
@@ -1779,25 +1583,20 @@ footer {
     <div class="nav-actions">
 
         <button
-            class="login-btn-nav"
-            onclick="openModal('loginModal')"
+            class="login-btn"
+            onclick="openLogin()"
         >
-
             <i class="fa-solid fa-right-to-bracket"></i>
-
             دخول الأعضاء
-
         </button>
 
 
-        <button
-            class="nav-button"
-            onclick="openModal('volunteerModal')"
+        <a
+            href="#volunteer"
+            class="volunteer-nav"
         >
-
             تطوع معنا
-
-        </button>
+        </a>
 
     </div>
 
@@ -1806,13 +1605,11 @@ footer {
 </header>
 
 
-
 <!-- =========================================================
      HERO
-========================================================= -->
+     ========================================================= -->
 
 <main id="home">
-
 
 <section class="hero">
 
@@ -1850,11 +1647,10 @@ footer {
 
     <p class="hero-description">
 
-        مؤسسة ميدلايف الطبية الخيرية التطوعية.
-        نعمل من أجل مجتمع أكثر صحة ووعياً،
-        ونؤمن بأن العمل الطبي والإنساني
-        والتطوعي يمكن أن يصنع أثراً حقيقياً
-        في حياة الناس.
+        ميدلايف هي مساحة يلتقي فيها الطب بالإنسانية،
+        ويلتقي فيها الشغف بالعمل التطوعي.
+        نؤمن أن لكل شخص قدرة على تقديم شيء مختلف،
+        وأن أعظم الأثر يبدأ أحياناً بفكرة صغيرة.
 
     </p>
 
@@ -1862,13 +1658,13 @@ footer {
     <div class="hero-buttons">
 
         <a
-            href="#contact"
+            href="#volunteer"
             class="btn btn-primary"
         >
 
-            <i class="fa-solid fa-envelope"></i>
+            <i class="fa-solid fa-hand-holding-heart"></i>
 
-            تواصل معنا
+            اكتشف عالم ميدلايف
 
         </a>
 
@@ -1880,7 +1676,7 @@ footer {
 
             <i class="fa-solid fa-circle-info"></i>
 
-            تعرف على ميدلايف
+            تعرف علينا
 
         </a>
 
@@ -1910,10 +1706,9 @@ footer {
 </section>
 
 
-
 <!-- =========================================================
      STATS
-========================================================= -->
+     ========================================================= -->
 
 <section class="stats">
 
@@ -1968,7 +1763,7 @@ footer {
     </div>
 
     <div class="stat-title">
-        عام الانطلاق
+        بداية الرحلة
     </div>
 
 </div>
@@ -1979,153 +1774,11 @@ footer {
 </div>
 
 </section>
-
-
-
-<!-- =========================================================
-     HISTORY
-========================================================= -->
-
-<section
-    class="history"
-    id="history"
->
-
-<div class="container">
-
-
-<div class="section-title">
-
-    <div class="eyebrow">
-        رحلتنا
-    </div>
-
-    <h2>
-        تاريخ ميدلايف
-    </h2>
-
-    <p>
-        رحلة تطوعية طبية وإنسانية بدأت من سوريا
-        وتوسعت لتصل إلى مجتمعات مختلفة.
-    </p>
-
-</div>
-
-
-<div class="timeline">
-
-
-<div class="timeline-item">
-
-    <div class="timeline-dot"></div>
-
-    <div class="timeline-content">
-
-        <span class="timeline-date">
-            2019
-        </span>
-
-        <h3>
-            الانطلاقة
-        </h3>
-
-        <p>
-            انطلاق ميدلايف كمبادرة طبية تطوعية
-            تهدف إلى تعزيز الوعي الصحي وخدمة المجتمع.
-        </p>
-
-    </div>
-
-</div>
-
-
-
-<div class="timeline-item">
-
-    <div class="timeline-dot"></div>
-
-    <div class="timeline-content">
-
-        <span class="timeline-date">
-            2023
-        </span>
-
-        <h3>
-            الترخيص الرسمي
-        </h3>
-
-        <p>
-            حصول المؤسسة على الترخيص الرسمي
-            لممارسة نشاطها كمنظمة غير ربحية.
-        </p>
-
-    </div>
-
-</div>
-
-
-
-<div class="timeline-item">
-
-    <div class="timeline-dot"></div>
-
-    <div class="timeline-content">
-
-        <span class="timeline-date">
-            2025
-        </span>
-
-        <h3>
-            توسع العمل الميداني
-        </h3>
-
-        <p>
-            تنفيذ العديد من المبادرات الطبية والإنسانية
-            والتوعوية في عدد من المحافظات السورية.
-        </p>
-
-    </div>
-
-</div>
-
-
-
-<div class="timeline-item">
-
-    <div class="timeline-dot"></div>
-
-    <div class="timeline-content">
-
-        <span class="timeline-date">
-            2026
-        </span>
-
-        <h3>
-            التحول الرقمي
-        </h3>
-
-        <p>
-            تطوير الحضور الرقمي للمؤسسة وتعزيز
-            استخدام التكنولوجيا للوصول إلى المجتمع
-            والكوادر الطبية والمتطوعين.
-        </p>
-
-    </div>
-
-</div>
-
-
-</div>
-
-</div>
-
-</section>
-
 
 
 <!-- =========================================================
      ABOUT
-========================================================= -->
+     ========================================================= -->
 
 <section
     class="about"
@@ -2150,21 +1803,40 @@ footer {
             من نحن
         </div>
 
+
         <h2>
-            ميدلايف... لأن الصحة مسؤولية مشتركة
+            ميدلايف... مساحة لصناعة الأثر
         </h2>
 
-        <p>
-            مؤسسة ميدلايف الطبية الخيرية التطوعية
-            هي منظمة غير ربحية تعمل على تقديم
-            الدعم الطبي والإنساني للمجتمعات المحلية
-            في سوريا.
-        </p>
 
         <p>
-            تركز المؤسسة على المبادرات الطبية،
-            التوعية الصحية، العمل الإنساني،
-            التعليم الطبي والعمل التطوعي.
+
+            ميدلايف هي مؤسسة طبية خيرية تطوعية
+            انطلقت من إيمان بسيط وعميق:
+            أن المعرفة الطبية والعمل الإنساني
+            يمكن أن يصنعا فرقاً حقيقياً في المجتمع.
+
+        </p>
+
+
+        <p>
+
+            لم تكن ميدلايف مجرد فريق يقدم مبادرات
+            صحية، بل أصبحت مساحة تجمع الأطباء
+            وطلاب الطب والصيادلة والمختصين والشباب
+            وأصحاب المواهب المختلفة حول هدف واحد:
+            أن يكون لكل شخص دور في صناعة الخير.
+
+        </p>
+
+
+        <p>
+
+            نعمل في مجالات التوعية الصحية،
+            الدعم الطبي والإنساني، التعليم والتدريب،
+            المبادرات المجتمعية، والعمل التطوعي
+            والتقني والإعلامي.
+
         </p>
 
     </div>
@@ -2177,24 +1849,27 @@ footer {
 
     <div
         class="section-title"
-        style="
-            text-align:right;
-            margin:0 0 30px 0;
-        "
+        style="text-align:right;margin:0 0 30px 0;"
     >
 
         <div class="eyebrow">
-            رؤيتنا
+            فلسفتنا
         </div>
 
+
         <h2>
-            مجتمع أكثر صحة ووعياً
+            كل شخص لديه شيء يضيفه
         </h2>
 
+
         <p>
-            نؤمن أن العمل الصحي لا يقتصر
-            على تقديم الخدمة الطبية، بل يشمل
-            التوعية والتعليم وتمكين المجتمع.
+
+            لا نؤمن أن التطوع له شكل واحد.
+            الطبيب يستطيع أن يقدم علمه،
+            المصمم يقدم إبداعه،
+            المبرمج يقدم مهاراته،
+            والطالب يقدم وقته وشغفه.
+
         </p>
 
     </div>
@@ -2204,18 +1879,22 @@ footer {
 
         <div class="program-icon">
 
-            <i class="fa-solid fa-hand-holding-heart"></i>
+            <i class="fa-solid fa-lightbulb"></i>
 
         </div>
 
+
         <h3>
-            الإنسان أولاً
+            ميدلايف ساحة إبداع
         </h3>
 
+
         <p>
-            نضع الإنسان واحتياجات المجتمع
-            في قلب المبادرات والبرامج
-            التي نعمل عليها.
+
+            نريد أن تكون ميدلايف بيئة يستطيع فيها
+            كل شخص اكتشاف قدراته وتطويرها وتحويلها
+            إلى أثر حقيقي يخدم المجتمع.
+
         </p>
 
     </div>
@@ -2228,18 +1907,224 @@ footer {
 </section>
 
 
-
 <!-- =========================================================
-     PROGRAMS
-========================================================= -->
+     JOURNEY
+     ========================================================= -->
 
 <section
-    class="programs"
-    id="programs"
+    class="journey"
+    id="journey"
 >
 
 <div class="container">
 
+<div class="section-title">
+
+    <div class="eyebrow">
+        رحلتنا
+    </div>
+
+    <h2>
+        من فكرة تطوعية إلى مجتمع من الأثر
+    </h2>
+
+    <p>
+
+        رحلة ميدلايف هي رحلة نمو مستمر،
+        بدأت بفكرة شبابية وتطورت إلى مؤسسة
+        تعمل في مجالات طبية وإنسانية وتطوعية متعددة.
+
+    </p>
+
+</div>
+
+
+<div class="journey-grid">
+
+
+<div class="journey-card">
+
+    <div class="journey-year">
+        2019
+    </div>
+
+    <h3>
+        البداية
+    </h3>
+
+    <p>
+
+        انطلقت ميدلايف كفكرة شبابية قائمة
+        على العمل الطبي التطوعي والتوعية الصحية
+        وخدمة المجتمع.
+
+    </p>
+
+</div>
+
+
+
+<div class="journey-card">
+
+    <div class="journey-year">
+        2023
+    </div>
+
+    <h3>
+        الترخيص الرسمي
+    </h3>
+
+    <p>
+
+        انتقلت ميدلايف إلى مرحلة أكثر تنظيماً
+        مع الحصول على الترخيص الرسمي،
+        وتوسيع العمل المؤسسي والتطوعي.
+
+    </p>
+
+</div>
+
+
+
+<div class="journey-card">
+
+    <div class="journey-year">
+        2024+
+    </div>
+
+    <h3>
+        التوسع والأثر
+    </h3>
+
+    <p>
+
+        توسعت الفرق والمبادرات في عدد من
+        المحافظات، مع زيادة التركيز على
+        التوعية والدعم الطبي والعمل الإنساني.
+
+    </p>
+
+</div>
+
+
+
+<div class="journey-card">
+
+    <div class="journey-year">
+        اليوم
+    </div>
+
+    <h3>
+        نحو المستقبل
+    </h3>
+
+    <p>
+
+        نعمل على بناء بيئة تجمع التطوع
+        والتعليم والإبداع والتكنولوجيا
+        لصناعة أثر مستدام.
+
+    </p>
+
+</div>
+
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+     VOLUNTEERING & CREATIVITY
+     ========================================================= -->
+
+<section
+    class="volunteer-section"
+    id="volunteer"
+>
+
+<div class="container">
+
+<div class="creative-box">
+
+<div class="creative-content">
+
+
+<div class="creative-icon">
+
+    <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+</div>
+
+
+<h2>
+
+    ميدلايف ليست مجرد فريق...
+
+    <br>
+
+    إنها <span>ساحة إبداع</span>
+
+</h2>
+
+
+<p>
+
+    نؤمن أن العمل التطوعي لا يعني فقط
+    أن تقدم وقتك، بل أن تجد مساحة تستطيع
+    فيها أن تكون أنت، وتتعلم، وتجرب،
+    وتخطئ، وتبدع، وتصنع شيئاً له معنى.
+
+</p>
+
+
+<div class="creative-highlight">
+
+    طبيب، طالب، صيدلي، مصمم، مبرمج،
+    كاتب، مصور، إعلامي، مهندس أو صاحب فكرة...
+
+</div>
+
+
+<p>
+
+    ربما تكون مهارتك هي الشيء الذي تحتاجه
+    ميدلايف لصناعة المبادرة القادمة.
+
+</p>
+
+
+<a
+    href="#"
+    class="cta-button"
+    onclick="showVolunteerMessage(event)"
+>
+
+    <i class="fa-solid fa-user-plus"></i>
+
+    أريد أن أكون جزءاً من ميدلايف
+
+</a>
+
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+     PROGRAMS
+     ========================================================= -->
+
+<section class="programs">
+
+<div class="container">
 
 <div class="section-title">
 
@@ -2248,12 +2133,11 @@ footer {
     </div>
 
     <h2>
-        ماذا نفعل؟
+        أين يمكن أن تصنع أثرك؟
     </h2>
 
     <p>
-        مجالات متعددة يجتمع فيها العمل الطبي
-        والإنساني والتطوعي.
+        التطوع في ميدلايف ليس محصوراً بالتخصص الطبي.
     </p>
 
 </div>
@@ -2265,18 +2149,16 @@ footer {
 <div class="program-card">
 
     <div class="program-icon">
-
         <i class="fa-solid fa-stethoscope"></i>
-
     </div>
 
     <h3>
-        الخدمات الطبية
+        العمل الطبي
     </h3>
 
     <p>
-        دعم الوصول إلى الخدمات والاستشارات
-        والمبادرات الطبية ضمن الإمكانيات المتاحة.
+        التوعية الصحية، الدعم الطبي،
+        الاستشارات والمبادرات الصحية.
     </p>
 
 </div>
@@ -2286,51 +2168,7 @@ footer {
 <div class="program-card">
 
     <div class="program-icon">
-
-        <i class="fa-solid fa-heart-pulse"></i>
-
-    </div>
-
-    <h3>
-        التوعية الصحية
-    </h3>
-
-    <p>
-        نشر الثقافة الطبية والمعلومات الصحية
-        الموثوقة بطريقة مبسطة للمجتمع.
-    </p>
-
-</div>
-
-
-
-<div class="program-card">
-
-    <div class="program-icon">
-
-        <i class="fa-solid fa-hands-holding-child"></i>
-
-    </div>
-
-    <h3>
-        العمل الإنساني
-    </h3>
-
-    <p>
-        المشاركة في المبادرات الإنسانية
-        ودعم الفئات الأكثر احتياجاً.
-    </p>
-
-</div>
-
-
-
-<div class="program-card">
-
-    <div class="program-icon">
-
         <i class="fa-solid fa-graduation-cap"></i>
-
     </div>
 
     <h3>
@@ -2338,8 +2176,8 @@ footer {
     </h3>
 
     <p>
-        دعم التعليم الطبي والتدريب
-        وبناء قدرات الشباب والكوادر الصحية.
+        المحاضرات، التدريب الطبي،
+        المحتوى التعليمي وتبادل المعرفة.
     </p>
 
 </div>
@@ -2349,18 +2187,16 @@ footer {
 <div class="program-card">
 
     <div class="program-icon">
-
-        <i class="fa-solid fa-users"></i>
-
+        <i class="fa-solid fa-palette"></i>
     </div>
 
     <h3>
-        التطوع
+        التصميم والإبداع
     </h3>
 
     <p>
-        بناء فرق تطوعية تعمل بروح الفريق
-        والمسؤولية لخدمة المجتمع.
+        التصميم الجرافيكي، الهوية البصرية،
+        الأفكار والمحتوى الإبداعي.
     </p>
 
 </div>
@@ -2370,18 +2206,54 @@ footer {
 <div class="program-card">
 
     <div class="program-icon">
-
-        <i class="fa-solid fa-laptop-medical"></i>
-
+        <i class="fa-solid fa-camera"></i>
     </div>
 
     <h3>
-        الابتكار الرقمي
+        الإعلام
     </h3>
 
     <p>
-        توظيف التكنولوجيا والمنصات الرقمية
-        لتطوير العمل الصحي والتطوعي.
+        التصوير، الفيديو، التغطية،
+        صناعة المحتوى والإعلام الرقمي.
+    </p>
+
+</div>
+
+
+
+<div class="program-card">
+
+    <div class="program-icon">
+        <i class="fa-solid fa-code"></i>
+    </div>
+
+    <h3>
+        التكنولوجيا
+    </h3>
+
+    <p>
+        البرمجة، الأنظمة الرقمية،
+        الأتمتة والحلول التقنية.
+    </p>
+
+</div>
+
+
+
+<div class="program-card">
+
+    <div class="program-icon">
+        <i class="fa-solid fa-people-group"></i>
+    </div>
+
+    <h3>
+        العمل المجتمعي
+    </h3>
+
+    <p>
+        المبادرات الإنسانية والميدانية
+        وخدمة المجتمعات المحلية.
     </p>
 
 </div>
@@ -2394,32 +2266,30 @@ footer {
 </section>
 
 
-
 <!-- =========================================================
-     MEDICAL CONSULTATION
-========================================================= -->
+     CONSULTATIONS
+     ========================================================= -->
 
 <section
-    class="consultation"
-    id="consultation"
+    class="consultations"
+    id="consultations"
 >
 
 <div class="container">
 
-
 <div class="section-title">
 
     <div class="eyebrow">
-        خدمة ميدلايف
+        خدمة الاستشارات
     </div>
 
     <h2>
-        الاستشارات الطبية
+        ميدلايف أقرب إليك
     </h2>
 
     <p>
-        يمكنكم التواصل مع بوت الاستشارات
-        الطبية الخاص بميدلايف عبر Telegram.
+        يمكنك الوصول إلى بوت الاستشارات الطبية
+        الخاص بميدلايف عبر Telegram.
     </p>
 
 </div>
@@ -2428,25 +2298,24 @@ footer {
 <div class="consultation-card">
 
 
+<div class="telegram-icon">
+
+    <i class="fa-brands fa-telegram"></i>
+
+</div>
+
+
 <div>
 
-    <div class="consultation-icon">
-
-        <i class="fa-solid fa-user-doctor"></i>
-
-    </div>
-
-
-    <h3>
-        MedLife Medical Consultation
-    </h3>
-
+    <h2>
+        الاستشارات الطبية
+    </h2>
 
     <p>
 
-        للوصول إلى خدمة الاستشارات الطبية
-        عبر Telegram، اضغط على الزر التالي
-        للتواصل مع بوت ميدلايف.
+        للاستفسارات الطبية والصيدلانية،
+        يمكنكم التواصل مع بوت ميدلايف الرسمي
+        على Telegram.
 
     </p>
 
@@ -2455,7 +2324,7 @@ footer {
         href="https://t.me/Medlife2024bot"
         target="_blank"
         rel="noopener noreferrer"
-        class="telegram-button"
+        class="telegram-btn"
     >
 
         <i class="fa-brands fa-telegram"></i>
@@ -2467,9 +2336,127 @@ footer {
 </div>
 
 
-<div class="telegram-box">
+</div>
 
-    <i class="fa-brands fa-telegram"></i>
+</div>
+
+</section>
+
+
+<!-- =========================================================
+     SOCIAL MEDIA
+     ========================================================= -->
+
+<section class="social-section">
+
+<div class="container">
+
+<div class="section-title">
+
+    <div class="eyebrow">
+        منصات ميدلايف
+    </div>
+
+    <h2>
+        تابع رحلتنا أينما كنت
+    </h2>
+
+    <p>
+        تعرف على أخبارنا ومبادراتنا ومحتوانا الجديد.
+    </p>
+
+</div>
+
+
+<div class="social-grid">
+
+
+<!-- LINKEDIN -->
+
+<div class="social-card">
+
+    <div class="social-card-icon">
+
+        <i class="fa-brands fa-linkedin-in"></i>
+
+    </div>
+
+    <h3>
+        LinkedIn
+    </h3>
+
+    <p>
+        الصفحة المهنية لميدلايف.
+    </p>
+
+    <a
+        href="https://sy.linkedin.com/company/med-life-syria"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        زيارة الصفحة
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+
+</div>
+
+
+<!-- YOUTUBE -->
+
+<div class="social-card">
+
+    <div class="social-card-icon">
+
+        <i class="fa-brands fa-youtube"></i>
+
+    </div>
+
+    <h3>
+        YouTube
+    </h3>
+
+    <p>
+        المحتوى المرئي والتوعوي لميدلايف.
+    </p>
+
+    <a
+        href="https://www.youtube.com/@medlifesy"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        زيارة القناة
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+
+</div>
+
+
+<!-- TELEGRAM -->
+
+<div class="social-card">
+
+    <div class="social-card-icon">
+
+        <i class="fa-brands fa-telegram"></i>
+
+    </div>
+
+    <h3>
+        Telegram
+    </h3>
+
+    <p>
+        أخبار ميدلايف والاستشارات الطبية.
+    </p>
+
+    <a
+        href="https://t.me/Medlife2024bot"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        فتح Telegram
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
 
 </div>
 
@@ -2481,10 +2468,9 @@ footer {
 </section>
 
 
-
 <!-- =========================================================
      CTA
-========================================================= -->
+     ========================================================= -->
 
 <section class="cta">
 
@@ -2493,26 +2479,32 @@ footer {
 <div class="cta-box">
 
     <h2>
-        كن جزءاً من الأثر
+        ربما يكون مكانك معنا
     </h2>
 
     <p>
-        فرص التطوع يتم الإعلان عنها عبر
-        المنصات الرسمية لميدلايف.
-        تابعنا لتكون أول من يعرف عن الفرص الجديدة.
+
+        حالياً لا توجد فرص تطوع مفتوحة للتقديم.
+        لكن فرص الانضمام الجديدة سيتم الإعلان عنها
+        عبر منصات ميدلايف الرسمية.
+
+        <br>
+
+        خليك متابعنا... يمكن الفرصة القادمة تكون إلك.
+
     </p>
 
 
-    <button
-        class="btn"
-        onclick="openModal('volunteerModal')"
+    <a
+        href="#contact"
+        class="cta-button"
     >
 
-        <i class="fa-solid fa-user-plus"></i>
+        <i class="fa-solid fa-bell"></i>
 
-        تابع فرص التطوع
+        تابع منصاتنا
 
-    </button>
+    </a>
 
 </div>
 
@@ -2521,10 +2513,9 @@ footer {
 </section>
 
 
-
 <!-- =========================================================
      CONTACT
-========================================================= -->
+     ========================================================= -->
 
 <section
     class="contact-section"
@@ -2536,164 +2527,131 @@ footer {
 
 <div class="contact-info">
 
-
-<h2>
-    تواصل مع ميدلايف
-</h2>
-
-
-<p>
-    تابع منصاتنا الرسمية وابقَ على اطلاع
-    بآخر المبادرات والأخبار والفرص.
-</p>
+    <h2>
+        تواصل مع ميدلايف
+    </h2>
 
 
-<div class="contact-list">
+    <p>
+
+        للاستفسارات والتعاون والشراكات،
+        يمكنكم التواصل معنا عبر قنواتنا الرسمية.
+
+    </p>
 
 
-<div class="contact-item">
+    <div class="contact-list">
 
-    <div class="contact-icon">
 
-        <i class="fa-solid fa-globe"></i>
+        <div class="contact-item">
+
+            <div class="contact-icon">
+
+                <i class="fa-solid fa-globe"></i>
+
+            </div>
+
+
+            <div class="contact-details">
+
+                <span>
+                    الموقع الإلكتروني
+                </span>
+
+                <a
+                    href="https://medlifesy.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    medlifesy.org
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="contact-item">
+
+            <div class="contact-icon">
+
+                <i class="fa-brands fa-telegram"></i>
+
+            </div>
+
+
+            <div class="contact-details">
+
+                <span>
+                    الاستشارات
+                </span>
+
+                <a
+                    href="https://t.me/Medlife2024bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    @Medlife2024bot
+                </a>
+
+            </div>
+
+        </div>
+
 
     </div>
 
-    <div class="contact-details">
 
-        <span>
-            الموقع الإلكتروني
-        </span>
+    <div
+        style="
+        margin-top:35px;
+        color:#CBD5E1;
+        font-weight:700;
+        "
+    >
+
+        تابعونا عبر منصاتنا الرسمية
+
+    </div>
+
+
+    <div class="footer-socials">
+
 
         <a
-            href="https://medlifesy.org"
+            href="https://sy.linkedin.com/company/med-life-syria"
             target="_blank"
             rel="noopener noreferrer"
+            class="footer-social"
+            title="LinkedIn"
         >
-            medlifesy.org
+            <i class="fa-brands fa-linkedin-in"></i>
         </a>
 
-    </div>
 
-</div>
+        <a
+            href="https://www.youtube.com/@medlifesy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-social"
+            title="YouTube"
+        >
+            <i class="fa-brands fa-youtube"></i>
+        </a>
 
-
-
-<div class="contact-item">
-
-    <div class="contact-icon">
-
-        <i class="fa-brands fa-telegram"></i>
-
-    </div>
-
-    <div class="contact-details">
-
-        <span>
-            الاستشارات الطبية
-        </span>
 
         <a
             href="https://t.me/Medlife2024bot"
             target="_blank"
             rel="noopener noreferrer"
+            class="footer-social"
+            title="Telegram"
         >
-            @Medlife2024bot
+            <i class="fa-brands fa-telegram"></i>
         </a>
 
+
     </div>
-
-</div>
-
-
-</div>
-
-
-
-<div class="social-title">
-    تابعونا على منصاتنا
-</div>
-
-
-<div class="socials">
-
-
-<!-- Facebook -->
-
-<a
-    href="https://www.facebook.com/medlifesy"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="social"
-    title="Facebook"
->
-
-    <i class="fa-brands fa-facebook-f"></i>
-
-</a>
-
-
-<!-- Instagram -->
-
-<a
-    href="https://www.instagram.com/medlifesy"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="social"
-    title="Instagram"
->
-
-    <i class="fa-brands fa-instagram"></i>
-
-</a>
-
-
-<!-- LinkedIn VERIFIED -->
-
-<a
-    href="https://www.linkedin.com/company/med-life-syria"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="social"
-    title="LinkedIn"
->
-
-    <i class="fa-brands fa-linkedin-in"></i>
-
-</a>
-
-
-<!-- YouTube -->
-
-<a
-    href="https://www.youtube.com/@medlifesy"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="social"
-    title="YouTube"
->
-
-    <i class="fa-brands fa-youtube"></i>
-
-</a>
-
-
-<!-- Telegram -->
-
-<a
-    href="https://t.me/Medlife2024bot"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="social"
-    title="Telegram"
->
-
-    <i class="fa-brands fa-telegram"></i>
-
-</a>
-
-
-</div>
 
 </div>
 
@@ -2713,121 +2671,73 @@ footer {
 
 </section>
 
-
 </main>
-
-
-
-<!-- =========================================================
-     VOLUNTEER MODAL
-========================================================= -->
-
-<div
-    class="modal-overlay"
-    id="volunteerModal"
->
-
-<div class="modal">
-
-    <div class="modal-icon">
-
-        <i class="fa-solid fa-users"></i>
-
-    </div>
-
-
-    <h3>
-        فرص التطوع
-    </h3>
-
-
-    <p>
-
-        حالياً لا توجد فرص تطوع متاحة.
-
-        <br><br>
-
-        تابع منصات ميدلايف الرسمية،
-        وعند توفر فرص جديدة سيتم الإعلان
-        عنها من خلال صفحاتنا الرسمية.
-
-    </p>
-
-
-    <button
-        class="modal-close"
-        onclick="closeAllModals()"
-    >
-
-        حسناً
-
-    </button>
-
-</div>
-
-</div>
-
 
 
 <!-- =========================================================
      LOGIN MODAL
-========================================================= -->
+     ========================================================= -->
 
 <div
-    class="modal-overlay"
+    class="modal"
     id="loginModal"
 >
 
-<div class="modal">
-
-    <div class="modal-icon">
-
-        <i class="fa-solid fa-lock"></i>
-
-    </div>
+<div class="modal-box">
 
 
-    <h3>
-        دخول الأعضاء
-    </h3>
+<button
+    class="modal-close"
+    onclick="closeLogin()"
+>
+    ×
+</button>
 
 
-    <p>
+<div class="modal-icon">
 
-        هذه الخدمة قيد التطوير حالياً.
+    <i class="fa-solid fa-lock"></i>
 
-        <br><br>
-
-        سيتم تفعيل نظام دخول الأعضاء
-        عند اكتمال تطوير المنصة الداخلية
-        لمؤسسة ميدلايف.
-
-    </p>
+</div>
 
 
-    <button
-        class="modal-close"
-        onclick="closeAllModals()"
-    >
+<h2>
+    دخول الأعضاء
+</h2>
 
-        حسناً
 
-    </button>
+<p>
+
+    هذه الخدمة قيد التطوير حالياً.
+
+    <br>
+
+    سيتم الإعلان عن إطلاق نظام دخول
+    أعضاء ميدلايف عند جاهزيته.
+
+</p>
+
+
+<button
+    class="btn btn-primary"
+    onclick="closeLogin()"
+>
+    حسناً
+</button>
+
 
 </div>
 
 </div>
-
 
 
 <!-- =========================================================
      FOOTER
-========================================================= -->
+     ========================================================= -->
 
 <footer>
 
 <div class="container">
-
 
 <div class="footer-grid">
 
@@ -2846,46 +2756,22 @@ footer {
 
     <p class="footer-description">
 
-        مؤسسة ميدلايف الطبية الخيرية التطوعية.
-        نعمل من أجل صحة أفضل ومجتمع أكثر وعياً،
-        ونؤمن بقوة العمل التطوعي والشراكة
-        في صناعة التغيير.
+        ميدلايف مؤسسة طبية خيرية تطوعية
+        تؤمن بأن لكل شخص قدرة على صناعة الأثر،
+        وأن التطوع يمكن أن يكون مساحة للتعلم
+        والإبداع وخدمة المجتمع.
 
     </p>
 
 
-    <div class="socials">
+    <div class="footer-socials">
 
 
         <a
-            href="https://www.facebook.com/medlifesy"
+            href="https://sy.linkedin.com/company/med-life-syria"
             target="_blank"
             rel="noopener noreferrer"
-            class="social"
-        >
-
-            <i class="fa-brands fa-facebook-f"></i>
-
-        </a>
-
-
-        <a
-            href="https://www.instagram.com/medlifesy"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="social"
-        >
-
-            <i class="fa-brands fa-instagram"></i>
-
-        </a>
-
-
-        <a
-            href="https://www.linkedin.com/company/med-life-syria"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="social"
+            class="footer-social"
         >
 
             <i class="fa-brands fa-linkedin-in"></i>
@@ -2897,7 +2783,7 @@ footer {
             href="https://www.youtube.com/@medlifesy"
             target="_blank"
             rel="noopener noreferrer"
-            class="social"
+            class="footer-social"
         >
 
             <i class="fa-brands fa-youtube"></i>
@@ -2909,7 +2795,7 @@ footer {
             href="https://t.me/Medlife2024bot"
             target="_blank"
             rel="noopener noreferrer"
-            class="social"
+            class="footer-social"
         >
 
             <i class="fa-brands fa-telegram"></i>
@@ -2933,24 +2819,20 @@ footer {
         الرئيسية
     </a>
 
-    <a href="#history">
-        تاريخنا
-    </a>
-
     <a href="#about">
         من نحن
     </a>
 
-    <a href="#programs">
-        مجالات العمل
+    <a href="#journey">
+        رحلتنا
     </a>
 
-    <a href="#consultation">
-        الاستشارات الطبية
+    <a href="#volunteer">
+        التطوع والإبداع
     </a>
 
-    <a href="#contact">
-        تواصل معنا
+    <a href="#consultations">
+        الاستشارات
     </a>
 
 </div>
@@ -2960,52 +2842,23 @@ footer {
 <div class="footer-column">
 
     <h4>
-        المنصات الرسمية
+        خدمات ميدلايف
     </h4>
 
-
-    <a
-        href="https://www.facebook.com/medlifesy"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
-        Facebook
+    <a href="#consultations">
+        الاستشارات الطبية
     </a>
 
-
-    <a
-        href="https://www.instagram.com/medlifesy"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
-        Instagram
+    <a href="#volunteer">
+        العمل التطوعي
     </a>
 
-
-    <a
-        href="https://www.linkedin.com/company/med-life-syria"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
-        LinkedIn
+    <a href="#about">
+        المبادرات المجتمعية
     </a>
 
-
-    <a
-        href="https://www.youtube.com/@medlifesy"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
-        YouTube
-    </a>
-
-
-    <a
-        href="https://t.me/Medlife2024bot"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
-        Telegram – الاستشارات
+    <a href="#contact">
+        التواصل
     </a>
 
 </div>
@@ -3028,76 +2881,65 @@ footer {
 </footer>
 
 
-
 <!-- =========================================================
      JAVASCRIPT
-========================================================= -->
+     ========================================================= -->
 
 <script>
 
-/* فتح النوافذ */
 
-function openModal(id) {
+/* =========================
+   LOGIN
+   ========================= */
+
+function openLogin() {
 
     document
-        .getElementById(id)
-        .classList
-        .add("active");
+        .getElementById("loginModal")
+        .classList.add("active");
 
 }
 
 
-/* إغلاق جميع النوافذ */
-
-function closeAllModals() {
+function closeLogin() {
 
     document
-        .querySelectorAll(".modal-overlay")
-        .forEach(function(modal) {
-
-            modal.classList.remove("active");
-
-        });
+        .getElementById("loginModal")
+        .classList.remove("active");
 
 }
 
 
-/* إغلاق عند الضغط خارج النافذة */
+window.addEventListener("click", function(event) {
 
-document
-    .querySelectorAll(".modal-overlay")
-    .forEach(function(overlay) {
+    const modal =
+        document.getElementById("loginModal");
 
-        overlay.addEventListener(
-            "click",
-            function(event) {
+    if(event.target === modal) {
 
-                if (event.target === overlay) {
-
-                    closeAllModals();
-
-                }
-
-            }
-        );
-
-    });
-
-
-/* إغلاق باستخدام ESC */
-
-document.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (event.key === "Escape") {
-
-            closeAllModals();
-
-        }
+        closeLogin();
 
     }
-);
+
+});
+
+
+/* =========================
+   VOLUNTEERING
+   ========================= */
+
+function showVolunteerMessage(event) {
+
+    event.preventDefault();
+
+    alert(
+        "حالياً لا توجد فرص تطوع مفتوحة للتقديم.\n\n" +
+        "خليك متابع منصات ميدلايف الرسمية، " +
+        "وسيتم الإعلان عن فرص التطوع عند فتحها."
+    );
+
+}
+
 
 </script>
 
