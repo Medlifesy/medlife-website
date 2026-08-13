@@ -1,0 +1,10 @@
+name = "medlife-website"
+
+pages_build_output_dir = "."
+
+compatibility_date = "2026-08-14"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "medlife-articles"
+database_id = "PUT-YOUR-DATABASE-ID-HERE"
