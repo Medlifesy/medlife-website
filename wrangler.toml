@@ -7,4 +7,4 @@ compatibility_date = "2026-08-14"
 [[d1_databases]]
 binding = "DB"
 database_name = "medlife-articles"
-database_id = "PUT-YOUR-DATABASE-ID-HERE"
+database_id = "036972c6-162c-47d9-9fea-d011cb451da7"
