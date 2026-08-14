@@ -1,145 +1,73 @@
 /* =========================================================
    MEDLIFE SYRIA
-   Main JavaScript
-   Version: 1.0
-========================================================= */
-
-"use strict";
-
-
-/* =========================================================
-   DOM READY
+   MAIN JAVASCRIPT
+   Compatible with the final index.html
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* =====================================================
-       ELEMENTS
-    ====================================================== */
+    "use strict";
 
-    const body = document.body;
+
+    /* =====================================================
+       1. LANGUAGE SYSTEM
+    ====================================================== */
 
     const languageBtn = document.getElementById("languageBtn");
 
-    const menuToggle = document.getElementById("menuToggle");
-    const mobileMenu = document.getElementById("mobileMenu");
-
-    const loginBtn = document.getElementById("loginBtn");
-    const mobileLoginBtn = document.getElementById("mobileLoginBtn");
-
-    const loginModal = document.getElementById("loginModal");
-    const closeLogin = document.getElementById("closeLogin");
-    const closeLogin2 = document.getElementById("closeLogin2");
-
-    const volunteerModal = document.getElementById("volunteerModal");
-    const closeVolunteer = document.getElementById("closeVolunteer");
-
-    const volunteerBtn = document.getElementById("volunteerBtn");
-
-    const aiOpenBtn = document.getElementById("aiOpenBtn");
-    const aiCloseBtn = document.getElementById("aiCloseBtn");
-    const aiOverlay = document.getElementById("aiOverlay");
-
-    const aiForm = document.getElementById("aiForm");
-    const aiInput = document.getElementById("aiInput");
-    const aiMessages = document.getElementById("aiMessages");
-
-    const mobileLinks =
-        document.querySelectorAll("[data-mobile-link]");
-
-    const volunteerTriggers =
-        document.querySelectorAll("[data-volunteer-trigger]");
-
-    const languageElements =
-        document.querySelectorAll("[data-ar][data-en]");
-
-    const aiSuggestionButtons =
-        document.querySelectorAll(".ai-suggestions button");
-
-
-    /* =====================================================
-       LANGUAGE
-    ====================================================== */
-
-    let currentLanguage =
-        localStorage.getItem("medlifeLanguage") || "ar";
-
+    let currentLanguage = localStorage.getItem("medlifeLanguage") || "ar";
 
     function updateLanguage() {
 
-        const isArabic = currentLanguage === "ar";
+        const elements = document.querySelectorAll("[data-ar][data-en]");
 
-        document.documentElement.lang =
-            isArabic ? "ar" : "en";
+        elements.forEach((element) => {
 
-        document.documentElement.dir =
-            isArabic ? "rtl" : "ltr";
+            const arabicText = element.getAttribute("data-ar");
+            const englishText = element.getAttribute("data-en");
 
-
-        /* ---------------------------------------------
-           TEXT CONTENT
-        --------------------------------------------- */
-
-        languageElements.forEach(element => {
-
-            const arabicText =
-                element.getAttribute("data-ar");
-
-            const englishText =
-                element.getAttribute("data-en");
-
-            if (!arabicText || !englishText) {
-                return;
+            if (currentLanguage === "ar") {
+                element.textContent = arabicText;
+            } else {
+                element.textContent = englishText;
             }
-
-            element.textContent =
-                isArabic ? arabicText : englishText;
 
         });
 
 
-        /* ---------------------------------------------
-           LANGUAGE BUTTON
-        --------------------------------------------- */
+        /* Page direction */
+
+        document.documentElement.lang = currentLanguage;
+
+        document.documentElement.dir =
+            currentLanguage === "ar" ? "rtl" : "ltr";
+
+
+        /* Language button */
 
         if (languageBtn) {
-
             languageBtn.textContent =
-                isArabic ? "EN" : "ع";
-
-            languageBtn.setAttribute(
-                "aria-label",
-                isArabic
-                    ? "Switch to English"
-                    : "التبديل إلى العربية"
-            );
-
+                currentLanguage === "ar" ? "EN" : "AR";
         }
 
 
-        /* ---------------------------------------------
-           AI INPUT PLACEHOLDER
-        --------------------------------------------- */
+        /* Textarea placeholder */
+
+        const aiInput = document.getElementById("aiInput");
 
         if (aiInput) {
 
-            const placeholderArabic =
-                aiInput.getAttribute("data-placeholder-ar");
+            const placeholder =
+                currentLanguage === "ar"
+                    ? aiInput.getAttribute("data-placeholder-ar")
+                    : aiInput.getAttribute("data-placeholder-en");
 
-            const placeholderEnglish =
-                aiInput.getAttribute("data-placeholder-en");
-
-            aiInput.placeholder =
-                isArabic
-                    ? placeholderArabic
-                    : placeholderEnglish;
+            if (placeholder) {
+                aiInput.placeholder = placeholder;
+            }
 
         }
 
-
-        /* ---------------------------------------------
-           SAVE LANGUAGE
-        --------------------------------------------- */
 
         localStorage.setItem(
             "medlifeLanguage",
@@ -154,9 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
         languageBtn.addEventListener("click", () => {
 
             currentLanguage =
-                currentLanguage === "ar"
-                    ? "en"
-                    : "ar";
+                currentLanguage === "ar" ? "en" : "ar";
 
             updateLanguage();
 
@@ -165,124 +91,117 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =====================================================
-       MOBILE MENU
-    ====================================================== */
+    updateLanguage();
 
-    function openMobileMenu() {
-
-        if (!mobileMenu || !menuToggle) {
-            return;
-        }
-
-        mobileMenu.classList.add("active");
-
-        menuToggle.classList.add("active");
-
-        menuToggle.setAttribute(
-            "aria-expanded",
-            "true"
-        );
-
-        const icon =
-            menuToggle.querySelector("i");
-
-        if (icon) {
-
-            icon.classList.remove(
-                "fa-bars"
-            );
-
-            icon.classList.add(
-                "fa-xmark"
-            );
-
-        }
-
-    }
-
-
-    function closeMobileMenu() {
-
-        if (!mobileMenu || !menuToggle) {
-            return;
-        }
-
-        mobileMenu.classList.remove("active");
-
-        menuToggle.classList.remove("active");
-
-        menuToggle.setAttribute(
-            "aria-expanded",
-            "false"
-        );
-
-        const icon =
-            menuToggle.querySelector("i");
-
-        if (icon) {
-
-            icon.classList.remove(
-                "fa-xmark"
-            );
-
-            icon.classList.add(
-                "fa-bars"
-            );
-
-        }
-
-    }
-
-
-    function toggleMobileMenu() {
-
-        if (!mobileMenu) {
-            return;
-        }
-
-        if (mobileMenu.classList.contains("active")) {
-
-            closeMobileMenu();
-
-        } else {
-
-            openMobileMenu();
-
-        }
-
-    }
-
-
-    if (menuToggle) {
-
-        menuToggle.addEventListener(
-            "click",
-            toggleMobileMenu
-        );
-
-    }
-
-
-    mobileLinks.forEach(link => {
-
-        link.addEventListener(
-            "click",
-            closeMobileMenu
-        );
-
-    });
 
 
     /* =====================================================
-       MODAL SYSTEM
+       2. MOBILE MENU
     ====================================================== */
+
+    const menuToggle =
+        document.getElementById("menuToggle");
+
+    const mobileMenu =
+        document.getElementById("mobileMenu");
+
+    if (menuToggle && mobileMenu) {
+
+        menuToggle.addEventListener("click", () => {
+
+            const isOpen =
+                mobileMenu.classList.toggle("active");
+
+            menuToggle.setAttribute(
+                "aria-expanded",
+                isOpen ? "true" : "false"
+            );
+
+
+            const icon =
+                menuToggle.querySelector("i");
+
+            if (icon) {
+
+                icon.classList.toggle(
+                    "fa-bars",
+                    !isOpen
+                );
+
+                icon.classList.toggle(
+                    "fa-xmark",
+                    isOpen
+                );
+
+            }
+
+        });
+
+
+        /* Close menu after clicking a link */
+
+        const mobileLinks =
+            mobileMenu.querySelectorAll(
+                "[data-mobile-link]"
+            );
+
+        mobileLinks.forEach((link) => {
+
+            link.addEventListener("click", () => {
+
+                mobileMenu.classList.remove("active");
+
+                menuToggle.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+                const icon =
+                    menuToggle.querySelector("i");
+
+                if (icon) {
+
+                    icon.classList.remove(
+                        "fa-xmark"
+                    );
+
+                    icon.classList.add(
+                        "fa-bars"
+                    );
+
+                }
+
+            });
+
+        });
+
+    }
+
+
+
+    /* =====================================================
+       3. LOGIN MODAL
+    ====================================================== */
+
+    const loginModal =
+        document.getElementById("loginModal");
+
+    const loginBtn =
+        document.getElementById("loginBtn");
+
+    const mobileLoginBtn =
+        document.getElementById("mobileLoginBtn");
+
+    const closeLogin =
+        document.getElementById("closeLogin");
+
+    const closeLogin2 =
+        document.getElementById("closeLogin2");
+
 
     function openModal(modal) {
 
-        if (!modal) {
-            return;
-        }
+        if (!modal) return;
 
         modal.classList.add("active");
 
@@ -291,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "false"
         );
 
-        body.classList.add(
+        document.body.classList.add(
             "modal-open"
         );
 
@@ -300,9 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeModal(modal) {
 
-        if (!modal) {
-            return;
-        }
+        if (!modal) return;
 
         modal.classList.remove("active");
 
@@ -311,36 +228,18 @@ document.addEventListener("DOMContentLoaded", () => {
             "true"
         );
 
-        if (
-            !document.querySelector(
-                ".modal.active"
-            )
-        ) {
-
-            body.classList.remove(
-                "modal-open"
-            );
-
-        }
+        document.body.classList.remove(
+            "modal-open"
+        );
 
     }
 
-
-    /* =====================================================
-       LOGIN MODAL
-    ====================================================== */
 
     if (loginBtn) {
 
         loginBtn.addEventListener(
             "click",
-            () => {
-
-                closeMobileMenu();
-
-                openModal(loginModal);
-
-            }
+            () => openModal(loginModal)
         );
 
     }
@@ -352,7 +251,18 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             () => {
 
-                closeMobileMenu();
+                if (mobileMenu) {
+                    mobileMenu.classList.remove(
+                        "active"
+                    );
+                }
+
+                if (menuToggle) {
+                    menuToggle.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+                }
 
                 openModal(loginModal);
 
@@ -382,24 +292,66 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+
     /* =====================================================
-       VOLUNTEER MODAL
+       4. VOLUNTEER MODAL
     ====================================================== */
 
-    volunteerTriggers.forEach(trigger => {
+    const volunteerModal =
+        document.getElementById("volunteerModal");
 
-        trigger.addEventListener(
-            "click",
-            event => {
+    const closeVolunteer =
+        document.getElementById("closeVolunteer");
 
-                event.preventDefault();
+    const volunteerBtn =
+        document.getElementById("volunteerBtn");
 
-                closeMobileMenu();
 
-                openModal(volunteerModal);
+    const volunteerTriggers =
+        document.querySelectorAll(
+            "[data-volunteer-trigger]"
+        );
+
+
+    volunteerTriggers.forEach((trigger) => {
+
+        trigger.addEventListener("click", (event) => {
+
+            event.preventDefault();
+
+            if (mobileMenu) {
+                mobileMenu.classList.remove(
+                    "active"
+                );
+            }
+
+            if (menuToggle) {
+
+                menuToggle.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+                const icon =
+                    menuToggle.querySelector("i");
+
+                if (icon) {
+
+                    icon.classList.remove(
+                        "fa-xmark"
+                    );
+
+                    icon.classList.add(
+                        "fa-bars"
+                    );
+
+                }
 
             }
-        );
+
+            openModal(volunteerModal);
+
+        });
 
     });
 
@@ -408,11 +360,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         volunteerBtn.addEventListener(
             "click",
-            () => {
-
-                openModal(volunteerModal);
-
-            }
+            () => closeModal(volunteerModal)
         );
 
     }
@@ -428,41 +376,76 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+
     /* =====================================================
-       CLOSE MODAL BY CLICKING OUTSIDE
+       5. CLOSE MODALS WHEN CLICKING OUTSIDE
     ====================================================== */
 
-    [loginModal, volunteerModal].forEach(modal => {
+    document.querySelectorAll(".modal").forEach((modal) => {
 
-        if (!modal) {
-            return;
-        }
+        modal.addEventListener("click", (event) => {
 
-        modal.addEventListener(
-            "click",
-            event => {
-
-                if (event.target === modal) {
-
-                    closeModal(modal);
-
-                }
-
+            if (event.target === modal) {
+                closeModal(modal);
             }
-        );
+
+        });
 
     });
 
 
+
     /* =====================================================
-       MEDLIFE AI
+       6. ESCAPE KEY
     ====================================================== */
+
+    document.addEventListener("keydown", (event) => {
+
+        if (event.key !== "Escape") return;
+
+
+        if (loginModal) {
+            closeModal(loginModal);
+        }
+
+
+        if (volunteerModal) {
+            closeModal(volunteerModal);
+        }
+
+
+        closeAI();
+
+    });
+
+
+
+    /* =====================================================
+       7. AI PANEL
+    ====================================================== */
+
+    const aiOpenBtn =
+        document.getElementById("aiOpenBtn");
+
+    const aiCloseBtn =
+        document.getElementById("aiCloseBtn");
+
+    const aiOverlay =
+        document.getElementById("aiOverlay");
+
+    const aiForm =
+        document.getElementById("aiForm");
+
+    const aiInput =
+        document.getElementById("aiInput");
+
+    const aiMessages =
+        document.getElementById("aiMessages");
+
 
     function openAI() {
 
-        if (!aiOverlay) {
-            return;
-        }
+        if (!aiOverlay) return;
 
         aiOverlay.classList.add("active");
 
@@ -471,7 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "false"
         );
 
-        body.classList.add(
+        document.body.classList.add(
             "ai-open"
         );
 
@@ -489,20 +472,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeAI() {
 
-        if (!aiOverlay) {
-            return;
-        }
+        if (!aiOverlay) return;
 
-        aiOverlay.classList.remove(
-            "active"
-        );
+        aiOverlay.classList.remove("active");
 
         aiOverlay.setAttribute(
             "aria-hidden",
             "true"
         );
 
-        body.classList.remove(
+        document.body.classList.remove(
             "ai-open"
         );
 
@@ -529,22 +508,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =====================================================
-       CLOSE AI WHEN CLICKING OVERLAY
-    ====================================================== */
+    /* Close AI by clicking overlay */
 
     if (aiOverlay) {
 
         aiOverlay.addEventListener(
             "click",
-            event => {
+            (event) => {
 
-                if (
-                    event.target === aiOverlay
-                ) {
-
+                if (event.target === aiOverlay) {
                     closeAI();
-
                 }
 
             }
@@ -553,15 +526,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+
     /* =====================================================
-       AI MESSAGE SYSTEM
+       8. AI CHAT HELPERS
     ====================================================== */
 
     function addUserMessage(text) {
 
-        if (!aiMessages || !text) {
-            return;
-        }
+        if (!aiMessages) return;
+
 
         const message =
             document.createElement("div");
@@ -569,16 +542,21 @@ document.addEventListener("DOMContentLoaded", () => {
         message.className =
             "ai-message ai-user";
 
+
         message.innerHTML = `
             <div class="ai-message-content">
                 <p></p>
             </div>
         `;
 
+
         const paragraph =
             message.querySelector("p");
 
-        paragraph.textContent = text;
+        if (paragraph) {
+            paragraph.textContent = text;
+        }
+
 
         aiMessages.appendChild(message);
 
@@ -589,15 +567,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function addBotMessage(text) {
 
-        if (!aiMessages || !text) {
-            return;
-        }
+        if (!aiMessages) return;
+
 
         const message =
             document.createElement("div");
 
         message.className =
             "ai-message ai-bot";
+
 
         message.innerHTML = `
             <div class="ai-message-avatar">
@@ -609,10 +587,14 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `;
 
+
         const paragraph =
             message.querySelector("p");
 
-        paragraph.textContent = text;
+        if (paragraph) {
+            paragraph.textContent = text;
+        }
+
 
         aiMessages.appendChild(message);
 
@@ -621,46 +603,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function addTypingIndicator() {
-
-        if (!aiMessages) {
-            return null;
-        }
-
-        const typing =
-            document.createElement("div");
-
-        typing.className =
-            "ai-message ai-bot ai-typing";
-
-        typing.innerHTML = `
-            <div class="ai-message-avatar">
-                <img src="logo.PNG" alt="MedLife">
-            </div>
-
-            <div class="ai-message-content">
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        `;
-
-        aiMessages.appendChild(typing);
-
-        scrollAIMessages();
-
-        return typing;
-
-    }
-
-
     function scrollAIMessages() {
 
-        if (!aiMessages) {
-            return;
-        }
+        if (!aiMessages) return;
 
         aiMessages.scrollTo({
             top: aiMessages.scrollHeight,
@@ -670,60 +615,61 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+
     /* =====================================================
-       BASIC MEDLIFE AI KNOWLEDGE
+       9. SIMPLE MEDLIFE AI KNOWLEDGE
     ====================================================== */
 
     function getAIResponse(question) {
 
-        const normalized =
+        const q =
             question
                 .toLowerCase()
                 .trim();
 
 
         if (
-            normalized.includes("من هي ميدلايف") ||
-            normalized.includes("ما هي ميدلايف") ||
-            normalized.includes("what is medlife") ||
-            normalized.includes("medlife")
+            q.includes("ما هي ميدلايف") ||
+            q.includes("ما هي مؤسسة ميدلايف") ||
+            q.includes("medlife") ||
+            q.includes("what is medlife")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "ميدلايف هي مؤسسة طبية خيرية تطوعية انطلقت عام 2019، وتعمل في مجالات الصحة والتوعية والتعليم والتدريب والمبادرات الإنسانية والتقنية وتمكين الشباب. حصلت المؤسسة على الترخيص الرسمي عام 2023."
+                ? "ميدلايف هي مؤسسة طبية خيرية تطوعية تأسست عام 2019، وتعمل في مجالات الصحة والتوعية والتعليم والتدريب والمبادرات الإنسانية والابتكار وتمكين الشباب."
 
-                : "MedLife is a voluntary medical charity organization founded in 2019. It works across health, awareness, education, training, humanitarian initiatives, technology, and youth empowerment. The organization obtained official registration in 2023.";
+                : "MedLife is a voluntary medical charity organization founded in 2019, working in health, awareness, education, humanitarian initiatives, innovation, and youth empowerment.";
 
         }
 
 
         if (
-            normalized.includes("تطوع") ||
-            normalized.includes("متطوع") ||
-            normalized.includes("volunteer")
+            q.includes("تطوع") ||
+            q.includes("متطوع") ||
+            q.includes("volunteer")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "حالياً لا توجد فرص تطوع مفتوحة في ميدلايف. عند توفر فرص جديدة سيتم الإعلان عنها عبر المنصات الرسمية للمؤسسة."
+                ? "حالياً لا توجد فرص تطوع مفتوحة. يمكنك متابعة منصات ميدلايف الرسمية لمعرفة فرص الانضمام الجديدة عند الإعلان عنها."
 
-                : "There are currently no open volunteer opportunities at MedLife. New opportunities will be announced through MedLife's official platforms.";
+                : "There are currently no open volunteer opportunities. Follow MedLife's official platforms for future opportunities.";
 
         }
 
 
         if (
-            normalized.includes("مجالات") ||
-            normalized.includes("ماذا تفعل") ||
-            normalized.includes("areas") ||
-            normalized.includes("programs") ||
-            normalized.includes("what do you do")
+            q.includes("مجالات") ||
+            q.includes("ماذا تفعل") ||
+            q.includes("مجال عمل") ||
+            q.includes("areas of work") ||
+            q.includes("what do you do")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "تشمل مجالات عمل ميدلايف الخدمات والاستشارات الطبية، التوعية الصحية، التعليم والتدريب، المبادرات الإنسانية، التقنية والابتكار، وتمكين الشباب."
+                ? "تعمل ميدلايف في عدة مجالات، منها الخدمات والاستشارات الطبية، التوعية الصحية، التعليم والتدريب، المبادرات الإنسانية، التقنية والابتكار، وتمكين الشباب."
 
                 : "MedLife works across medical services and consultation, health awareness, education and training, humanitarian initiatives, technology and innovation, and youth empowerment.";
 
@@ -731,123 +677,102 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         if (
-            normalized.includes("2019") ||
-            normalized.includes("تأسست") ||
-            normalized.includes("founded")
+            q.includes("استشارة") ||
+            q.includes("طبي") ||
+            q.includes("medical consultation") ||
+            q.includes("consultation")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "انطلقت ميدلايف عام 2019 كمبادرة تطوعية طبية، ثم تطورت تدريجياً حتى حصلت على الترخيص الرسمي عام 2023."
+                ? "للاستشارات الطبية يمكنك التواصل مباشرة مع بوت ميدلايف على Telegram عبر @Medlife2024bot."
 
-                : "MedLife started in 2019 as a voluntary medical initiative and gradually developed into an officially registered organization in 2023.";
+                : "For medical consultation, you can contact the MedLife Telegram bot at @Medlife2024bot.";
 
         }
 
 
         if (
-            normalized.includes("استشارة") ||
-            normalized.includes("طبية") ||
-            normalized.includes("consultation") ||
-            normalized.includes("medical")
+            q.includes("2019") ||
+            q.includes("متى تأسست") ||
+            q.includes("founded")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "للاستشارات الطبية يمكنك استخدام بوت ميدلايف على Telegram عبر @Medlife2024bot. تذكّر أن MedLife AI نفسه لا يحل محل الطبيب أو الاستشارة الطبية المتخصصة."
+                ? "بدأت رحلة ميدلايف عام 2019 كمبادرة تطوعية طبية، ثم حصلت المؤسسة على الترخيص الرسمي عام 2023."
 
-                : "For medical consultation, you can use MedLife's Telegram bot at @Medlife2024bot. Please remember that MedLife AI itself does not replace a doctor or professional medical advice.";
-
-        }
-
-
-        if (
-            normalized.includes("مقال") ||
-            normalized.includes("مقالات") ||
-            normalized.includes("article") ||
-            normalized.includes("articles")
-        ) {
-
-            return currentLanguage === "ar"
-
-                ? "نعمل على تطوير مساحة للمقالات الطبية والتوعوية التي يكتبها أعضاء ومتطوعو ميدلايف."
-
-                : "We are developing a space for medical and awareness articles written by MedLife members and volunteers.";
-
-        }
-
-
-        if (
-            normalized.includes("طرطوس") ||
-            normalized.includes("tartous") ||
-            normalized.includes("headquarters")
-        ) {
-
-            return currentLanguage === "ar"
-
-                ? "المقر الرئيسي لميدلايف موجود في طرطوس — سوريا."
-
-                : "MedLife's headquarters are in Tartous, Syria.";
+                : "MedLife started in 2019 as a medical volunteer initiative and received official registration in 2023.";
 
         }
 
 
         return currentLanguage === "ar"
 
-            ? "شكراً لسؤالك ❤️ يمكنني مساعدتك بالمعلومات المتعلقة بميدلايف، مثل من نحن، مجالات العمل، التطوع، المبادرات، المقالات والاستشارات الطبية."
+            ? "شكراً لسؤالك! أنا MedLife AI حالياً أستطيع مساعدتك بالمعلومات العامة عن ميدلايف، برامجها، مبادراتها، التطوع والاستشارات الطبية."
 
-            : "Thank you for your question ❤️ I can help with information about MedLife, including who we are, our areas of work, volunteering, initiatives, articles, and medical consultation.";
+            : "Thank you for your question! MedLife AI can currently help with general information about MedLife, its programs, initiatives, volunteering, and medical consultation.";
 
     }
 
 
+
     /* =====================================================
-       AI FORM
+       10. AI FORM
     ====================================================== */
 
-    if (aiForm) {
+    if (aiForm && aiInput) {
 
         aiForm.addEventListener(
             "submit",
-            event => {
+            (event) => {
 
                 event.preventDefault();
 
-                if (!aiInput) {
-                    return;
-                }
 
                 const question =
                     aiInput.value.trim();
 
-                if (!question) {
-                    return;
-                }
+
+                if (!question) return;
 
 
                 addUserMessage(question);
 
+
                 aiInput.value = "";
-
-                autoResizeTextarea();
-
-
-                const typing =
-                    addTypingIndicator();
 
 
                 setTimeout(() => {
-
-                    if (typing) {
-                        typing.remove();
-                    }
 
                     const response =
                         getAIResponse(question);
 
                     addBotMessage(response);
 
-                }, 700);
+                }, 500);
+
+            }
+        );
+
+
+        /* Enter = send
+           Shift + Enter = new line */
+
+        aiInput.addEventListener(
+            "keydown",
+            (event) => {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    aiForm.requestSubmit();
+
+                }
 
             }
         );
@@ -855,11 +780,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+
     /* =====================================================
-       AI QUICK QUESTIONS
+       11. AI SUGGESTION BUTTONS
     ====================================================== */
 
-    aiSuggestionButtons.forEach(button => {
+    const aiSuggestions =
+        document.querySelectorAll(
+            ".ai-suggestions button"
+        );
+
+
+    aiSuggestions.forEach((button) => {
 
         button.addEventListener(
             "click",
@@ -876,18 +808,19 @@ document.addEventListener("DOMContentLoaded", () => {
                             "data-question-en"
                         );
 
-                if (!question) {
-                    return;
-                }
+
+                if (!question) return;
+
+
+                openAI();
+
 
                 if (aiInput) {
 
                     aiInput.value =
                         question;
 
-                    autoResizeTextarea();
-
-                    aiInput.focus();
+                    aiForm?.requestSubmit();
 
                 }
 
@@ -897,78 +830,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* =====================================================
-       AI TEXTAREA AUTO RESIZE
-    ====================================================== */
-
-    function autoResizeTextarea() {
-
-        if (!aiInput) {
-            return;
-        }
-
-        aiInput.style.height = "auto";
-
-        aiInput.style.height =
-            Math.min(
-                aiInput.scrollHeight,
-                130
-            ) + "px";
-
-    }
-
-
-    if (aiInput) {
-
-        aiInput.addEventListener(
-            "input",
-            autoResizeTextarea
-        );
-
-
-        aiInput.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.key === "Enter" &&
-                    !event.shiftKey
-                ) {
-
-                    event.preventDefault();
-
-                    if (aiForm) {
-                        aiForm.requestSubmit();
-                    }
-
-                }
-
-            }
-        );
-
-    }
-
 
     /* =====================================================
-       SCROLL REVEAL
+       12. SCROLL REVEAL
     ====================================================== */
 
     const revealElements =
-        document.querySelectorAll(
-            ".reveal"
-        );
+        document.querySelectorAll(".reveal");
 
 
-    if (
-        "IntersectionObserver"
-        in window
-    ) {
+    if ("IntersectionObserver" in window) {
 
-        const observer =
+        const revealObserver =
             new IntersectionObserver(
-                entries => {
+                (entries, observer) => {
 
-                    entries.forEach(entry => {
+                    entries.forEach((entry) => {
 
                         if (
                             entry.isIntersecting
@@ -988,47 +865,83 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 },
                 {
-                    threshold: 0.12,
-                    rootMargin: "0px 0px -40px 0px"
+                    threshold: 0.12
                 }
             );
 
 
-        revealElements.forEach(element => {
+        revealElements.forEach((element) => {
 
-            observer.observe(element);
+            revealObserver.observe(element);
 
         });
 
     } else {
 
-        revealElements.forEach(element => {
+        revealElements.forEach((element) => {
 
-            element.classList.add(
-                "visible"
-            );
+            element.classList.add("visible");
 
         });
 
     }
 
 
+
     /* =====================================================
-       SMOOTH SCROLL
+       13. HEADER SCROLL EFFECT
+    ====================================================== */
+
+    const header =
+        document.querySelector(".site-header");
+
+
+    function handleHeaderScroll() {
+
+        if (!header) return;
+
+
+        if (window.scrollY > 30) {
+
+            header.classList.add("scrolled");
+
+        } else {
+
+            header.classList.remove("scrolled");
+
+        }
+
+    }
+
+
+    window.addEventListener(
+        "scroll",
+        handleHeaderScroll,
+        {
+            passive: true
+        }
+    );
+
+
+    handleHeaderScroll();
+
+
+
+    /* =====================================================
+       14. SMOOTH SCROLL
     ====================================================== */
 
     document
         .querySelectorAll('a[href^="#"]')
-        .forEach(anchor => {
+        .forEach((link) => {
 
-            anchor.addEventListener(
+            link.addEventListener(
                 "click",
-                event => {
+                (event) => {
 
                     const targetId =
-                        anchor.getAttribute(
-                            "href"
-                        );
+                        link.getAttribute("href");
+
 
                     if (
                         !targetId ||
@@ -1037,18 +950,18 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
+
                     const target =
                         document.querySelector(
                             targetId
                         );
 
-                    if (!target) {
-                        return;
-                    }
+
+                    if (!target) return;
+
 
                     event.preventDefault();
 
-                    closeMobileMenu();
 
                     target.scrollIntoView({
                         behavior: "smooth",
@@ -1061,97 +974,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 
-    /* =====================================================
-       ESCAPE KEY
-    ====================================================== */
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (event.key !== "Escape") {
-                return;
-            }
-
-            closeMobileMenu();
-
-            closeModal(loginModal);
-
-            closeModal(volunteerModal);
-
-            closeAI();
-
-        }
-    );
-
 
     /* =====================================================
-       BODY SCROLL CONTROL
-    ====================================================== */
-
-    function updateBodyScroll() {
-
-        const modalOpen =
-            document.querySelector(
-                ".modal.active"
-            );
-
-        const aiIsOpen =
-            aiOverlay &&
-            aiOverlay.classList.contains(
-                "active"
-            );
-
-        if (
-            modalOpen ||
-            aiIsOpen
-        ) {
-
-            body.classList.add(
-                "no-scroll"
-            );
-
-        } else {
-
-            body.classList.remove(
-                "no-scroll"
-            );
-
-        }
-
-    }
-
-
-    /* =====================================================
-       HANDLE WINDOW RESIZE
-    ====================================================== */
-
-    window.addEventListener(
-        "resize",
-        () => {
-
-            if (
-                window.innerWidth > 768
-            ) {
-
-                closeMobileMenu();
-
-            }
-
-            updateBodyScroll();
-
-        }
-    );
-
-
-    /* =====================================================
-       ACTIVE NAVIGATION
+       15. ACTIVE NAVIGATION
     ====================================================== */
 
     const sections =
         document.querySelectorAll(
             "main section[id]"
         );
+
 
     const navLinks =
         document.querySelectorAll(
@@ -1160,15 +992,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (
-        "IntersectionObserver"
-        in window
+        sections.length &&
+        navLinks.length &&
+        "IntersectionObserver" in window
     ) {
 
-        const sectionObserver =
+        const navObserver =
             new IntersectionObserver(
-                entries => {
+                (entries) => {
 
-                    entries.forEach(entry => {
+                    entries.forEach((entry) => {
 
                         if (
                             !entry.isIntersecting
@@ -1176,118 +1009,103 @@ document.addEventListener("DOMContentLoaded", () => {
                             return;
                         }
 
-                        const id =
-                            entry.target.id;
 
-                        navLinks.forEach(link => {
+                        navLinks.forEach((link) => {
 
                             link.classList.remove(
                                 "active"
                             );
 
-                            if (
-                                link.getAttribute(
-                                    "href"
-                                ) === `#${id}`
-                            ) {
-
-                                link.classList.add(
-                                    "active"
-                                );
-
-                            }
-
                         });
+
+
+                        const activeLink =
+                            document.querySelector(
+                                `.nav-links a[href="#${entry.target.id}"]`
+                            );
+
+
+                        if (activeLink) {
+
+                            activeLink.classList.add(
+                                "active"
+                            );
+
+                        }
 
                     });
 
                 },
                 {
-                    threshold: 0.25,
-                    rootMargin: "-20% 0px -60% 0px"
+                    rootMargin:
+                        "-35% 0px -55% 0px"
                 }
             );
 
 
-        sections.forEach(section => {
+        sections.forEach((section) => {
 
-            sectionObserver.observe(
-                section
-            );
+            navObserver.observe(section);
 
         });
 
     }
 
 
+
     /* =====================================================
-       HEADER SCROLL EFFECT
+       16. AI TEXTAREA AUTO HEIGHT
     ====================================================== */
 
-    const header =
-        document.querySelector(
-            ".site-header"
-        );
+    if (aiInput) {
 
+        aiInput.addEventListener(
+            "input",
+            () => {
 
-    if (header) {
+                aiInput.style.height = "auto";
 
-        const handleHeaderScroll = () => {
-
-            if (
-                window.scrollY > 30
-            ) {
-
-                header.classList.add(
-                    "scrolled"
-                );
-
-            } else {
-
-                header.classList.remove(
-                    "scrolled"
-                );
+                aiInput.style.height =
+                    Math.min(
+                        aiInput.scrollHeight,
+                        120
+                    ) + "px";
 
             }
-
-        };
-
-
-        window.addEventListener(
-            "scroll",
-            handleHeaderScroll,
-            {
-                passive: true
-            }
         );
-
-
-        handleHeaderScroll();
 
     }
 
 
+
     /* =====================================================
-       INITIALIZATION
+       17. PREVENT IMAGE DRAGGING
     ====================================================== */
 
-    updateLanguage();
+    document
+        .querySelectorAll("img")
+        .forEach((image) => {
 
-    updateBodyScroll();
+            image.setAttribute(
+                "draggable",
+                "false"
+            );
+
+        });
+
 
 
     /* =====================================================
-       CONSOLE
+       18. FINAL INITIALIZATION
     ====================================================== */
 
     console.log(
         "%cMedLife Syria",
-        "font-size:22px;font-weight:bold;"
+        "font-size:20px;font-weight:bold;"
     );
 
     console.log(
-        "%cWe save life, we are med.life",
-        "font-size:13px;"
+        "MedLife website initialized successfully."
     );
 
 });
