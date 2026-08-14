@@ -1,113 +1,40 @@
-/**
- * =========================================================
- * MedLife Dynamic Gallery API
- * =========================================================
- *
- * Endpoint:
- * GET /api/gallery
- *
- * Searches recursively inside:
- *
- * /images/
- *
- * It automatically finds images inside:
- *
- * images/
- * images/articles/
- * images/campaigns/
- * images/projects/
- * images/team/
- * etc.
- *
- * No image filenames need to be added to index.html.
- * =========================================================
- */
-
 export async function onRequestGet(context) {
 
     const OWNER = "Medlifesy";
     const REPOSITORY = "medlife-website";
     const BRANCH = "main";
+
     const IMAGE_FOLDER = "images";
 
-
-    /*
-     * GitHub Git Trees API
-     *
-     * recursive=1 means:
-     * search inside all subfolders.
-     */
-
-    const githubUrl =
+    const GITHUB_URL =
         `https://api.github.com/repos/${OWNER}/${REPOSITORY}/git/trees/${BRANCH}?recursive=1`;
-
 
     try {
 
-        /* =====================================================
-           REQUEST GITHUB
-        ===================================================== */
-
         const response = await fetch(
-            githubUrl,
+            GITHUB_URL,
             {
-                method: "GET",
-
                 headers: {
-                    "Accept":
-                        "application/vnd.github+json",
-
-                    "User-Agent":
-                        "MedLife-Website",
-
-                    "X-GitHub-Api-Version":
-                        "2022-11-28"
+                    "Accept": "application/vnd.github+json",
+                    "User-Agent": "MedLife-Website",
+                    "X-GitHub-Api-Version": "2022-11-28"
                 }
             }
         );
 
-
         if (!response.ok) {
-
-            console.error(
-                "GitHub Tree API error:",
-                response.status,
-                response.statusText
-            );
-
-            return jsonResponse(
-                {
-                    success: false,
-                    error:
-                        "Unable to read MedLife gallery."
-                },
-                500
+            throw new Error(
+                `GitHub API returned ${response.status}`
             );
         }
 
+        const data = await response.json();
 
-        const data =
-            await response.json();
-
-
-        if (
-            !Array.isArray(data.tree)
-        ) {
-
-            return jsonResponse(
-                {
-                    success: false,
-                    error:
-                        "Invalid GitHub tree response."
-                },
-                500
+        if (!Array.isArray(data.tree)) {
+            throw new Error(
+                "Invalid GitHub tree response."
             );
         }
-
-
-        /* =====================================================
-           ALLOWED IMAGE FORMATS
-        ===================================================== */
 
         const allowedExtensions = [
             ".jpg",
@@ -118,105 +45,95 @@ export async function onRequestGet(context) {
             ".avif"
         ];
 
+        const images = data.tree
+            .filter(item => {
 
-        /* =====================================================
-           FIND ALL IMAGES INSIDE /images/
-        ===================================================== */
+                if (!item || item.type !== "blob") {
+                    return false;
+                }
 
-        const images =
-            data.tree
-                .filter(item => {
+                const path =
+                    String(item.path || "");
 
-                    /*
-                     * Must be a file.
-                     */
-                    if (
-                        !item ||
-                        item.type !== "blob"
-                    ) {
-                        return false;
-                    }
+                /*
+                 * Must be inside images/
+                 */
+                if (
+                    !path.startsWith(
+                        `${IMAGE_FOLDER}/`
+                    )
+                ) {
+                    return false;
+                }
 
+                /*
+                 * Never include anything inside:
+                 * images/logo/
+                 */
+                if (
+                    path.startsWith(
+                        `${IMAGE_FOLDER}/logo/`
+                    )
+                ) {
+                    return false;
+                }
 
-                    /*
-                     * Must be inside images/
-                     */
-                    if (
-                        !item.path.startsWith(
-                            `${IMAGE_FOLDER}/`
+                /*
+                 * Never include files containing
+                 * "logo" as filename.
+                 */
+                const fileName =
+                    path
+                        .split("/")
+                        .pop()
+                        .toLowerCase();
+
+                if (
+                    fileName === "logo.png" ||
+                    fileName === "logo.jpg" ||
+                    fileName === "logo.jpeg" ||
+                    fileName === "logo.webp" ||
+                    fileName === "logo.gif"
+                ) {
+                    return false;
+                }
+
+                /*
+                 * Check extension.
+                 */
+                return allowedExtensions.some(
+                    extension =>
+                        path.toLowerCase().endsWith(
+                            extension
                         )
-                    ) {
-                        return false;
-                    }
+                );
 
+            })
+            .map(item => {
 
-                    /*
-                     * Check extension.
-                     */
-                    const fileName =
-                        item.path.toLowerCase();
+                const encodedPath =
+                    item.path
+                        .split("/")
+                        .map(
+                            part =>
+                                encodeURIComponent(part)
+                        )
+                        .join("/");
 
-
-                    return allowedExtensions.some(
-                        extension =>
-                            fileName.endsWith(
-                                extension
-                            )
-                    );
-
-                })
-                .map(item => {
-
-                    /*
-                     * Example:
-                     *
-                     * images/campaigns/photo.jpg
-                     *
-                     * becomes:
-                     *
-                     * https://raw.githubusercontent.com/
-                     * Medlifesy/medlife-website/main/
-                     * images/campaigns/photo.jpg
-                     *
-                     */
-
-                    const encodedPath =
+                return {
+                    name:
                         item.path
                             .split("/")
-                            .map(
-                                part =>
-                                    encodeURIComponent(
-                                        part
-                                    )
-                            )
-                            .join("/");
+                            .pop(),
 
+                    path:
+                        item.path,
 
-                    const imageUrl =
-                        `https://raw.githubusercontent.com/${OWNER}/${REPOSITORY}/${BRANCH}/${encodedPath}`;
+                    url:
+                        `https://raw.githubusercontent.com/${OWNER}/${REPOSITORY}/${BRANCH}/${encodedPath}`
+                };
 
-
-                    return {
-
-                        name:
-                            item.path
-                                .split("/")
-                                .pop(),
-
-                        path:
-                            item.path,
-
-                        url:
-                            imageUrl
-
-                    };
-
-                });
-
-
-        /* =====================================================
-           SORT
-        ===================================================== */
+            });
 
         images.sort(
             (a, b) =>
@@ -230,71 +147,46 @@ export async function onRequestGet(context) {
                 )
         );
 
+        return new Response(
+            JSON.stringify({
+                success: true,
+                count: images.length,
+                images: images
+            }),
+            {
+                status: 200,
+                headers: {
+                    "Content-Type":
+                        "application/json; charset=UTF-8",
 
-        /* =====================================================
-           RESPONSE
-        ===================================================== */
-
-        return jsonResponse({
-
-            success:
-                true,
-
-            count:
-                images.length,
-
-            images:
-                images
-
-        });
-
+                    "Cache-Control":
+                        "public, max-age=300"
+                }
+            }
+        );
 
     } catch (error) {
 
         console.error(
-            "MedLife Gallery Function Error:",
+            "MedLife Gallery Error:",
             error
         );
 
-
-        return jsonResponse(
-            {
+        return new Response(
+            JSON.stringify({
                 success: false,
-
+                count: 0,
+                images: [],
                 error:
-                    "Gallery service is temporarily unavailable."
-            },
-            500
+                    "Unable to load gallery."
+            }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type":
+                        "application/json; charset=UTF-8"
+                }
+            }
         );
     }
-}
-
-
-/* =========================================================
-   JSON RESPONSE
-========================================================= */
-
-function jsonResponse(
-    data,
-    status = 200
-) {
-
-    return new Response(
-        JSON.stringify(data),
-        {
-            status: status,
-
-            headers: {
-
-                "Content-Type":
-                    "application/json; charset=UTF-8",
-
-                /*
-                 * Cache for 5 minutes.
-                 */
-                "Cache-Control":
-                    "public, max-age=300"
-            }
-        }
-    );
 }
