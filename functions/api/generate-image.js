@@ -1,16 +1,8 @@
-```javascript
 /**
  * MedLife AI Image Generator
  *
  * Endpoint:
  * POST /api/generate-image
- *
- * Request:
- * {
- *   prompt: "...",
- *   placement: "cover",
- *   purpose: "..."
- * }
  *
  * Uses:
  * OPENAI_API_KEY
@@ -22,65 +14,48 @@ export async function onRequestPost(context) {
 
     try {
 
-        /* =====================================================
-           VALIDATION
-        ===================================================== */
-
         if (!env.OPENAI_API_KEY) {
-
             return jsonResponse(
                 {
                     success: false,
-                    error:
-                        "OPENAI_API_KEY is not configured."
+                    error: "OPENAI_API_KEY is not configured."
                 },
                 500
             );
         }
 
-
-        const body =
-            await request.json();
-
+        const body = await request.json();
 
         const prompt =
             typeof body.prompt === "string"
                 ? body.prompt.trim()
                 : "";
 
-
         const placement =
             typeof body.placement === "string"
                 ? body.placement.trim()
                 : "section";
-
 
         const purpose =
             typeof body.purpose === "string"
                 ? body.purpose.trim()
                 : "Medical illustration";
 
-
         if (!prompt) {
-
             return jsonResponse(
                 {
                     success: false,
-                    error:
-                        "Image prompt is required."
+                    error: "Image prompt is required."
                 },
                 400
             );
         }
 
-
         /* =====================================================
            MEDLIFE IMAGE STYLE
         ===================================================== */
 
-        const finalPrompt = `
-
-Create a professional medical editorial illustration
+        const finalPrompt = `Create a professional medical editorial illustration
 for the MedLife Syria medical knowledge website.
 
 The image must be:
@@ -97,9 +72,9 @@ The image must be:
 - free of watermarks
 - free of unnecessary text
 
-Use a modern medical illustration style with
-clear anatomy/concepts, balanced composition,
-soft professional lighting, and a clean background.
+Use a modern medical illustration style with clear
+anatomy or concepts, balanced composition, professional
+lighting, and a clean background.
 
 Image placement:
 ${placement}
@@ -115,54 +90,31 @@ hospital names, organization names, or watermarks
 inside the image.
 `;
 
-
         /* =====================================================
            OPENAI IMAGE GENERATION
         ===================================================== */
 
-        const openAIResponse =
-            await fetch(
-                "https://api.openai.com/v1/images/generations",
-                {
+        const openAIResponse = await fetch(
+            "https://api.openai.com/v1/images/generations",
+            {
+                method: "POST",
 
-                    method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${env.OPENAI_API_KEY}`
+                },
 
-                    headers: {
+                body: JSON.stringify({
+                    model: "gpt-image-1",
+                    prompt: finalPrompt,
+                    size: "1536x1024",
+                    quality: "medium",
+                    output_format: "png"
+                })
+            }
+        );
 
-                        "Content-Type":
-                            "application/json",
-
-                        "Authorization":
-                            `Bearer ${env.OPENAI_API_KEY}`
-
-                    },
-
-                    body: JSON.stringify({
-
-                        model:
-                            "gpt-image-1",
-
-                        prompt:
-                            finalPrompt,
-
-                        size:
-                            "1536x1024",
-
-                        quality:
-                            "medium",
-
-                        output_format:
-                            "png"
-
-                    })
-
-                }
-            );
-
-
-        const result =
-            await openAIResponse.json();
-
+        const result = await openAIResponse.json();
 
         /* =====================================================
            OPENAI ERROR
@@ -179,12 +131,12 @@ inside the image.
                 {
                     success: false,
                     error:
+                        result?.error?.message ||
                         "The image generation service returned an error."
                 },
                 502
             );
         }
-
 
         /* =====================================================
            EXTRACT IMAGE
@@ -195,13 +147,11 @@ inside the image.
                 ? result.data[0]
                 : null;
 
-
         const base64 =
             generated &&
             typeof generated.b64_json === "string"
                 ? generated.b64_json
                 : "";
-
 
         if (!base64) {
 
@@ -213,39 +163,25 @@ inside the image.
             return jsonResponse(
                 {
                     success: false,
-                    error:
-                        "No image was returned."
+                    error: "No image was returned."
                 },
                 502
             );
         }
-
 
         /* =====================================================
            SUCCESS
         ===================================================== */
 
         return jsonResponse({
-
-            success:
-                true,
+            success: true,
 
             image: {
-
-                placement:
-                    placement,
-
-                purpose:
-                    purpose,
-
-                mime_type:
-                    "image/png",
-
-                b64_json:
-                    base64
-
+                placement: placement,
+                purpose: purpose,
+                mime_type: "image/png",
+                b64_json: base64
             }
-
         });
 
     } catch (error) {
@@ -259,6 +195,7 @@ inside the image.
             {
                 success: false,
                 error:
+                    error?.message ||
                     "Internal server error."
             },
             500
@@ -277,28 +214,17 @@ function jsonResponse(
 ) {
 
     return new Response(
-
-        JSON.stringify(
-            data
-        ),
-
+        JSON.stringify(data),
         {
-
-            status:
-                status,
+            status: status,
 
             headers: {
-
                 "Content-Type":
                     "application/json; charset=UTF-8",
 
                 "Cache-Control":
                     "no-store"
-
             }
-
         }
-
     );
 }
-```
