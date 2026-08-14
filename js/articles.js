@@ -47,8 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         method: "GET",
 
                         headers: {
-                            "Accept":
-                                "application/json"
+                            "Accept": "application/json"
                         },
 
                         cache: "no-store"
@@ -66,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     data.error ||
                     "Unable to load articles."
                 );
+
             }
 
 
@@ -78,14 +78,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             /*
-             * Public page should show only approved articles.
+             * The API already returns only published
+             * articles to public visitors.
+             *
+             * We use the correct status:
+             * published
              */
 
             articles =
                 articles.filter(
                     article =>
-                        article.status ===
-                        "approved"
+                        String(
+                            article.status || ""
+                        ).toLowerCase() === "published"
                 );
 
 
@@ -101,10 +106,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 error
             );
 
-
             showError();
 
         }
+
     }
 
 
@@ -137,8 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
             articles.filter(
                 article => {
 
-                    /* Category */
-
                     if (
                         category !== "all" &&
                         String(
@@ -149,8 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         return false;
                     }
 
-
-                    /* Search */
 
                     if (!search) {
                         return true;
@@ -173,14 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         ).toLowerCase();
 
 
-                    const content =
-                        String(
-                            article.content_ar ||
-                            article.content_en ||
-                            ""
-                        ).toLowerCase();
-
-
                     const author =
                         String(
                             article.author_name ||
@@ -191,9 +184,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     return (
                         title.includes(search) ||
                         excerpt.includes(search) ||
-                        content.includes(search) ||
                         author.includes(search)
                     );
+
                 }
             );
 
@@ -201,25 +194,22 @@ document.addEventListener("DOMContentLoaded", () => {
         hideLoading();
 
 
-        if (
-            articlesEmpty
-        ) {
+        if (articlesEmpty) {
 
             articlesEmpty.style.display =
                 filtered.length === 0
                     ? "block"
                     : "none";
+
         }
 
 
-        if (
-            filtered.length === 0
-        ) {
+        if (filtered.length === 0) {
 
-            articlesContainer.innerHTML =
-                "";
+            articlesContainer.innerHTML = "";
 
             return;
+
         }
 
 
@@ -227,11 +217,10 @@ document.addEventListener("DOMContentLoaded", () => {
             filtered
                 .map(
                     article =>
-                        createArticleCard(
-                            article
-                        )
+                        createArticleCard(article)
                 )
                 .join("");
+
     }
 
 
@@ -239,9 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
        ARTICLE CARD
     ===================================================== */
 
-    function createArticleCard(
-        article
-    ) {
+    function createArticleCard(article) {
 
         const id =
             article.id;
@@ -287,10 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-        /*
-         * Image handling.
-         */
-
         const image =
             article.image_url
                 ? escapeAttribute(
@@ -325,7 +308,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <article
                 class="public-article-card">
 
-
                 <a
                     href="article.html?id=${encodeURIComponent(id)}"
                     class="article-image">
@@ -337,7 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 <div
                     class="public-article-content">
-
 
                     <div
                         class="public-article-category">
@@ -410,6 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </article>
 
         `;
+
     }
 
 
@@ -467,6 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
         `;
+
     }
 
 
@@ -474,14 +457,13 @@ document.addEventListener("DOMContentLoaded", () => {
        SEARCH
     ===================================================== */
 
-    if (
-        searchInput
-    ) {
+    if (searchInput) {
 
         searchInput.addEventListener(
             "input",
             renderArticles
         );
+
     }
 
 
@@ -489,14 +471,13 @@ document.addEventListener("DOMContentLoaded", () => {
        CATEGORY FILTER
     ===================================================== */
 
-    if (
-        categoryFilter
-    ) {
+    if (categoryFilter) {
 
         categoryFilter.addEventListener(
             "change",
             renderArticles
         );
+
     }
 
 
@@ -506,43 +487,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function showLoading() {
 
-        if (
-            articlesLoading
-        ) {
+        if (articlesLoading) {
 
-            articlesLoading.style.display =
-                "flex";
+            articlesLoading.style.display = "flex";
+
         }
 
 
-        if (
-            articlesEmpty
-        ) {
+        if (articlesEmpty) {
 
-            articlesEmpty.style.display =
-                "none";
+            articlesEmpty.style.display = "none";
+
         }
 
 
-        if (
-            articlesError
-        ) {
+        if (articlesError) {
 
-            articlesError.style.display =
-                "none";
+            articlesError.style.display = "none";
+
         }
+
     }
 
 
     function hideLoading() {
 
-        if (
-            articlesLoading
-        ) {
+        if (articlesLoading) {
 
-            articlesLoading.style.display =
-                "none";
+            articlesLoading.style.display = "none";
+
         }
+
     }
 
 
@@ -555,31 +530,26 @@ document.addEventListener("DOMContentLoaded", () => {
         hideLoading();
 
 
-        if (
-            articlesEmpty
-        ) {
+        if (articlesEmpty) {
 
-            articlesEmpty.style.display =
-                "none";
+            articlesEmpty.style.display = "none";
+
         }
 
 
-        if (
-            articlesError
-        ) {
+        if (articlesError) {
 
-            articlesError.style.display =
-                "block";
+            articlesError.style.display = "block";
+
         }
 
 
-        if (
-            articlesContainer
-        ) {
+        if (articlesContainer) {
 
-            articlesContainer.innerHTML =
-                "";
+            articlesContainer.innerHTML = "";
+
         }
+
     }
 
 
@@ -587,15 +557,11 @@ document.addEventListener("DOMContentLoaded", () => {
        CREATE EXCERPT
     ===================================================== */
 
-    function createExcerpt(
-        text
-    ) {
+    function createExcerpt(text) {
 
         const cleanText =
             stripHTML(
-                String(
-                    text || ""
-                )
+                String(text || "")
             )
             .replace(
                 /\s+/g,
@@ -604,20 +570,18 @@ document.addEventListener("DOMContentLoaded", () => {
             .trim();
 
 
-        if (
-            cleanText.length <= 150
-        ) {
+        if (cleanText.length <= 150) {
 
             return cleanText;
+
         }
 
 
         return (
-            cleanText.substring(
-                0,
-                150
-            ) + "..."
+            cleanText.substring(0, 150) +
+            "..."
         );
+
     }
 
 
@@ -625,23 +589,22 @@ document.addEventListener("DOMContentLoaded", () => {
        STRIP HTML
     ===================================================== */
 
-    function stripHTML(
-        html
-    ) {
+    function stripHTML(html) {
 
         const div =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
 
         div.innerHTML =
             html;
 
 
-        return div.textContent ||
+        return (
+            div.textContent ||
             div.innerText ||
-            "";
+            ""
+        );
+
     }
 
 
@@ -649,9 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
        DATE
     ===================================================== */
 
-    function formatDate(
-        value
-    ) {
+    function formatDate(value) {
 
         if (!value) {
             return "";
@@ -659,9 +620,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         const date =
-            new Date(
-                value
-            );
+            new Date(value);
 
 
         if (
@@ -677,16 +636,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return date.toLocaleDateString(
             "ar-SY",
             {
-                year:
-                    "numeric",
-
-                month:
-                    "long",
-
-                day:
-                    "numeric"
+                year: "numeric",
+                month: "long",
+                day: "numeric"
             }
         );
+
     }
 
 
@@ -694,33 +649,35 @@ document.addEventListener("DOMContentLoaded", () => {
        ESCAPE HTML
     ===================================================== */
 
-    function escapeHTML(
-        value
-    ) {
+    function escapeHTML(value) {
 
-        return String(
-            value ?? ""
-        )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        return String(value ?? "")
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
     }
 
 
@@ -728,29 +685,30 @@ document.addEventListener("DOMContentLoaded", () => {
        ESCAPE ATTRIBUTE
     ===================================================== */
 
-    function escapeAttribute(
-        value
-    ) {
+    function escapeAttribute(value) {
 
-        return String(
-            value ?? ""
-        )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        );
+        return String(value ?? "")
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            );
+
     }
 
 });
