@@ -13,7 +13,8 @@
   <meta property="og:image" content="https://medlifesy.org/logo.PNG">
   <meta property="og:url" content="https://medlifesy.org/">
   <meta property="og:type" content="website">
-  <link rel="icon" type="image/png" href="logo.PNG">
+  <link rel="icon" type="image/png" href="./logo.PNG">
+  <link rel="preload" as="image" href="./logo.PNG">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -49,13 +50,36 @@ footer{background:#0D1222;color:#fff;padding:60px 0 24px}.footer-grid{display:gr
 
 /* Official contact social cards */
 .contact-social-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.contact-social-grid .social-card{min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px 15px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:20px;color:#fff;transition:.3s ease}.contact-social-grid .social-card i{width:52px;height:52px;margin:0 0 12px;border-radius:15px;display:flex;align-items:center;justify-content:center;background:rgba(255,42,84,.12);color:var(--red);font-size:22px}.contact-social-grid .social-card h3{color:#fff;font-size:16px;margin:0 0 4px}.contact-social-grid .social-card span{color:#94A3B8;font-size:11px}.contact-social-grid .social-card:hover{transform:translateY(-5px);background:rgba(255,255,255,.07);border-color:rgba(255,42,84,.35);box-shadow:0 18px 40px rgba(0,0,0,.18)}.contact .section-header{margin-bottom:45px}.contact .contact-list{gap:20px}.contact .contact-item{padding:12px 0}.contact .contact-item a{transition:.25s ease}.contact .contact-item a:hover{color:var(--red)}.contact .telegram-button{box-shadow:0 12px 30px rgba(255,42,84,.20)}@media(max-width:700px){.contact-social-grid{grid-template-columns:1fr 1fr;gap:10px}.contact-social-grid .social-card{min-height:125px;padding:16px 10px}.contact-social-grid .social-card i{width:46px;height:46px;font-size:19px;margin-bottom:9px}.contact-social-grid .social-card h3{font-size:14px}.contact-social-grid .social-card span{font-size:10px}}@media(max-width:430px){.contact-social-grid{grid-template-columns:1fr}}
+
+/* =========================================================
+   FORUM COMING SOON
+========================================================= */
+
+.forum-modal .modal-icon{
+    background:var(--red-soft);
+    color:var(--red);
+}
+
+.forum-modal .forum-status{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:6px;
+    padding:8px 14px;
+    border-radius:999px;
+    background:var(--light);
+    color:var(--navy);
+    font-size:12px;
+    font-weight:800;
+}
+
 </style>
 </head>
 <body>
 
 <header>
   <div class="container nav">
-    <a href="#home" class="logo-brand" aria-label="MedLife Syria"><img src="logo.PNG" alt="MedLife Syria" class="logo-img"></a>
+    <a href="#home" class="logo-brand" aria-label="MedLife Syria"><img src="./logo.PNG" alt="MedLife Syria" class="logo-img"></a>
     <nav aria-label="Main navigation">
       <ul class="nav-links">
         <li><a href="#home" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
@@ -63,7 +87,7 @@ footer{background:#0D1222;color:#fff;padding:60px 0 24px}.footer-grid{display:gr
         <li><a href="#journey" data-ar="رحلتنا" data-en="Our Journey">رحلتنا</a></li>
         <li><a href="#programs" data-ar="ماذا نفعل" data-en="What We Do">ماذا نفعل</a></li>
         <li><a href="#gallery" data-ar="صورنا" data-en="Gallery">صورنا</a></li>
-        <li><a href="#articles" data-ar="المقالات" data-en="Articles">المقالات</a></li><li><a href="forum.html" data-ar="منتدى ميدلايف" data-en="MedLife Forum">منتدى ميدلايف</a></li>
+        <li><a href="#articles" data-ar="المقالات" data-en="Articles">المقالات</a></li><li><a href="#forum-coming-soon" data-forum-trigger data-ar="منتدى ميدلايف" data-en="MedLife Forum">منتدى ميدلايف</a></li>
         <li><a href="#consultation" data-ar="الاستشارات" data-en="Consultation">الاستشارات</a></li>
         <li><a href="#contact" data-ar="تواصل معنا" data-en="Contact">تواصل معنا</a></li>
       </ul>
@@ -85,7 +109,7 @@ footer{background:#0D1222;color:#fff;padding:60px 0 24px}.footer-grid{display:gr
       <li><a href="#journey" data-mobile-link data-ar="رحلتنا" data-en="Our Journey">رحلتنا</a></li>
       <li><a href="#programs" data-mobile-link data-ar="ماذا نفعل" data-en="What We Do">ماذا نفعل</a></li>
       <li><a href="#gallery" data-mobile-link data-ar="صورنا" data-en="Gallery">صورنا</a></li>
-      <li><a href="#articles" data-mobile-link data-ar="المقالات" data-en="Articles">المقالات</a></li><li><a href="forum.html" data-mobile-link data-ar="منتدى ميدلايف" data-en="MedLife Forum">منتدى ميدلايف</a></li>
+      <li><a href="#articles" data-mobile-link data-ar="المقالات" data-en="Articles">المقالات</a></li><li><a href="#forum-coming-soon" data-mobile-link data-forum-trigger data-ar="منتدى ميدلايف" data-en="MedLife Forum">منتدى ميدلايف</a></li>
       <li><a href="#consultation" data-mobile-link data-ar="الاستشارات" data-en="Consultation">الاستشارات</a></li>
       <li><a href="#contact" data-mobile-link data-ar="تواصل معنا" data-en="Contact">تواصل معنا</a></li>
     </ul>
@@ -106,7 +130,7 @@ footer{background:#0D1222;color:#fff;padding:60px 0 24px}.footer-grid{display:gr
     <p class="hero-description" data-ar="ميدلايف هي مؤسسة طبية خيرية تطوعية تؤمن بأن العمل التطوعي ليس مجرد تقديم الوقت، بل مساحة لصناعة الأفكار، وتطوير المهارات، وبناء الإنسان، وتحويل المعرفة إلى أثر حقيقي في المجتمع." data-en="MedLife is a voluntary medical charity organization that believes volunteering is more than giving time. It is a space for creativity, skills development, human development, and turning knowledge into meaningful community impact.">ميدلايف هي مؤسسة طبية خيرية تطوعية تؤمن بأن العمل التطوعي ليس مجرد تقديم الوقت، بل مساحة لصناعة الأفكار، وتطوير المهارات، وبناء الإنسان، وتحويل المعرفة إلى أثر حقيقي في المجتمع.</p>
     <div class="hero-buttons"><a href="#about" class="btn btn-primary"><i class="fa-solid fa-circle-info"></i><span data-ar="اكتشف ميدلايف" data-en="Discover MedLife">اكتشف ميدلايف</span></a><a href="#volunteer" class="btn btn-outline" data-volunteer-trigger><i class="fa-solid fa-hand-holding-heart"></i><span data-ar="كن جزءاً من الأثر" data-en="Be Part of the Impact">كن جزءاً من الأثر</span></a></div>
   </div>
-  <div class="hero-visual reveal"><div class="hero-brand-card"><div class="floating-icon one"><i class="fa-solid fa-heart-pulse"></i></div><div class="floating-icon two"><i class="fa-solid fa-users"></i></div><div class="floating-icon three"><i class="fa-solid fa-lightbulb"></i></div><img src="logo.PNG" alt="MedLife Syria Logo" class="hero-logo"></div></div>
+  <div class="hero-visual reveal"><div class="hero-brand-card"><div class="floating-icon one"><i class="fa-solid fa-heart-pulse"></i></div><div class="floating-icon two"><i class="fa-solid fa-users"></i></div><div class="floating-icon three"><i class="fa-solid fa-lightbulb"></i></div><img src="./logo.PNG" alt="MedLife Syria Logo" class="hero-logo"></div></div>
 </div></section>
 
 <section class="stats"><div class="container"><div class="stats-box reveal">
@@ -117,7 +141,7 @@ footer{background:#0D1222;color:#fff;padding:60px 0 24px}.footer-grid{display:gr
 </div></div></section>
 
 <section class="section about" id="about"><div class="container about-grid">
-  <div class="about-card reveal"><img src="logo.PNG" alt="MedLife Logo"><h3 data-ar="ميدلايف... مساحة لصناعة الأثر" data-en="MedLife... A Space to Create Impact">ميدلايف... مساحة لصناعة الأثر</h3><p data-ar="مؤسسة طبية خيرية تطوعية تجمع المعرفة الطبية والطاقة الشبابية والعمل المجتمعي." data-en="A voluntary medical charity organization connecting medical knowledge, youth energy, and community action.">مؤسسة طبية خيرية تطوعية تجمع المعرفة الطبية والطاقة الشبابية والعمل المجتمعي.</p></div>
+  <div class="about-card reveal"><img src="./logo.PNG" alt="MedLife Logo"><h3 data-ar="ميدلايف... مساحة لصناعة الأثر" data-en="MedLife... A Space to Create Impact">ميدلايف... مساحة لصناعة الأثر</h3><p data-ar="مؤسسة طبية خيرية تطوعية تجمع المعرفة الطبية والطاقة الشبابية والعمل المجتمعي." data-en="A voluntary medical charity organization connecting medical knowledge, youth energy, and community action.">مؤسسة طبية خيرية تطوعية تجمع المعرفة الطبية والطاقة الشبابية والعمل المجتمعي.</p></div>
   <div class="about-content reveal">
     <div class="eyebrow" data-ar="من نحن" data-en="About Us">من نحن</div>
     <div class="section-header" style="text-align:inherit;margin:0 0 25px"><h2 data-ar="من فكرة تطوعية إلى مؤسسة تصنع الأثر" data-en="From a Volunteer Initiative to an Impact-Driven Organization">من فكرة تطوعية إلى مؤسسة تصنع الأثر</h2></div>
@@ -202,11 +226,73 @@ footer{background:#0D1222;color:#fff;padding:60px 0 24px}.footer-grid{display:gr
 
 <div class="modal" id="volunteerModal" role="dialog" aria-modal="true" aria-hidden="true"><div class="modal-box"><button class="modal-close" id="closeVolunteer" type="button" aria-label="Close">×</button><div class="modal-icon"><i class="fa-solid fa-hand-holding-heart"></i></div><h3 data-ar="التطوع في ميدلايف" data-en="Volunteering at MedLife">التطوع في ميدلايف</h3><p data-ar="لا توجد حالياً فرص تطوع مفتوحة. ابقَ متابعاً لمنصات ميدلايف الرسمية، وسنعلن عن فتح باب الانضمام عند توفر فرص جديدة." data-en="There are currently no open volunteer opportunities. Follow MedLife's official platforms and we will announce new opportunities when available.">لا توجد حالياً فرص تطوع مفتوحة. ابقَ متابعاً لمنصات ميدلايف الرسمية، وسنعلن عن فتح باب الانضمام عند توفر فرص جديدة.</p><a href="https://www.facebook.com/Medlifesy/" target="_blank" rel="noopener noreferrer" class="btn btn-primary"><i class="fa-brands fa-facebook-f"></i><span data-ar="تابع ميدلايف" data-en="Follow MedLife">تابع ميدلايف</span></a></div></div>
 
+
+<!-- =========================================================
+     FORUM COMING SOON MODAL
+========================================================= -->
+
+<div class="modal forum-modal"
+     id="forumModal"
+     role="dialog"
+     aria-modal="true"
+     aria-hidden="true">
+
+    <div class="modal-box">
+
+        <button
+            class="modal-close"
+            id="closeForum"
+            type="button"
+            aria-label="Close">
+            ×
+        </button>
+
+        <div class="modal-icon">
+            <i class="fa-solid fa-comments"></i>
+        </div>
+
+        <h3
+            data-ar="منتدى ميدلايف"
+            data-en="MedLife Forum">
+            منتدى ميدلايف
+        </h3>
+
+        <div class="forum-status">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span
+                data-ar="قيد التجهيز"
+                data-en="Coming Soon">
+                قيد التجهيز
+            </span>
+        </div>
+
+        <p
+            style="margin-top:16px;"
+            data-ar="نعمل حالياً على تجهيز منتدى ميدلايف ليكون مساحة للحوار، المعرفة، التعليم، الابتكار وصناعة المبادرات. سنعلن عن إطلاقه قريباً."
+            data-en="We are currently preparing the MedLife Forum as a space for dialogue, knowledge, education, innovation, and initiative building. It will be launched soon.">
+            نعمل حالياً على تجهيز منتدى ميدلايف ليكون مساحة للحوار، المعرفة، التعليم، الابتكار وصناعة المبادرات. سنعلن عن إطلاقه قريباً.
+        </p>
+
+        <button
+            class="btn btn-primary"
+            id="closeForum2"
+            type="button">
+            <span
+                data-ar="حسناً"
+                data-en="OK">
+                حسناً
+            </span>
+        </button>
+
+    </div>
+
+</div>
+
 <button class="ai-floating-btn" id="aiOpenBtn" type="button" aria-label="Open MedLife AI"><span class="ai-pulse"></span><i class="fa-solid fa-wand-magic-sparkles"></i><span class="ai-floating-label">MedLife AI</span></button>
 
-<div class="ai-overlay" id="aiOverlay" aria-hidden="true"><div class="ai-panel" role="dialog" aria-modal="true" aria-labelledby="aiTitle"><div class="ai-header"><div class="ai-brand"><div class="ai-logo-wrap"><img src="logo.PNG" alt="MedLife" class="ai-logo"></div><div><strong id="aiTitle">MedLife AI</strong><span data-ar="مساعد ميدلايف الذكي" data-en="MedLife Smart Assistant">مساعد ميدلايف الذكي</span></div></div><button class="ai-close" id="aiCloseBtn" type="button" aria-label="Close MedLife AI"><i class="fa-solid fa-xmark"></i></button></div><div class="ai-messages" id="aiMessages"><div class="ai-message ai-bot"><div class="ai-message-avatar"><img src="logo.PNG" alt="MedLife"></div><div class="ai-message-content"><p data-ar="مرحباً 👋 أنا MedLife AI. كيف يمكنني مساعدتك؟ يمكنك أن تسألني عن ميدلايف، برامجنا، مبادراتنا، التطوع أو المقالات." data-en="Hello 👋 I’m MedLife AI. How can I help you? You can ask me about MedLife, our programs, initiatives, volunteering, or articles.">مرحباً 👋 أنا MedLife AI. كيف يمكنني مساعدتك؟ يمكنك أن تسألني عن ميدلايف، برامجنا، مبادراتنا، التطوع أو المقالات.</p></div></div><div class="ai-suggestions"><button type="button" data-question-ar="ما هي مؤسسة ميدلايف؟" data-question-en="What is MedLife?"><i class="fa-solid fa-heart-pulse"></i><span data-ar="ما هي ميدلايف؟" data-en="What is MedLife?">ما هي ميدلايف؟</span></button><button type="button" data-question-ar="كيف يمكنني التطوع مع ميدلايف؟" data-question-en="How can I volunteer with MedLife?"><i class="fa-solid fa-hand-holding-heart"></i><span data-ar="كيف يمكنني التطوع؟" data-en="How can I volunteer?">كيف يمكنني التطوع؟</span></button><button type="button" data-question-ar="ما هي مجالات عمل ميدلايف؟" data-question-en="What are MedLife's areas of work?"><i class="fa-solid fa-layer-group"></i><span data-ar="مجالات عمل ميدلايف" data-en="MedLife areas of work">مجالات عمل ميدلايف</span></button></div></div><form class="ai-input-area" id="aiForm"><textarea id="aiInput" rows="1" maxlength="1200" autocomplete="off" data-placeholder-ar="اكتب سؤالك هنا..." data-placeholder-en="Type your question here..." placeholder="اكتب سؤالك هنا..."></textarea><button type="submit" class="ai-send" id="aiSendBtn" aria-label="Send message"><i class="fa-solid fa-paper-plane"></i></button></form><div class="ai-disclaimer"><i class="fa-solid fa-shield-heart"></i><span data-ar="MedLife AI مساعد معلوماتي، ولا يحل محل الطبيب أو الاستشارة الطبية المتخصصة." data-en="MedLife AI provides informational assistance and does not replace a doctor or professional medical advice.">MedLife AI مساعد معلوماتي، ولا يحل محل الطبيب أو الاستشارة الطبية المتخصصة.</span></div></div></div>
+<div class="ai-overlay" id="aiOverlay" aria-hidden="true"><div class="ai-panel" role="dialog" aria-modal="true" aria-labelledby="aiTitle"><div class="ai-header"><div class="ai-brand"><div class="ai-logo-wrap"><img src="./logo.PNG" alt="MedLife" class="ai-logo"></div><div><strong id="aiTitle">MedLife AI</strong><span data-ar="مساعد ميدلايف الذكي" data-en="MedLife Smart Assistant">مساعد ميدلايف الذكي</span></div></div><button class="ai-close" id="aiCloseBtn" type="button" aria-label="Close MedLife AI"><i class="fa-solid fa-xmark"></i></button></div><div class="ai-messages" id="aiMessages"><div class="ai-message ai-bot"><div class="ai-message-avatar"><img src="./logo.PNG" alt="MedLife"></div><div class="ai-message-content"><p data-ar="مرحباً 👋 أنا MedLife AI. كيف يمكنني مساعدتك؟ يمكنك أن تسألني عن ميدلايف، برامجنا، مبادراتنا، التطوع أو المقالات." data-en="Hello 👋 I’m MedLife AI. How can I help you? You can ask me about MedLife, our programs, initiatives, volunteering, or articles.">مرحباً 👋 أنا MedLife AI. كيف يمكنني مساعدتك؟ يمكنك أن تسألني عن ميدلايف، برامجنا، مبادراتنا، التطوع أو المقالات.</p></div></div><div class="ai-suggestions"><button type="button" data-question-ar="ما هي مؤسسة ميدلايف؟" data-question-en="What is MedLife?"><i class="fa-solid fa-heart-pulse"></i><span data-ar="ما هي ميدلايف؟" data-en="What is MedLife?">ما هي ميدلايف؟</span></button><button type="button" data-question-ar="كيف يمكنني التطوع مع ميدلايف؟" data-question-en="How can I volunteer with MedLife?"><i class="fa-solid fa-hand-holding-heart"></i><span data-ar="كيف يمكنني التطوع؟" data-en="How can I volunteer?">كيف يمكنني التطوع؟</span></button><button type="button" data-question-ar="ما هي مجالات عمل ميدلايف؟" data-question-en="What are MedLife's areas of work?"><i class="fa-solid fa-layer-group"></i><span data-ar="مجالات عمل ميدلايف" data-en="MedLife areas of work">مجالات عمل ميدلايف</span></button></div></div><form class="ai-input-area" id="aiForm"><textarea id="aiInput" rows="1" maxlength="1200" autocomplete="off" data-placeholder-ar="اكتب سؤالك هنا..." data-placeholder-en="Type your question here..." placeholder="اكتب سؤالك هنا..."></textarea><button type="submit" class="ai-send" id="aiSendBtn" aria-label="Send message"><i class="fa-solid fa-paper-plane"></i></button></form><div class="ai-disclaimer"><i class="fa-solid fa-shield-heart"></i><span data-ar="MedLife AI مساعد معلوماتي، ولا يحل محل الطبيب أو الاستشارة الطبية المتخصصة." data-en="MedLife AI provides informational assistance and does not replace a doctor or professional medical advice.">MedLife AI مساعد معلوماتي، ولا يحل محل الطبيب أو الاستشارة الطبية المتخصصة.</span></div></div></div>
 
-<footer><div class="container footer-grid"><div><div class="footer-logo"><img src="logo.PNG" alt="MedLife Syria"></div><p class="footer-description" data-ar="مؤسسة ميدلايف الطبية الخيرية التطوعية. بالعمل التطوعي نصنع الأثر، ونؤمن بأن لكل شخص مساحة يستطيع من خلالها أن يتعلم ويبدع ويخدم مجتمعه." data-en="MedLife is a voluntary medical charity organization. Through volunteerism we create impact, and we believe everyone can find a space to learn, create, and serve their community.">مؤسسة ميدلايف الطبية الخيرية التطوعية. بالعمل التطوعي نصنع الأثر، ونؤمن بأن لكل شخص مساحة يستطيع من خلالها أن يتعلم ويبدع ويخدم مجتمعه.</p><div class="footer-socials"><a href="https://www.facebook.com/Medlifesy/" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/med-life-syria/" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a><a href="https://www.youtube.com/@medlifesy" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a><a href="https://t.me/Medlife2024bot" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a></div></div><div class="footer-column"><h4 data-ar="روابط سريعة" data-en="Quick Links">روابط سريعة</h4><a href="#home" data-ar="الرئيسية" data-en="Home">الرئيسية</a><a href="#about" data-ar="من نحن" data-en="About Us">من نحن</a><a href="#journey" data-ar="رحلتنا" data-en="Our Journey">رحلتنا</a><a href="#programs" data-ar="مجالات العمل" data-en="Our Work">مجالات العمل</a><a href="#gallery" data-ar="صورنا" data-en="Gallery">صورنا</a><a href="#articles" data-ar="المقالات" data-en="Articles">المقالات</a><a href="forum.html" data-ar="منتدى ميدلايف" data-en="MedLife Forum">منتدى ميدلايف</a><a href="#consultation" data-ar="الاستشارات" data-en="Consultation">الاستشارات</a></div><div class="footer-column"><h4 data-ar="منصات ميدلايف" data-en="MedLife Platforms">منصات ميدلايف</h4><a href="https://www.facebook.com/Medlifesy/" target="_blank" rel="noopener noreferrer">Facebook</a><a href="https://www.linkedin.com/company/med-life-syria/" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://www.youtube.com/@medlifesy" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://t.me/Medlife2024bot" target="_blank" rel="noopener noreferrer">Telegram — Medical Consultation</a><a href="athar.html">أثر ميدلايف</a><a href="mailto:info@medlifesy.org">info@medlifesy.org</a><a href="tel:+963998942124">+963 998 942 124</a><a href="tel:+963182222568">+963 182 222 568</a><a href="mailto:info@medlifesy.org">info@medlifesy.org</a><a href="tel:+963998942124">+963 998 942 124</a><a href="tel:+963182222568">+963 182 222 568</a></div></div><div class="container"><div class="copyright">© 2026 MedLife Syria — <span data-ar="مؤسسة ميدلايف الطبية الخيرية التطوعية" data-en="MedLife Voluntary Medical Charity Organization">مؤسسة ميدلايف الطبية الخيرية التطوعية</span><br>We save life, we are med.life</div></div></footer>
+<footer><div class="container footer-grid"><div><div class="footer-logo"><img src="./logo.PNG" alt="MedLife Syria"></div><p class="footer-description" data-ar="مؤسسة ميدلايف الطبية الخيرية التطوعية. بالعمل التطوعي نصنع الأثر، ونؤمن بأن لكل شخص مساحة يستطيع من خلالها أن يتعلم ويبدع ويخدم مجتمعه." data-en="MedLife is a voluntary medical charity organization. Through volunteerism we create impact, and we believe everyone can find a space to learn, create, and serve their community.">مؤسسة ميدلايف الطبية الخيرية التطوعية. بالعمل التطوعي نصنع الأثر، ونؤمن بأن لكل شخص مساحة يستطيع من خلالها أن يتعلم ويبدع ويخدم مجتمعه.</p><div class="footer-socials"><a href="https://www.facebook.com/Medlifesy/" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/med-life-syria/" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a><a href="https://www.youtube.com/@medlifesy" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a><a href="https://t.me/Medlife2024bot" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a></div></div><div class="footer-column"><h4 data-ar="روابط سريعة" data-en="Quick Links">روابط سريعة</h4><a href="#home" data-ar="الرئيسية" data-en="Home">الرئيسية</a><a href="#about" data-ar="من نحن" data-en="About Us">من نحن</a><a href="#journey" data-ar="رحلتنا" data-en="Our Journey">رحلتنا</a><a href="#programs" data-ar="مجالات العمل" data-en="Our Work">مجالات العمل</a><a href="#gallery" data-ar="صورنا" data-en="Gallery">صورنا</a><a href="#articles" data-ar="المقالات" data-en="Articles">المقالات</a><a href="#forum-coming-soon" data-forum-trigger data-ar="منتدى ميدلايف" data-en="MedLife Forum">منتدى ميدلايف</a><a href="#consultation" data-ar="الاستشارات" data-en="Consultation">الاستشارات</a></div><div class="footer-column"><h4 data-ar="منصات ميدلايف" data-en="MedLife Platforms">منصات ميدلايف</h4><a href="https://www.facebook.com/Medlifesy/" target="_blank" rel="noopener noreferrer">Facebook</a><a href="https://www.linkedin.com/company/med-life-syria/" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://www.youtube.com/@medlifesy" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://t.me/Medlife2024bot" target="_blank" rel="noopener noreferrer">Telegram — Medical Consultation</a><a href="athar.html">أثر ميدلايف</a><a href="mailto:info@medlifesy.org">info@medlifesy.org</a><a href="tel:+963998942124">+963 998 942 124</a><a href="tel:+963182222568">+963 182 222 568</a><a href="mailto:info@medlifesy.org">info@medlifesy.org</a><a href="tel:+963998942124">+963 998 942 124</a><a href="tel:+963182222568">+963 182 222 568</a></div></div><div class="container"><div class="copyright">© 2026 MedLife Syria — <span data-ar="مؤسسة ميدلايف الطبية الخيرية التطوعية" data-en="MedLife Voluntary Medical Charity Organization">مؤسسة ميدلايف الطبية الخيرية التطوعية</span><br>We save life, we are med.life</div></div></footer>
 
 <script>
 const languageBtn=document.getElementById('languageBtn');const aiInput=document.getElementById('aiInput');let currentLanguage=localStorage.getItem('medlifeLanguage')||'ar';
@@ -218,9 +304,96 @@ const volunteerModal=document.getElementById('volunteerModal');const volunteerBt
 const revealEls=document.querySelectorAll('.reveal');if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('show');observer.unobserve(entry.target)}}),{threshold:.12});revealEls.forEach(el=>observer.observe(el))}else revealEls.forEach(el=>el.classList.add('show'));
 
 /* MedLife AI */
-const aiOpenBtn=document.getElementById('aiOpenBtn');const aiCloseBtn=document.getElementById('aiCloseBtn');const aiOverlay=document.getElementById('aiOverlay');const aiForm=document.getElementById('aiForm');const aiMessages=document.getElementById('aiMessages');const aiSendBtn=document.getElementById('aiSendBtn');let aiHistory=[];function openAI(){aiOverlay.classList.add('active');aiOverlay.setAttribute('aria-hidden','false');document.body.classList.add('ai-open');setTimeout(()=>aiInput.focus(),200)}function closeAI(){aiOverlay.classList.remove('active');aiOverlay.setAttribute('aria-hidden','true');document.body.classList.remove('ai-open')}aiOpenBtn.addEventListener('click',openAI);aiCloseBtn.addEventListener('click',closeAI);aiOverlay.addEventListener('click',e=>{if(e.target===aiOverlay)closeAI()});function addAIMessage(message,type='bot'){const w=document.createElement('div');w.className=`ai-message ai-${type}`;w.innerHTML=type==='bot'?'<div class="ai-message-avatar"><img src="logo.PNG" alt="MedLife"></div><div class="ai-message-content"><p></p></div>':'<div class="ai-message-content"><p></p></div>';w.querySelector('p').textContent=message;aiMessages.appendChild(w);aiMessages.scrollTop=aiMessages.scrollHeight;return w}function showTyping(){removeTyping();const w=document.createElement('div');w.id='aiTyping';w.className='ai-message ai-bot';w.innerHTML='<div class="ai-message-avatar"><img src="logo.PNG" alt="MedLife"></div><div class="ai-message-content"><div class="ai-typing"><span></span><span></span><span></span></div></div>';aiMessages.appendChild(w);aiMessages.scrollTop=aiMessages.scrollHeight}function removeTyping(){document.getElementById('aiTyping')?.remove()}async function askMedLifeAI(question){const q=String(question||'').trim();if(!q)return;addAIMessage(q,'user');aiHistory.push({role:'user',content:q});aiInput.value='';aiInput.style.height='auto';aiSendBtn.disabled=true;showTyping();try{const response=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history:aiHistory.slice(-10),language:currentLanguage})});const data=await response.json().catch(()=>({}));removeTyping();if(!response.ok)throw new Error(data.error||'AI request failed');const answer=data.answer||'';if(!answer)throw new Error('Empty AI response');addAIMessage(answer,'bot');aiHistory.push({role:'assistant',content:answer})}catch(err){removeTyping();addAIMessage(currentLanguage==='en'?'Sorry, MedLife AI is temporarily unavailable. Please try again later.':'عذراً، خدمة MedLife AI غير متاحة حالياً. حاول مرة أخرى لاحقاً.','bot');console.error(err)}finally{aiSendBtn.disabled=false;aiInput.focus()}}aiForm.addEventListener('submit',e=>{e.preventDefault();askMedLifeAI(aiInput.value)});document.querySelectorAll('[data-question-ar][data-question-en]').forEach(btn=>btn.addEventListener('click',()=>askMedLifeAI(btn.getAttribute(currentLanguage==='en'?'data-question-en':'data-question-ar'))));aiInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiForm.requestSubmit()}});aiInput.addEventListener('input',()=>{aiInput.style.height='auto';aiInput.style.height=Math.min(aiInput.scrollHeight,110)+'px'});
+const aiOpenBtn=document.getElementById('aiOpenBtn');const aiCloseBtn=document.getElementById('aiCloseBtn');const aiOverlay=document.getElementById('aiOverlay');const aiForm=document.getElementById('aiForm');const aiMessages=document.getElementById('aiMessages');const aiSendBtn=document.getElementById('aiSendBtn');let aiHistory=[];function openAI(){aiOverlay.classList.add('active');aiOverlay.setAttribute('aria-hidden','false');document.body.classList.add('ai-open');setTimeout(()=>aiInput.focus(),200)}function closeAI(){aiOverlay.classList.remove('active');aiOverlay.setAttribute('aria-hidden','true');document.body.classList.remove('ai-open')}aiOpenBtn.addEventListener('click',openAI);aiCloseBtn.addEventListener('click',closeAI);aiOverlay.addEventListener('click',e=>{if(e.target===aiOverlay)closeAI()});function addAIMessage(message,type='bot'){const w=document.createElement('div');w.className=`ai-message ai-${type}`;w.innerHTML=type==='bot'?'<div class="ai-message-avatar"><img src="./logo.PNG" alt="MedLife"></div><div class="ai-message-content"><p></p></div>':'<div class="ai-message-content"><p></p></div>';w.querySelector('p').textContent=message;aiMessages.appendChild(w);aiMessages.scrollTop=aiMessages.scrollHeight;return w}function showTyping(){removeTyping();const w=document.createElement('div');w.id='aiTyping';w.className='ai-message ai-bot';w.innerHTML='<div class="ai-message-avatar"><img src="./logo.PNG" alt="MedLife"></div><div class="ai-message-content"><div class="ai-typing"><span></span><span></span><span></span></div></div>';aiMessages.appendChild(w);aiMessages.scrollTop=aiMessages.scrollHeight}function removeTyping(){document.getElementById('aiTyping')?.remove()}async function askMedLifeAI(question){const q=String(question||'').trim();if(!q)return;addAIMessage(q,'user');aiHistory.push({role:'user',content:q});aiInput.value='';aiInput.style.height='auto';aiSendBtn.disabled=true;showTyping();try{const response=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history:aiHistory.slice(-10),language:currentLanguage})});const data=await response.json().catch(()=>({}));removeTyping();if(!response.ok)throw new Error(data.error||'AI request failed');const answer=data.answer||'';if(!answer)throw new Error('Empty AI response');addAIMessage(answer,'bot');aiHistory.push({role:'assistant',content:answer})}catch(err){removeTyping();addAIMessage(currentLanguage==='en'?'Sorry, MedLife AI is temporarily unavailable. Please try again later.':'عذراً، خدمة MedLife AI غير متاحة حالياً. حاول مرة أخرى لاحقاً.','bot');console.error(err)}finally{aiSendBtn.disabled=false;aiInput.focus()}}aiForm.addEventListener('submit',e=>{e.preventDefault();askMedLifeAI(aiInput.value)});document.querySelectorAll('[data-question-ar][data-question-en]').forEach(btn=>btn.addEventListener('click',()=>askMedLifeAI(btn.getAttribute(currentLanguage==='en'?'data-question-en':'data-question-ar'))));aiInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiForm.requestSubmit()}});aiInput.addEventListener('input',()=>{aiInput.style.height='auto';aiInput.style.height=Math.min(aiInput.scrollHeight,110)+'px'});
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLoginModal();closeVolunteerModal();closeMobileMenu();closeAI()}});window.addEventListener('resize',()=>{if(window.innerWidth>1050)closeMobileMenu()});
+
+/* =========================================================
+   FORUM COMING SOON
+========================================================= */
+
+const forumModal =
+    document.getElementById("forumModal");
+
+const closeForum =
+    document.getElementById("closeForum");
+
+const closeForum2 =
+    document.getElementById("closeForum2");
+
+function openForumModal(){
+
+    if(!forumModal) return;
+
+    forumModal.classList.add("active");
+
+    forumModal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+}
+
+function closeForumModal(){
+
+    if(!forumModal) return;
+
+    forumModal.classList.remove("active");
+
+    forumModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+}
+
+document.querySelectorAll(
+    "[data-forum-trigger]"
+).forEach(
+    element => {
+
+        element.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                closeMobileMenu();
+
+                openForumModal();
+
+            }
+        );
+
+    }
+);
+
+if(closeForum){
+    closeForum.addEventListener(
+        "click",
+        closeForumModal
+    );
+}
+
+if(closeForum2){
+    closeForum2.addEventListener(
+        "click",
+        closeForumModal
+    );
+}
+
+if(forumModal){
+    forumModal.addEventListener(
+        "click",
+        event => {
+
+            if(event.target === forumModal){
+                closeForumModal();
+            }
+
+        }
+    );
+}
+
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLoginModal();closeVolunteerModal();closeMobileMenu();closeForumModal();closeAI()}});window.addEventListener('resize',()=>{if(window.innerWidth>1050)closeMobileMenu()});
 applyLanguage(currentLanguage);
 </script>
 
