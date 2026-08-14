@@ -287,6 +287,67 @@
             background: #e0efed;
         }
 
+        .ai-button {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            color: white;
+        }
+
+        .ai-button:hover {
+            background: linear-gradient(135deg, #6d28d9, #4c1d95);
+            transform: translateY(-1px);
+        }
+
+        .ai-button:disabled {
+            opacity: .65;
+            cursor: wait;
+            transform: none;
+        }
+
+        .ai-status {
+            display: none;
+            margin-top: 14px;
+            padding: 12px 15px;
+            border-radius: 9px;
+            background: #f3efff;
+            color: #5b21b6;
+            border: 1px solid #ddd3ff;
+            font-size: 14px;
+        }
+
+        .ai-preview {
+            display: none;
+            margin-top: 18px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #fbf9ff;
+            border: 1px solid #e5ddff;
+        }
+
+        .ai-preview.open {
+            display: block;
+        }
+
+        .ai-preview h4 {
+            margin: 0 0 10px;
+            color: #5b21b6;
+        }
+
+        .ai-preview h5 {
+            margin: 18px 0 6px;
+            color: var(--secondary);
+        }
+
+        .ai-preview p {
+            margin: 0;
+            line-height: 1.9;
+            white-space: pre-wrap;
+        }
+
+        .ai-section {
+            padding: 14px 0;
+            border-top: 1px solid #eee8ff;
+        }
+
         .review-button {
             background: #eef3f7;
             color: var(--secondary);
@@ -779,6 +840,89 @@
 
                 </div>
 
+                <div class="full">
+
+                    <div class="button-row" style="margin-top:0;">
+
+                        <button
+                            type="button"
+                            id="formatArticleAiButton"
+                            class="ai-button"
+                        >
+                            ✨ تجهيز المقال بالذكاء الاصطناعي
+                        </button>
+
+                        <span class="form-note" style="align-self:center;">
+                            سيعيد AI ترتيب المقال وتحسين لغته واقتراح أماكن للصور، دون نشره تلقائياً.
+                        </span>
+
+                    </div>
+
+                    <div
+                        id="aiStatus"
+                        class="ai-status"
+                    ></div>
+
+                    <div
+                        id="aiPreview"
+                        class="ai-preview"
+                    >
+
+                        <h4>✨ معاينة نسخة الذكاء الاصطناعي</h4>
+
+                        <div class="ai-section">
+                            <h5>العنوان</h5>
+                            <p id="aiTitle"></p>
+                        </div>
+
+                        <div class="ai-section">
+                            <h5>الوصف التعريفي</h5>
+                            <p id="aiExcerpt"></p>
+                        </div>
+
+                        <div class="ai-section">
+                            <h5>المقدمة</h5>
+                            <p id="aiIntroduction"></p>
+                        </div>
+
+                        <div id="aiSections"></div>
+
+                        <div class="ai-section">
+                            <h5>الخاتمة</h5>
+                            <p id="aiConclusion"></p>
+                        </div>
+
+                        <div class="ai-section">
+                            <h5>المراجع</h5>
+                            <div id="aiReferences"></div>
+                        </div>
+
+                        <div class="ai-section">
+                            <h5>ملاحظات المراجعة العلمية</h5>
+                            <div id="aiNotes"></div>
+                        </div>
+
+                        <div class="ai-section">
+                            <h5>اقتراحات الصور</h5>
+                            <div id="aiImages"></div>
+                        </div>
+
+                        <div class="button-row">
+
+                            <button
+                                type="button"
+                                id="applyAiButton"
+                                class="primary-button"
+                            >
+                                ✅ اعتماد التنسيق في النموذج
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
 
                 <div class="full">
 
@@ -889,10 +1033,290 @@ const pendingCount =
 const publishedCount =
     document.getElementById("publishedCount");
 
+const formatArticleAiButton =
+    document.getElementById("formatArticleAiButton");
+
+const applyAiButton =
+    document.getElementById("applyAiButton");
+
+const aiStatus =
+    document.getElementById("aiStatus");
+
+const aiPreview =
+    document.getElementById("aiPreview");
+
+let formattedAiArticle = null;
+
 
 // =====================================================
 // SUBMIT ARTICLE
 // =====================================================
+
+formatArticleAiButton.addEventListener(
+    "click",
+    async function() {
+
+        const articleText =
+            document.getElementById("content_ar").value.trim();
+
+        if (!articleText) {
+            showAIStatus(
+                "أدخل محتوى المقال أولاً ثم اضغط زر الذكاء الاصطناعي.",
+                true
+            );
+            return;
+        }
+
+        formatArticleAiButton.disabled = true;
+        formatArticleAiButton.textContent = "⏳ جاري تجهيز المقال...";
+
+        showAIStatus(
+            "يقوم الذكاء الاصطناعي بترتيب المقال ومراجعته تحريرياً...",
+            false
+        );
+
+        try {
+
+            const response =
+                await fetch("/api/ai", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({
+                        action: "format_article",
+                        language: "ar",
+                        article: articleText
+                    })
+                });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success || !data.article) {
+                throw new Error(
+                    data.error || "تعذر تجهيز المقال بالذكاء الاصطناعي."
+                );
+            }
+
+            formattedAiArticle = data.article;
+
+            renderAIArticlePreview(formattedAiArticle);
+
+            showAIStatus(
+                "تم تجهيز نسخة منسقة بنجاح. راجعها ثم اضغط اعتماد التنسيق.",
+                false
+            );
+
+        } catch (error) {
+
+            console.error("MedLife AI article error:", error);
+
+            showAIStatus(
+                error.message || "حدث خطأ أثناء تجهيز المقال.",
+                true
+            );
+
+        } finally {
+
+            formatArticleAiButton.disabled = false;
+            formatArticleAiButton.textContent =
+                "✨ تجهيز المقال بالذكاء الاصطناعي";
+
+        }
+    }
+);
+
+
+applyAiButton.addEventListener(
+    "click",
+    function() {
+
+        if (!formattedAiArticle) {
+            return;
+        }
+
+        if (formattedAiArticle.title) {
+            document.getElementById("title_ar").value =
+                formattedAiArticle.title;
+        }
+
+        if (formattedAiArticle.excerpt) {
+            document.getElementById("excerpt_ar").value =
+                formattedAiArticle.excerpt;
+        }
+
+        document.getElementById("content_ar").value =
+            buildFormattedContent(formattedAiArticle);
+
+        document.getElementById("image_url").value = "";
+
+        message.className = "message success";
+        message.textContent =
+            "تم اعتماد التنسيق داخل النموذج. المقال لم يُنشر بعد وسيبقى قيد المراجعة عند إرساله.";
+
+        window.scrollTo({
+            top: document.getElementById("articleForm").offsetTop - 20,
+            behavior: "smooth"
+        });
+    }
+);
+
+
+function showAIStatus(text, isError) {
+
+    aiStatus.style.display = "block";
+    aiStatus.textContent = text;
+    aiStatus.style.background =
+        isError ? "#fdecec" : "#f3efff";
+    aiStatus.style.color =
+        isError ? "#dc3545" : "#5b21b6";
+    aiStatus.style.borderColor =
+        isError ? "#f7caca" : "#ddd3ff";
+}
+
+
+function renderAIArticlePreview(article) {
+
+    document.getElementById("aiTitle").textContent =
+        article.title || "";
+
+    document.getElementById("aiExcerpt").textContent =
+        article.excerpt || "";
+
+    document.getElementById("aiIntroduction").textContent =
+        article.introduction || "";
+
+    const sectionsContainer =
+        document.getElementById("aiSections");
+
+    sectionsContainer.innerHTML = "";
+
+    (article.sections || []).forEach(section => {
+
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className = "ai-section";
+
+        const heading =
+            document.createElement("h5");
+
+        heading.textContent =
+            section.heading || "";
+
+        const content =
+            document.createElement("p");
+
+        content.textContent =
+            section.content || "";
+
+        wrapper.appendChild(heading);
+        wrapper.appendChild(content);
+
+        sectionsContainer.appendChild(wrapper);
+    });
+
+    document.getElementById("aiConclusion").textContent =
+        article.conclusion || "";
+
+    const references =
+        document.getElementById("aiReferences");
+
+    references.innerHTML = "";
+
+    (article.references || []).forEach(reference => {
+
+        const p = document.createElement("p");
+        p.textContent = `• ${reference}`;
+        references.appendChild(p);
+    });
+
+    if (!(article.references || []).length) {
+        references.textContent = "لا توجد مراجع أُعيد تنظيمها.";
+    }
+
+    const notes =
+        document.getElementById("aiNotes");
+
+    notes.innerHTML = "";
+
+    (article.editor_notes || []).forEach(note => {
+
+        const p = document.createElement("p");
+        p.textContent = `• ${note}`;
+        notes.appendChild(p);
+    });
+
+    if (!(article.editor_notes || []).length) {
+        notes.textContent = "لا توجد ملاحظات إضافية من AI.";
+    }
+
+    const images =
+        document.getElementById("aiImages");
+
+    images.innerHTML = "";
+
+    (article.image_prompts || []).forEach(image => {
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "ai-section";
+
+        const title = document.createElement("strong");
+        title.textContent =
+            `${image.placement || "section"} — ${image.purpose || ""}`;
+
+        const p = document.createElement("p");
+        p.style.marginTop = "6px";
+        p.textContent = image.prompt || "";
+
+        wrapper.appendChild(title);
+        wrapper.appendChild(p);
+        images.appendChild(wrapper);
+    });
+
+    if (!(article.image_prompts || []).length) {
+        images.textContent = "لم يتم اقتراح صور.";
+    }
+
+    aiPreview.classList.add("open");
+}
+
+
+function buildFormattedContent(article) {
+
+    const parts = [];
+
+    if (article.introduction) {
+        parts.push(article.introduction.trim());
+    }
+
+    (article.sections || []).forEach(section => {
+
+        if (section.heading) {
+            parts.push(`\n## ${section.heading}`);
+        }
+
+        if (section.content) {
+            parts.push(section.content.trim());
+        }
+    });
+
+    if (article.conclusion) {
+        parts.push(`\n## الخاتمة`);
+        parts.push(article.conclusion.trim());
+    }
+
+    if ((article.references || []).length) {
+        parts.push(`\n## المراجع`);
+
+        article.references.forEach(reference => {
+            parts.push(`- ${reference}`);
+        });
+    }
+
+    return parts.join("\n\n").trim();
+}
 
 form.addEventListener(
     "submit",
