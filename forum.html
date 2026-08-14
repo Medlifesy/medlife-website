@@ -1,0 +1,5250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color"
+          content="#151D36">
+
+    <title>
+        منتدى ميدلايف | MedLife Forum
+    </title>
+
+    <meta name="description"
+          content="منتدى ميدلايف في طرطوس — مساحة للقراءة والمعرفة والحوار وStudy Zone والأنشطة الثقافية والتعليمية.">
+
+    <meta name="robots"
+          content="index, follow">
+
+    <link rel="canonical"
+          href="https://medlifesy.org/forum.html">
+
+    <meta property="og:title"
+          content="منتدى ميدلايف | MedLife Forum">
+
+    <meta property="og:description"
+          content="مساحة للقراءة والمعرفة والحوار والدراسة والأنشطة الثقافية ضمن مؤسسة ميدلايف.">
+
+    <meta property="og:image"
+          content="https://medlifesy.org/logo.PNG">
+
+    <meta property="og:url"
+          content="https://medlifesy.org/forum.html">
+
+    <meta property="og:type"
+          content="website">
+
+    <link rel="icon"
+          type="image/png"
+          href="./logo.PNG">
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+<style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+:root{
+
+    --red:#FF2A54;
+    --red-dark:#E51E46;
+    --red-soft:#FFF0F3;
+
+    --navy:#151D36;
+    --navy-2:#202944;
+    --navy-3:#2B3659;
+
+    --white:#FFFFFF;
+    --light:#F7F9FC;
+    --text:#1E293B;
+    --muted:#64748B;
+
+    --border:#E2E8F0;
+
+    --shadow-sm:
+        0 8px 25px rgba(21,29,54,.06);
+
+    --shadow:
+        0 18px 45px rgba(21,29,54,.10);
+
+    --shadow-lg:
+        0 30px 80px rgba(21,29,54,.14);
+
+    --radius-sm:12px;
+    --radius:20px;
+    --radius-lg:30px;
+
+    --container:1200px;
+
+    --transition:.3s ease;
+}
+
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+
+html{
+    scroll-behavior:smooth;
+}
+
+
+body{
+
+    font-family:"Cairo",sans-serif;
+
+    background:var(--white);
+
+    color:var(--text);
+
+    line-height:1.8;
+
+    overflow-x:hidden;
+}
+
+
+body.menu-open{
+    overflow:hidden;
+}
+
+
+img{
+    max-width:100%;
+}
+
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+
+button{
+    font-family:inherit;
+    border:0;
+}
+
+
+.container{
+
+    width:
+        min(
+            var(--container),
+            calc(100% - 40px)
+        );
+
+    margin-inline:auto;
+}
+
+
+.section{
+    padding:95px 0;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+header{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+    background:
+        rgba(255,255,255,.96);
+
+    backdrop-filter:
+        blur(16px);
+
+    border-bottom:
+        1px solid
+        rgba(21,29,54,.08);
+}
+
+
+.nav{
+
+    min-height:82px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:20px;
+}
+
+
+.logo-brand{
+
+    display:flex;
+
+    align-items:center;
+
+    flex-shrink:0;
+}
+
+
+.logo-img{
+
+    height:58px;
+
+    width:auto;
+
+    display:block;
+
+    object-fit:contain;
+}
+
+
+.nav-links{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:21px;
+
+    list-style:none;
+
+    color:var(--navy);
+
+    font-size:14px;
+
+    font-weight:700;
+}
+
+
+.nav-links a{
+
+    position:relative;
+
+    transition:var(--transition);
+}
+
+
+.nav-links a:hover{
+
+    color:var(--red);
+}
+
+
+.nav-links a::after{
+
+    content:"";
+
+    position:absolute;
+
+    bottom:-8px;
+
+    inset-inline-end:0;
+
+    width:0;
+
+    height:2px;
+
+    background:var(--red);
+
+    transition:var(--transition);
+}
+
+
+.nav-links a:hover::after{
+
+    width:100%;
+}
+
+
+.nav-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+}
+
+
+.lang-btn,
+.back-btn{
+
+    background:var(--white);
+
+    color:var(--navy);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        var(--radius-sm);
+
+    padding:
+        9px 13px;
+
+    font-weight:800;
+
+    cursor:pointer;
+
+    transition:
+        var(--transition);
+}
+
+
+.lang-btn:hover,
+.back-btn:hover{
+
+    border-color:
+        var(--red);
+
+    color:
+        var(--red);
+}
+
+
+.menu-toggle{
+
+    display:none;
+
+    width:44px;
+
+    height:44px;
+
+    border-radius:12px;
+
+    background:var(--light);
+
+    color:var(--navy);
+
+    font-size:19px;
+
+    cursor:pointer;
+}
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+.mobile-menu{
+
+    position:fixed;
+
+    top:82px;
+
+    inset-inline:0;
+
+    z-index:999;
+
+    background:var(--white);
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        var(--shadow);
+
+    padding:20px;
+
+    transform:
+        translateY(-120%);
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:
+        .35s ease;
+}
+
+
+.mobile-menu.active{
+
+    transform:
+        translateY(0);
+
+    opacity:1;
+
+    pointer-events:auto;
+}
+
+
+.mobile-menu ul{
+    list-style:none;
+}
+
+
+.mobile-menu li + li{
+
+    border-top:
+        1px solid
+        var(--border);
+}
+
+
+.mobile-menu a{
+
+    display:block;
+
+    padding:15px 5px;
+
+    color:var(--navy);
+
+    font-weight:700;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero{
+
+    position:relative;
+
+    overflow:hidden;
+
+    padding:
+        100px 0
+        115px;
+
+    background:
+
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(255,42,84,.14),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 8% 90%,
+            rgba(255,42,84,.05),
+            transparent 28%
+        ),
+
+        linear-gradient(
+            135deg,
+            #FFFFFF,
+            #F7F9FC
+        );
+}
+
+
+.hero::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:520px;
+
+    height:520px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        rgba(255,42,84,.08);
+
+    top:-260px;
+
+    inset-inline-end:-180px;
+}
+
+
+.hero-grid{
+
+    position:relative;
+
+    z-index:2;
+
+    display:grid;
+
+    grid-template-columns:
+        1.05fr .95fr;
+
+    gap:65px;
+
+    align-items:center;
+}
+
+
+.eyebrow{
+
+    color:var(--red);
+
+    font-size:13px;
+
+    font-weight:900;
+
+    margin-bottom:8px;
+}
+
+
+.hero-tag{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    background:
+        var(--red-soft);
+
+    color:
+        var(--red);
+
+    border:
+        1px solid
+        rgba(255,42,84,.15);
+
+    border-radius:
+        999px;
+
+    padding:
+        8px 15px;
+
+    font-size:
+        12px;
+
+    font-weight:800;
+
+    margin-bottom:18px;
+}
+
+
+.hero h1{
+
+    color:
+        var(--navy);
+
+    font-size:
+        clamp(
+            42px,
+            5vw,
+            66px
+        );
+
+    line-height:
+        1.18;
+
+    font-weight:900;
+
+    margin-bottom:
+        16px;
+}
+
+
+.hero h1 span{
+
+    color:var(--red);
+}
+
+
+.hero p{
+
+    max-width:680px;
+
+    color:var(--muted);
+
+    font-size:17px;
+
+    margin-bottom:24px;
+}
+
+
+.hero-meta{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-bottom:25px;
+}
+
+
+.hero-meta span{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    background:#fff;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        12px;
+
+    padding:
+        8px 11px;
+
+    color:
+        var(--navy);
+
+    font-size:
+        11px;
+
+    font-weight:800;
+
+    box-shadow:
+        var(--shadow-sm);
+}
+
+
+.hero-meta i{
+    color:var(--red);
+}
+
+
+.hero-buttons{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:12px;
+}
+
+
+.btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:9px;
+
+    padding:
+        13px 21px;
+
+    border-radius:
+        12px;
+
+    font-weight:
+        800;
+
+    transition:
+        var(--transition);
+}
+
+
+.btn-primary{
+
+    background:
+        var(--red);
+
+    color:#fff;
+
+    box-shadow:
+        0 12px 30px
+        rgba(255,42,84,.20);
+}
+
+
+.btn-primary:hover{
+
+    background:
+        var(--red-dark);
+
+    transform:
+        translateY(-3px);
+}
+
+
+.btn-outline{
+
+    background:#fff;
+
+    color:var(--navy);
+
+    border:
+        2px solid
+        var(--border);
+}
+
+
+.btn-outline:hover{
+
+    border-color:
+        var(--navy);
+
+    transform:
+        translateY(-3px);
+}
+
+
+/* =========================================================
+   BRAND CARD
+========================================================= */
+
+.hero-visual{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+}
+
+
+.brand-card{
+
+    width:
+        min(
+            100%,
+            500px
+        );
+
+    min-height:
+        430px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    position:relative;
+
+    overflow:hidden;
+
+    padding:
+        55px;
+
+    border-radius:
+        38px;
+
+    background:
+
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(255,42,84,.08),
+            transparent 45%
+        ),
+
+        linear-gradient(
+            145deg,
+            #fff,
+            #fff8fa
+        );
+
+    border:
+        1px solid
+        #f1dce2;
+
+    box-shadow:
+        var(--shadow-lg);
+}
+
+
+.brand-card::before,
+.brand-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    border-radius:50%;
+}
+
+
+.brand-card::before{
+
+    width:330px;
+
+    height:330px;
+
+    background:
+        rgba(255,42,84,.07);
+
+    top:-170px;
+
+    inset-inline-end:-110px;
+}
+
+
+.brand-card::after{
+
+    width:240px;
+
+    height:240px;
+
+    background:
+        rgba(21,29,54,.04);
+
+    bottom:-140px;
+
+    inset-inline-start:-90px;
+}
+
+
+.forum-logo{
+
+    position:relative;
+
+    z-index:2;
+
+    width:72%;
+
+    max-width:320px;
+
+    filter:
+        drop-shadow(
+            0 20px 35px
+            rgba(21,29,54,.10)
+        );
+}
+
+
+.floating{
+
+    position:absolute;
+
+    z-index:4;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    background:
+        rgba(255,255,255,.96);
+
+    border:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        var(--shadow-sm);
+
+    padding:
+        8px 11px;
+
+    border-radius:12px;
+
+    font-size:10px;
+
+    font-weight:800;
+
+    color:var(--navy);
+}
+
+
+.floating i{
+    color:var(--red);
+}
+
+
+.floating.one{
+
+    top:25px;
+
+    inset-inline-start:25px;
+}
+
+
+.floating.two{
+
+    bottom:25px;
+
+    inset-inline-end:25px;
+}
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.section-head{
+
+    max-width:
+        780px;
+
+    margin:
+        0 auto 48px;
+
+    text-align:center;
+}
+
+
+.section-head h2{
+
+    color:var(--navy);
+
+    font-size:
+        clamp(
+            30px,
+            4vw,
+            42px
+        );
+
+    line-height:1.3;
+
+    margin-bottom:10px;
+}
+
+
+.section-head p{
+
+    color:
+        var(--muted);
+
+    font-size:
+        16px;
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats{
+
+    margin-top:-45px;
+
+    position:relative;
+
+    z-index:10;
+}
+
+
+.stats-box{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    background:#fff;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        22px;
+
+    box-shadow:
+        var(--shadow-lg);
+
+    overflow:hidden;
+}
+
+
+.stat{
+
+    text-align:center;
+
+    padding:
+        23px 12px;
+
+    position:relative;
+}
+
+
+.stat + .stat::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset-block:18px;
+
+    inset-inline-start:0;
+
+    width:1px;
+
+    background:
+        var(--border);
+}
+
+
+.stat-number{
+
+    font-size:30px;
+
+    line-height:1.2;
+
+    font-weight:900;
+
+    color:var(--red);
+}
+
+
+.stat-title{
+
+    font-size:12px;
+
+    color:var(--muted);
+
+    font-weight:700;
+}
+
+
+/* =========================================================
+   ABOUT
+========================================================= */
+
+.about{
+    background:var(--light);
+}
+
+
+.about-card{
+
+    max-width:950px;
+
+    margin:auto;
+
+    background:#fff;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        28px;
+
+    padding:
+        38px;
+
+    box-shadow:
+        var(--shadow);
+}
+
+
+.about-top{
+
+    display:grid;
+
+    grid-template-columns:
+        92px 1fr;
+
+    gap:22px;
+
+    align-items:center;
+
+    margin-bottom:22px;
+}
+
+
+.about-icon{
+
+    width:92px;
+
+    height:92px;
+
+    border-radius:24px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:
+        var(--red-soft);
+
+    color:
+        var(--red);
+
+    font-size:34px;
+}
+
+
+.about-card h3{
+
+    font-size:27px;
+
+    color:
+        var(--navy);
+
+    margin-bottom:4px;
+}
+
+
+.about-card .lead{
+
+    font-size:13px;
+
+    color:
+        var(--muted);
+}
+
+
+.about-card p{
+
+    font-size:15px;
+
+    color:
+        var(--muted);
+
+    margin-bottom:15px;
+}
+
+
+.quote{
+
+    margin-top:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            var(--navy-3)
+        );
+
+    color:#fff;
+
+    padding:
+        17px 18px;
+
+    border-radius:
+        16px;
+
+    text-align:center;
+
+    font-weight:800;
+}
+
+
+/* =========================================================
+   GENERAL CARDS
+========================================================= */
+
+.grid-3{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:20px;
+}
+
+
+.card{
+
+    background:#fff;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        22px;
+
+    padding:28px;
+
+    transition:
+        var(--transition);
+}
+
+
+.card:hover{
+
+    transform:
+        translateY(-6px);
+
+    box-shadow:
+        var(--shadow-lg);
+
+    border-color:
+        #f2cdd6;
+}
+
+
+.icon{
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:17px;
+
+    background:
+        var(--red-soft);
+
+    color:
+        var(--red);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:24px;
+
+    margin-bottom:18px;
+}
+
+
+.card h3{
+
+    color:
+        var(--navy);
+
+    font-size:19px;
+
+    margin-bottom:7px;
+}
+
+
+.card p{
+
+    color:
+        var(--muted);
+
+    font-size:13px;
+}
+
+
+/* =========================================================
+   STUDY ZONE
+========================================================= */
+
+.study-zone{
+    background:#fff;
+}
+
+
+.study-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        1.25fr .75fr;
+
+    gap:22px;
+
+    align-items:stretch;
+}
+
+
+.study-main{
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--navy),
+            var(--navy-3)
+        );
+
+    color:#fff;
+
+    border-radius:
+        28px;
+
+    padding:
+        34px;
+
+    position:relative;
+
+    overflow:hidden;
+
+    box-shadow:
+        var(--shadow-lg);
+}
+
+
+.study-main::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:280px;
+
+    height:280px;
+
+    border-radius:50%;
+
+    background:
+        rgba(255,42,84,.12);
+
+    top:-150px;
+
+    inset-inline-end:-90px;
+}
+
+
+.study-icon{
+
+    width:66px;
+
+    height:66px;
+
+    border-radius:19px;
+
+    background:
+        rgba(255,255,255,.10);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:27px;
+
+    margin-bottom:20px;
+
+    position:relative;
+
+    z-index:1;
+}
+
+
+.study-main h3{
+
+    font-size:26px;
+
+    margin-bottom:10px;
+
+    position:relative;
+
+    z-index:1;
+}
+
+
+.study-main p{
+
+    color:#CBD5E1;
+
+    font-size:14px;
+
+    position:relative;
+
+    z-index:1;
+}
+
+
+.study-features{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:13px;
+
+    margin-top:26px;
+
+    position:relative;
+
+    z-index:1;
+}
+
+
+.study-feature{
+
+    display:flex;
+
+    gap:10px;
+
+    align-items:flex-start;
+
+    padding:14px;
+
+    border-radius:15px;
+
+    background:
+        rgba(255,255,255,.06);
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+}
+
+
+.study-feature i{
+
+    color:
+        #FF7894;
+
+    margin-top:4px;
+}
+
+
+.study-feature strong{
+
+    display:block;
+
+    color:#fff;
+
+    font-size:13px;
+}
+
+
+.study-feature span{
+
+    display:block;
+
+    color:#AAB7CB;
+
+    font-size:10px;
+
+    margin-top:2px;
+}
+
+
+.study-side{
+
+    display:grid;
+
+    gap:14px;
+}
+
+
+.study-side-card{
+
+    background:#fff;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        20px;
+
+    padding:23px;
+
+    box-shadow:
+        var(--shadow-sm);
+}
+
+
+.study-side-card i{
+
+    width:48px;
+
+    height:48px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:14px;
+
+    background:
+        var(--red-soft);
+
+    color:
+        var(--red);
+
+    font-size:20px;
+
+    margin-bottom:12px;
+}
+
+
+.study-side-card h3{
+
+    color:
+        var(--navy);
+
+    font-size:17px;
+
+    margin-bottom:5px;
+}
+
+
+.study-side-card p{
+
+    color:
+        var(--muted);
+
+    font-size:12px;
+}
+
+
+.study-hours{
+
+    background:
+        var(--red-soft);
+
+    border:
+        1px solid
+        rgba(255,42,84,.13);
+
+    border-radius:
+        20px;
+
+    padding:
+        20px;
+
+    text-align:center;
+}
+
+
+.study-hours span{
+
+    display:block;
+
+    color:
+        var(--red);
+
+    font-size:
+        11px;
+
+    font-weight:900;
+}
+
+
+.study-hours strong{
+
+    display:block;
+
+    color:
+        var(--navy);
+
+    font-size:
+        24px;
+
+    line-height:1.2;
+}
+
+
+.study-hours small{
+
+    display:block;
+
+    color:
+        var(--muted);
+
+    font-size:
+        9px;
+
+    margin-top:6px;
+}
+
+
+/* =========================================================
+   READING
+========================================================= */
+
+.reading{
+
+    background:
+        var(--light);
+}
+
+
+.reading-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:20px;
+}
+
+
+.reading-card{
+
+    background:#fff;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        22px;
+
+    padding:28px;
+}
+
+
+.reading-card h3{
+
+    color:
+        var(--navy);
+
+    font-size:
+        21px;
+
+    margin-bottom:9px;
+}
+
+
+.reading-card p{
+
+    color:
+        var(--muted);
+
+    font-size:
+        14px;
+
+    margin-bottom:15px;
+}
+
+
+.list{
+
+    list-style:none;
+
+    display:grid;
+
+    gap:9px;
+}
+
+
+.list li{
+
+    display:flex;
+
+    gap:8px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        13px;
+}
+
+
+.list i{
+
+    color:
+        var(--red);
+
+    margin-top:5px;
+}
+
+
+/* =========================================================
+   ACTIVITIES
+========================================================= */
+
+.activities-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:18px;
+}
+
+
+.activity{
+
+    display:flex;
+
+    gap:16px;
+
+    align-items:flex-start;
+
+    background:#fff;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        20px;
+
+    padding:23px;
+
+    transition:
+        var(--transition);
+}
+
+
+.activity:hover{
+
+    transform:
+        translateY(-4px);
+
+    box-shadow:
+        var(--shadow);
+}
+
+
+.activity-icon{
+
+    width:56px;
+
+    height:56px;
+
+    flex:0 0 56px;
+
+    border-radius:16px;
+
+    background:
+        var(--red-soft);
+
+    color:
+        var(--red);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:21px;
+}
+
+
+.activity h3{
+
+    color:
+        var(--navy);
+
+    font-size:18px;
+
+    margin-bottom:5px;
+}
+
+
+.activity p{
+
+    color:
+        var(--muted);
+
+    font-size:13px;
+}
+
+
+/* =========================================================
+   TIMELINE
+========================================================= */
+
+.timeline-section{
+
+    background:
+        var(--light);
+}
+
+
+.timeline{
+
+    max-width:900px;
+
+    margin:auto;
+
+    position:relative;
+}
+
+
+.timeline::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    bottom:0;
+
+    inset-inline-start:118px;
+
+    width:2px;
+
+    background:#e7d6db;
+}
+
+
+.timeline-item{
+
+    display:grid;
+
+    grid-template-columns:
+        100px 1fr;
+
+    gap:40px;
+
+    margin-bottom:30px;
+
+    position:relative;
+}
+
+
+.timeline-year{
+
+    color:
+        var(--red);
+
+    font-weight:
+        900;
+
+    font-size:
+        22px;
+
+    text-align:
+        center;
+
+    padding-top:5px;
+
+    background:
+        var(--light);
+
+    position:relative;
+
+    z-index:2;
+}
+
+
+.timeline-dot{
+
+    position:absolute;
+
+    top:13px;
+
+    inset-inline-start:112px;
+
+    width:14px;
+
+    height:14px;
+
+    border-radius:50%;
+
+    background:
+        var(--red);
+
+    border:
+        4px solid
+        var(--light);
+
+    z-index:3;
+}
+
+
+.timeline-card{
+
+    background:#fff;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        20px;
+
+    padding:
+        22px;
+
+    box-shadow:
+        var(--shadow-sm);
+}
+
+
+.timeline-card h3{
+
+    color:
+        var(--navy);
+
+    font-size:
+        18px;
+
+    margin-bottom:
+        6px;
+}
+
+
+.timeline-card p{
+
+    color:
+        var(--muted);
+
+    font-size:
+        13px;
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+.events{
+
+    max-width:
+        950px;
+
+    margin:auto;
+
+    display:grid;
+
+    gap:16px;
+}
+
+
+.event{
+
+    display:grid;
+
+    grid-template-columns:
+        85px 1fr auto;
+
+    gap:18px;
+
+    align-items:center;
+
+    padding:21px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        20px;
+
+    background:#fff;
+
+    box-shadow:
+        var(--shadow-sm);
+}
+
+
+.event-date{
+
+    width:72px;
+
+    height:72px;
+
+    border-radius:
+        18px;
+
+    background:
+        var(--red-soft);
+
+    color:
+        var(--red);
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    font-weight:
+        900;
+}
+
+
+.event-date i{
+
+    font-size:
+        20px;
+
+    margin-bottom:2px;
+}
+
+
+.event h3{
+
+    color:
+        var(--navy);
+
+    font-size:
+        18px;
+
+    margin-bottom:4px;
+}
+
+
+.event p{
+
+    color:
+        var(--muted);
+
+    font-size:
+        13px;
+}
+
+
+.badge{
+
+    padding:
+        8px 10px;
+
+    border-radius:
+        10px;
+
+    background:
+        var(--red-soft);
+
+    color:
+        var(--red);
+
+    font-size:
+        10px;
+
+    font-weight:
+        900;
+
+    white-space:
+        nowrap;
+}
+
+
+.event-note{
+
+    margin:
+        18px auto 0;
+
+    max-width:
+        760px;
+
+    padding:
+        13px 15px;
+
+    background:
+        var(--light);
+
+    border:
+        1px dashed
+        #e7cbd2;
+
+    border-radius:
+        13px;
+
+    text-align:center;
+
+    color:
+        var(--muted);
+
+    font-size:
+        12px;
+}
+
+
+/* =========================================================
+   CONTACT
+========================================================= */
+
+.contact{
+
+    background:
+        var(--navy);
+
+    color:#fff;
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+
+.contact::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:420px;
+
+    height:420px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    top:-220px;
+
+    inset-inline-end:-120px;
+}
+
+
+.contact-grid{
+
+    position:relative;
+
+    z-index:2;
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:50px;
+}
+
+
+.contact .eyebrow{
+
+    color:
+        #FF7894;
+}
+
+
+.contact h2{
+
+    color:#fff;
+
+    font-size:
+        clamp(
+            31px,
+            4vw,
+            42px
+        );
+
+    margin-bottom:
+        10px;
+}
+
+
+.contact-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:13px;
+}
+
+
+.contact-item{
+
+    display:flex;
+
+    gap:13px;
+
+    align-items:flex-start;
+
+    padding:11px 0;
+}
+
+
+.contact-icon{
+
+    width:48px;
+
+    height:48px;
+
+    flex:0 0 48px;
+
+    border-radius:13px;
+
+    background:
+        rgba(255,42,84,.12);
+
+    color:
+        var(--red);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+
+.contact-item small{
+
+    display:block;
+
+    color:#94A3B8;
+
+    font-size:10px;
+
+    margin-bottom:2px;
+}
+
+
+.contact-item a,
+.contact-item span{
+
+    color:#fff;
+
+    font-weight:700;
+
+    font-size:14px;
+}
+
+
+.contact-item a{
+
+    direction:ltr;
+
+    display:inline-block;
+}
+
+
+.contact-cards{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:12px;
+}
+
+
+.contact-card{
+
+    min-height:135px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    background:
+        rgba(255,255,255,.04);
+
+    border:
+        1px solid
+        rgba(255,255,255,.10);
+
+    border-radius:
+        18px;
+
+    padding:
+        16px;
+
+    transition:
+        var(--transition);
+}
+
+
+.contact-card:hover{
+
+    transform:
+        translateY(-5px);
+
+    background:
+        rgba(255,255,255,.07);
+
+    border-color:
+        rgba(255,42,84,.35);
+}
+
+
+.contact-card i{
+
+    width:46px;
+
+    height:46px;
+
+    border-radius:13px;
+
+    background:
+        rgba(255,42,84,.12);
+
+    color:
+        var(--red);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:8px;
+}
+
+
+.contact-card h3{
+
+    color:#fff;
+
+    font-size:15px;
+
+    margin-bottom:2px;
+}
+
+
+.contact-card span{
+
+    color:#94A3B8;
+
+    font-size:10px;
+}
+
+
+.email-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    margin-top:14px;
+
+    padding:13px;
+
+    border-radius:12px;
+
+    background:
+        var(--red);
+
+    color:#fff;
+
+    font-weight:800;
+}
+
+
+.email-btn:hover{
+
+    background:
+        var(--red-dark);
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer{
+
+    background:
+        #0D1222;
+
+    color:#fff;
+
+    padding:
+        52px 0 24px;
+}
+
+
+.footer-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        1.5fr 1fr 1fr;
+
+    gap:40px;
+
+    margin-bottom:
+        35px;
+}
+
+
+.footer-logo img{
+
+    width:160px;
+
+    margin-bottom:
+        15px;
+}
+
+
+.footer-description{
+
+    color:#94A3B8;
+
+    font-size:13px;
+
+    max-width:420px;
+}
+
+
+.footer-column h4{
+
+    margin-bottom:
+        15px;
+}
+
+
+.footer-column a{
+
+    display:block;
+
+    color:#94A3B8;
+
+    font-size:13px;
+
+    margin-bottom:8px;
+}
+
+
+.footer-column a:hover{
+
+    color:#fff;
+}
+
+
+.footer-socials{
+
+    display:flex;
+
+    gap:8px;
+
+    margin-top:17px;
+}
+
+
+.footer-social{
+
+    width:40px;
+
+    height:40px;
+
+    border-radius:10px;
+
+    background:
+        rgba(255,255,255,.07);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+
+.footer-social:hover{
+
+    background:
+        var(--red);
+}
+
+
+.copyright{
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.08);
+
+    padding-top:
+        20px;
+
+    text-align:center;
+
+    color:#64748B;
+
+    font-size:11px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1050px){
+
+    .nav-links{
+        display:none;
+    }
+
+    .menu-toggle{
+        display:block;
+    }
+
+    .hero-grid{
+        grid-template-columns:1fr;
+    }
+
+    .hero-content{
+        text-align:center;
+    }
+
+    .hero p{
+        margin-inline:auto;
+    }
+
+    .hero-meta{
+        justify-content:center;
+    }
+
+    .hero-buttons{
+        justify-content:center;
+    }
+
+    .grid-3{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .study-grid{
+        grid-template-columns:1fr;
+    }
+
+    .footer-grid{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+}
+
+
+@media(max-width:700px){
+
+    .container{
+        width:
+            calc(100% - 28px);
+    }
+
+    .section{
+        padding:
+            72px 0;
+    }
+
+    .nav{
+        min-height:
+            72px;
+    }
+
+    .logo-img{
+        height:
+            48px;
+    }
+
+    .mobile-menu{
+        top:
+            72px;
+    }
+
+    .hero{
+        padding:
+            68px 0 85px;
+    }
+
+    .hero h1{
+        font-size:
+            40px;
+    }
+
+    .hero p{
+        font-size:
+            14px;
+    }
+
+    .brand-card{
+        min-height:
+            300px;
+
+        border-radius:
+            28px;
+
+        padding:
+            30px;
+    }
+
+    .forum-logo{
+        width:
+            80%;
+    }
+
+    .stats-box{
+        grid-template-columns:
+            repeat(2,1fr);
+
+        border-radius:
+            18px;
+    }
+
+    .stat + .stat::before{
+        display:none;
+    }
+
+    .stat:nth-child(odd){
+        border-inline-end:
+            1px solid
+            var(--border);
+    }
+
+    .stat:nth-child(-n+2){
+        border-bottom:
+            1px solid
+            var(--border);
+    }
+
+    .grid-3,
+    .reading-grid,
+    .activities-grid,
+    .contact-grid,
+    .footer-grid{
+        grid-template-columns:
+            1fr;
+    }
+
+    .about-top{
+        grid-template-columns:
+            1fr;
+
+        text-align:center;
+    }
+
+    .about-icon{
+        margin:auto;
+    }
+
+    .study-main{
+        padding:
+            25px;
+
+        border-radius:
+            23px;
+    }
+
+    .study-main h3{
+        font-size:
+            22px;
+    }
+
+    .study-features{
+        grid-template-columns:
+            1fr;
+    }
+
+    .timeline::before{
+        display:none;
+    }
+
+    .timeline-item{
+        grid-template-columns:
+            1fr;
+
+        gap:
+            8px;
+    }
+
+    .timeline-year{
+        text-align:start;
+
+        background:
+            transparent;
+    }
+
+    .timeline-dot{
+        display:none;
+    }
+
+    .event{
+        grid-template-columns:
+            1fr;
+
+        text-align:center;
+    }
+
+    .event-date{
+        margin:auto;
+    }
+
+    .contact-cards{
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+}
+
+
+@media(max-width:430px){
+
+    .hero h1{
+        font-size:
+            34px;
+    }
+
+    .hero-buttons .btn{
+        width:
+            100%;
+    }
+
+    .brand-card{
+        min-height:
+            260px;
+    }
+
+    .contact-cards{
+        grid-template-columns:
+            1fr;
+    }
+
+    .floating{
+        font-size:
+            9px;
+
+        padding:
+            7px 9px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header>
+
+    <div class="container nav">
+
+
+        <a href="index.html"
+           class="logo-brand"
+           aria-label="MedLife Syria">
+
+            <img src="./logo.PNG"
+                 alt="MedLife Syria"
+                 class="logo-img">
+
+        </a>
+
+
+        <nav aria-label="Main navigation">
+
+            <ul class="nav-links">
+
+                <li>
+                    <a href="index.html#home"
+                       data-ar="الرئيسية"
+                       data-en="Home">
+                        الرئيسية
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#about"
+                       data-ar="من نحن"
+                       data-en="About Us">
+                        من نحن
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#programs"
+                       data-ar="ماذا نفعل"
+                       data-en="What We Do">
+                        ماذا نفعل
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#gallery"
+                       data-ar="صورنا"
+                       data-en="Gallery">
+                        صورنا
+                    </a>
+                </li>
+
+                <li>
+                    <a href="articles.html"
+                       data-ar="المقالات"
+                       data-en="Articles">
+                        المقالات
+                    </a>
+                </li>
+
+                <li>
+                    <a href="forum.html"
+                       data-ar="منتدى ميدلايف"
+                       data-en="MedLife Forum">
+                        منتدى ميدلايف
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#contact"
+                       data-ar="تواصل معنا"
+                       data-en="Contact">
+                        تواصل معنا
+                    </a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+
+        <div class="nav-actions">
+
+            <button
+                class="lang-btn"
+                id="languageBtn"
+                type="button">
+
+                EN
+
+            </button>
+
+
+            <a href="index.html"
+               class="back-btn"
+               data-ar="الرئيسية"
+               data-en="Home">
+
+                الرئيسية
+
+            </a>
+
+
+            <button
+                class="menu-toggle"
+                id="menuToggle"
+                type="button"
+                aria-expanded="false">
+
+                <i class="fa-solid fa-bars"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     MOBILE MENU
+========================================================= -->
+
+<div class="mobile-menu"
+     id="mobileMenu">
+
+    <div class="container">
+
+        <ul>
+
+            <li>
+                <a href="index.html#home"
+                   data-mobile-link
+                   data-ar="الرئيسية"
+                   data-en="Home">
+                    الرئيسية
+                </a>
+            </li>
+
+            <li>
+                <a href="index.html#about"
+                   data-mobile-link
+                   data-ar="من نحن"
+                   data-en="About Us">
+                    من نحن
+                </a>
+            </li>
+
+            <li>
+                <a href="index.html#programs"
+                   data-mobile-link
+                   data-ar="ماذا نفعل"
+                   data-en="What We Do">
+                    ماذا نفعل
+                </a>
+            </li>
+
+            <li>
+                <a href="index.html#gallery"
+                   data-mobile-link
+                   data-ar="صورنا"
+                   data-en="Gallery">
+                    صورنا
+                </a>
+            </li>
+
+            <li>
+                <a href="articles.html"
+                   data-mobile-link
+                   data-ar="المقالات"
+                   data-en="Articles">
+                    المقالات
+                </a>
+            </li>
+
+            <li>
+                <a href="forum.html"
+                   data-mobile-link
+                   data-ar="منتدى ميدلايف"
+                   data-en="MedLife Forum">
+                    منتدى ميدلايف
+                </a>
+            </li>
+
+            <li>
+                <a href="index.html#contact"
+                   data-mobile-link
+                   data-ar="تواصل معنا"
+                   data-en="Contact">
+                    تواصل معنا
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+</div>
+
+
+<main>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section class="hero">
+
+    <div class="container hero-grid">
+
+
+        <div>
+
+            <div class="hero-tag">
+
+                <i class="fa-solid fa-book-open"></i>
+
+                <span
+                    data-ar="منتدى ميدلايف الثقافي والمعرفي"
+                    data-en="MedLife Cultural & Knowledge Forum">
+
+                    منتدى ميدلايف الثقافي والمعرفي
+
+                </span>
+
+            </div>
+
+
+            <div class="eyebrow">
+                MedLife Forum
+            </div>
+
+
+            <h1>
+
+                منتدى ميدلايف
+
+                <br>
+
+                <span
+                    data-ar="مساحة للقراءة والمعرفة والحوار"
+                    data-en="A Space for Reading, Knowledge & Dialogue">
+
+                    مساحة للقراءة والمعرفة والحوار
+
+                </span>
+
+            </h1>
+
+
+            <p
+
+                data-ar="منتدى ميدلايف هو مساحة ثقافية ومعرفية أطلقتها مؤسسة ميدلايف في طرطوس لتعزيز القراءة المتعمقة، وتشجيع التعلم، وتوفير بيئة هادئة للحوار والأنشطة الثقافية والتعليمية، إضافة إلى Study Zone للدراسة والتركيز."
+
+                data-en="MedLife Forum is a cultural and knowledge space launched by MedLife in Tartous to encourage deeper reading, learning, dialogue, cultural and educational activities, as well as a dedicated Study Zone for focused learning.">
+
+                منتدى ميدلايف هو مساحة ثقافية ومعرفية أطلقتها مؤسسة ميدلايف في طرطوس لتعزيز القراءة المتعمقة، وتشجيع التعلم، وتوفير بيئة هادئة للحوار والأنشطة الثقافية والتعليمية، إضافة إلى Study Zone للدراسة والتركيز.
+
+            </p>
+
+
+            <div class="hero-meta">
+
+                <span>
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span data-ar="طرطوس"
+                          data-en="Tartous">
+                        طرطوس
+                    </span>
+                </span>
+
+                <span>
+                    <i class="fa-solid fa-book"></i>
+                    <span data-ar="نحو 200 كتاب"
+                          data-en="Around 200 Books">
+                        نحو 200 كتاب
+                    </span>
+                </span>
+
+                <span>
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>
+                        Study Zone
+                    </span>
+                </span>
+
+                <span>
+                    <i class="fa-regular fa-clock"></i>
+                    <span data-ar="9 صباحاً – 8 مساءً"
+                          data-en="9 AM – 8 PM">
+                        9 صباحاً – 8 مساءً
+                    </span>
+                </span>
+
+            </div>
+
+
+            <div class="hero-buttons">
+
+                <a href="#about"
+                   class="btn btn-primary">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <span
+                        data-ar="اكتشف المنتدى"
+                        data-en="Discover the Forum">
+
+                        اكتشف المنتدى
+
+                    </span>
+
+                </a>
+
+
+                <a href="#study-zone"
+                   class="btn btn-outline">
+
+                    <i class="fa-solid fa-graduation-cap"></i>
+
+                    Study Zone
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-visual">
+
+            <div class="brand-card">
+
+                <div class="floating one">
+
+                    <i class="fa-solid fa-book"></i>
+
+                    <span
+                        data-ar="اقرأ • تعلّم • شارك"
+                        data-en="Read • Learn • Share">
+
+                        اقرأ • تعلّم • شارك
+
+                    </span>
+
+                </div>
+
+
+                <div class="floating two">
+
+                    <i class="fa-solid fa-graduation-cap"></i>
+
+                    <span>
+
+                        Study Zone
+
+                    </span>
+
+                </div>
+
+
+                <img
+                    src="./logo.PNG"
+                    alt="MedLife Forum"
+                    class="forum-logo">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     STATS
+========================================================= -->
+
+<section class="stats">
+
+    <div class="container">
+
+        <div class="stats-box">
+
+
+            <div class="stat">
+
+                <div class="stat-number">
+                    2026
+                </div>
+
+                <div class="stat-title"
+                     data-ar="عام انطلاق المنتدى"
+                     data-en="Forum Launch">
+
+                    عام انطلاق المنتدى
+
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-number">
+                    200+
+                </div>
+
+                <div class="stat-title"
+                     data-ar="كتاب تقريباً"
+                     data-en="Books">
+
+                    كتاب تقريباً
+
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-number">
+                    7
+                </div>
+
+                <div class="stat-title"
+                     data-ar="أيام في الأسبوع"
+                     data-en="Days a Week">
+
+                    أيام في الأسبوع
+
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-number">
+                    9–8
+                </div>
+
+                <div class="stat-title"
+                     data-ar="ساعات الدوام"
+                     data-en="Opening Hours">
+
+                    ساعات الدوام
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ABOUT
+========================================================= -->
+
+<section class="section about"
+         id="about">
+
+    <div class="container">
+
+
+        <div class="section-head">
+
+            <div class="eyebrow"
+                 data-ar="عن المنتدى"
+                 data-en="About the Forum">
+
+                عن المنتدى
+
+            </div>
+
+
+            <h2
+                data-ar="لماذا أُنشئ منتدى ميدلايف؟"
+                data-en="Why Was MedLife Forum Created?">
+
+                لماذا أُنشئ منتدى ميدلايف؟
+
+            </h2>
+
+
+            <p
+                data-ar="مساحة هادئة للقراءة والتعلّم والتواصل بعيداً عن تشتيت المحتوى السريع."
+
+                data-en="A calm space for reading, learning, and connection away from the distraction of fast content.">
+
+                مساحة هادئة للقراءة والتعلّم والتواصل بعيداً عن تشتيت المحتوى السريع.
+
+            </p>
+
+        </div>
+
+
+        <div class="about-card">
+
+
+            <div class="about-top">
+
+                <div class="about-icon">
+
+                    <i class="fa-solid fa-book-open-reader"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h3
+                        data-ar="نقرأ بعمق، ونتعلم معاً"
+                        data-en="Read Deeply, Learn Together">
+
+                        نقرأ بعمق، ونتعلم معاً
+
+                    </h3>
+
+
+                    <div class="lead"
+
+                         data-ar="انطلق المنتدى في طرطوس في 21 فبراير 2026 كمبادرة من مؤسسة ميدلايف."
+
+                         data-en="The forum opened in Tartous on February 21, 2026 as a MedLife initiative.">
+
+                        انطلق المنتدى في طرطوس في 21 فبراير 2026 كمبادرة من مؤسسة ميدلايف.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <p
+
+                data-ar="جاء المنتدى بهدف تشجيع الشباب على القراءة المتعمقة وتوفير بيئة هادئة تساعد على التركيز والاطلاع والتعلّم، مع تحويل القراءة من نشاط فردي إلى تجربة مجتمعية وثقافية قابلة للنمو."
+
+                data-en="The forum was created to encourage deeper reading among young people and provide a calm environment for focus, learning, and exploration, while turning reading from an individual activity into a growing community and cultural experience.">
+
+                جاء المنتدى بهدف تشجيع الشباب على القراءة المتعمقة وتوفير بيئة هادئة تساعد على التركيز والاطلاع والتعلّم، مع تحويل القراءة من نشاط فردي إلى تجربة مجتمعية وثقافية قابلة للنمو.
+
+            </p>
+
+
+            <p
+
+                data-ar="يضم المنتدى مجموعة كتب متنوعة تشمل الأدب والتاريخ واللغة العربية والتنمية وغيرها، وتُتاح للزوار للقراءة داخل المقر، إلى جانب Study Zone والأنشطة والتحديات والورشات والجلسات الحوارية."
+
+                data-en="The forum offers a diverse collection of books covering literature, history, Arabic language, personal development, and more, alongside the Study Zone, activities, challenges, workshops, and dialogue sessions.">
+
+                يضم المنتدى مجموعة كتب متنوعة تشمل الأدب والتاريخ واللغة العربية والتنمية وغيرها، وتُتاح للزوار للقراءة داخل المقر، إلى جانب Study Zone والأنشطة والتحديات والورشات والجلسات الحوارية.
+
+            </p>
+
+
+            <div class="quote"
+
+                 data-ar="المنتدى ليس مكاناً للكتب فقط... بل مكان للأفكار التي تبدأ من كتاب."
+
+                 data-en="The forum is not only a place for books... it is a place where ideas begin with a book.">
+
+                المنتدى ليس مكاناً للكتب فقط... بل مكان للأفكار التي تبدأ من كتاب.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     WHAT FORUM OFFERS
+========================================================= -->
+
+<section class="section">
+
+    <div class="container">
+
+
+        <div class="section-head">
+
+            <div class="eyebrow"
+                 data-ar="ماذا يقدم المنتدى؟"
+                 data-en="What the Forum Offers">
+
+                ماذا يقدم المنتدى؟
+
+            </div>
+
+
+            <h2
+                data-ar="أكثر من مساحة للقراءة"
+                data-en="More Than a Reading Space">
+
+                أكثر من مساحة للقراءة
+
+            </h2>
+
+
+            <p
+                data-ar="تجربة تجمع المعرفة والتطوير الشخصي والتفاعل الثقافي."
+
+                data-en="An experience combining knowledge, personal growth, and cultural interaction.">
+
+                تجربة تجمع المعرفة والتطوير الشخصي والتفاعل الثقافي.
+
+            </p>
+
+        </div>
+
+
+        <div class="grid-3">
+
+
+            <div class="card">
+
+                <div class="icon">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+
+                <h3
+                    data-ar="المكتبة والقراءة"
+                    data-en="Library & Reading">
+
+                    المكتبة والقراءة
+
+                </h3>
+
+                <p
+
+                    data-ar="مجموعة كتب متنوعة تتيح للزوار القراءة والاطلاع داخل المنتدى."
+
+                    data-en="A diverse book collection for visitors to read and explore inside the forum.">
+
+                    مجموعة كتب متنوعة تتيح للزوار القراءة والاطلاع داخل المنتدى.
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="icon">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <h3
+                    data-ar="تحديات القراءة"
+                    data-en="Reading Challenges">
+
+                    تحديات القراءة
+
+                </h3>
+
+                <p
+
+                    data-ar="مسابقات وتحديات تشجع على قراءة الكتب وإعداد ملخصات عنها مع جوائز وشهادات تقدير."
+
+                    data-en="Challenges encouraging book reading and summaries, with recognition and prizes.">
+
+                    مسابقات وتحديات تشجع على قراءة الكتب وإعداد ملخصات عنها مع جوائز وشهادات تقدير.
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="icon">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+
+                <h3
+                    data-ar="الدورات وورش العمل"
+                    data-en="Courses & Workshops">
+
+                    الدورات وورش العمل
+
+                </h3>
+
+                <p
+
+                    data-ar="مساحة لاستضافة دورات تدريبية وورشات وأنشطة تعليمية."
+
+                    data-en="A space for training courses, workshops, and educational activities.">
+
+                    مساحة لاستضافة دورات تدريبية وورشات وأنشطة تعليمية.
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="icon">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+
+                <h3
+                    data-ar="الجلسات الحوارية"
+                    data-en="Dialogue Sessions">
+
+                    الجلسات الحوارية
+
+                </h3>
+
+                <p
+
+                    data-ar="لقاءات للنقاش وتبادل الأفكار والخبرات حول موضوعات معرفية ومجتمعية."
+
+                    data-en="Discussions and exchanges around knowledge, culture, and community topics.">
+
+                    لقاءات للنقاش وتبادل الأفكار والخبرات حول موضوعات معرفية ومجتمعية.
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="icon">
+                    <i class="fa-solid fa-film"></i>
+                </div>
+
+                <h3
+                    data-ar="الأنشطة الثقافية"
+                    data-en="Cultural Activities">
+
+                    الأنشطة الثقافية
+
+                </h3>
+
+                <p
+
+                    data-ar="أمسيات وفعاليات ثقافية يمكن أن تمتد من القراءة إلى السينما والنقاش."
+
+                    data-en="Cultural evenings and activities ranging from reading to film and discussion.">
+
+                    أمسيات وفعاليات ثقافية يمكن أن تمتد من القراءة إلى السينما والنقاش.
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <h3
+                    data-ar="الشباب والمجتمع"
+                    data-en="Youth & Community">
+
+                    الشباب والمجتمع
+
+                </h3>
+
+                <p
+
+                    data-ar="مساحة تساعد الشباب على بناء العلاقات وتطوير المهارات وتحويل الأفكار إلى مبادرات."
+
+                    data-en="A space for young people to build connections, develop skills, and turn ideas into initiatives.">
+
+                    مساحة تساعد الشباب على بناء العلاقات وتطوير المهارات وتحويل الأفكار إلى مبادرات.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     STUDY ZONE
+========================================================= -->
+
+<section class="section study-zone"
+         id="study-zone">
+
+    <div class="container">
+
+
+        <div class="section-head">
+
+            <div class="eyebrow">
+                Study Zone
+            </div>
+
+
+            <h2
+                data-ar="مساحتك للدراسة والتركيز"
+                data-en="Your Space to Study & Focus">
+
+                مساحتك للدراسة والتركيز
+
+            </h2>
+
+
+            <p
+
+                data-ar="يوفر المنتدى مساحة هادئة ومناسبة للدراسة والقراءة والتحضير للامتحانات وإنجاز المهام التعليمية."
+
+                data-en="The forum provides a calm study environment for reading, exam preparation, learning, and focused work.">
+
+                يوفر المنتدى مساحة هادئة ومناسبة للدراسة والقراءة والتحضير للامتحانات وإنجاز المهام التعليمية.
+
+            </p>
+
+        </div>
+
+
+        <div class="study-grid">
+
+
+            <div class="study-main">
+
+                <div class="study-icon">
+
+                    <i class="fa-solid fa-graduation-cap"></i>
+
+                </div>
+
+
+                <h3>
+                    Study Zone —
+                    <span
+                        data-ar="ادرس بطريقتك"
+                        data-en="Study Your Way">
+
+                        ادرس بطريقتك
+
+                    </span>
+                </h3>
+
+
+                <p
+
+                    data-ar="صُممت Study Zone لتكون مساحة مريحة للطلاب والمهتمين بالتعلم، سواء للدراسة الفردية، المراجعة، القراءة، أو العمل على مشروع تعليمي."
+
+                    data-en="Study Zone is designed as a comfortable space for students and learners, whether for individual study, revision, reading, or educational projects.">
+
+                    صُممت Study Zone لتكون مساحة مريحة للطلاب والمهتمين بالتعلم، سواء للدراسة الفردية، المراجعة، القراءة، أو العمل على مشروع تعليمي.
+
+                </p>
+
+
+                <div class="study-features">
+
+
+                    <div class="study-feature">
+
+                        <i class="fa-solid fa-volume-xmark"></i>
+
+                        <div>
+
+                            <strong
+                                data-ar="بيئة هادئة"
+                                data-en="Quiet Environment">
+
+                                بيئة هادئة
+
+                            </strong>
+
+
+                            <span
+                                data-ar="مساحة تساعدك على التركيز."
+
+                                data-en="A space designed for focus.">
+
+                                مساحة تساعدك على التركيز.
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="study-feature">
+
+                        <i class="fa-solid fa-book-open"></i>
+
+                        <div>
+
+                            <strong
+                                data-ar="للدراسة والقراءة"
+                                data-en="Study & Reading">
+
+                                للدراسة والقراءة
+
+                            </strong>
+
+
+                            <span
+                                data-ar="للمراجعة والقراءة والتعلم."
+
+                                data-en="For revision, reading, and learning.">
+
+                                للمراجعة والقراءة والتعلم.
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="study-feature">
+
+                        <i class="fa-solid fa-clock"></i>
+
+                        <div>
+
+                            <strong
+                                data-ar="ساعات مناسبة"
+                                data-en="Convenient Hours">
+
+                                ساعات مناسبة
+
+                            </strong>
+
+
+                            <span
+                                data-ar="الدوام المعلن للمنتدى من 9 صباحاً حتى 8 مساءً."
+
+                                data-en="The announced forum hours are 9 AM to 8 PM.">
+
+                                الدوام المعلن للمنتدى من 9 صباحاً حتى 8 مساءً.
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="study-feature">
+
+                        <i class="fa-solid fa-users"></i>
+
+                        <div>
+
+                            <strong
+                                data-ar="مجتمع تعلّم"
+                                data-en="Learning Community">
+
+                                مجتمع تعلّم
+
+                            </strong>
+
+
+                            <span
+                                data-ar="تعلّم بجانب أشخاص لديهم نفس الاهتمام."
+
+                                data-en="Learn alongside people who share your interests.">
+
+                                تعلّم بجانب أشخاص لديهم نفس الاهتمام.
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <div class="study-side">
+
+
+                <div class="study-side-card">
+
+                    <i class="fa-solid fa-book-reader"></i>
+
+                    <h3
+                        data-ar="مناسبة للطلاب"
+                        data-en="Student Friendly">
+
+                        مناسبة للطلاب
+
+                    </h3>
+
+                    <p
+
+                        data-ar="مكان يساعدك على إنجاز جلسة دراسة مركزة بعيداً عن الضوضاء والتشتت."
+
+                        data-en="A focused study space away from noise and distractions.">
+
+                        مكان يساعدك على إنجاز جلسة دراسة مركزة بعيداً عن الضوضاء والتشتت.
+
+                    </p>
+
+                </div>
+
+
+                <div class="study-side-card">
+
+                    <i class="fa-solid fa-lightbulb"></i>
+
+                    <h3
+                        data-ar="تعلم وإنتاجية"
+                        data-en="Learning & Productivity">
+
+                        تعلم وإنتاجية
+
+                    </h3>
+
+                    <p
+
+                        data-ar="من القراءة إلى التحضير للامتحانات والمشاريع التعليمية."
+
+                        data-en="From reading to exam preparation and educational projects.">
+
+                        من القراءة إلى التحضير للامتحانات والمشاريع التعليمية.
+
+                    </p>
+
+                </div>
+
+
+                <div class="study-hours">
+
+                    <span
+                        data-ar="ساعات الدوام"
+                        data-en="Opening Hours">
+
+                        ساعات الدوام
+
+                    </span>
+
+
+                    <strong>
+                        09:00 — 20:00
+                    </strong>
+
+
+                    <small
+
+                        data-ar="قد تختلف ساعات العمل في المناسبات أو خلال شهر رمضان."
+
+                        data-en="Hours may vary during special occasions or Ramadan.">
+
+                        قد تختلف ساعات العمل في المناسبات أو خلال شهر رمضان.
+
+                    </small>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     READING
+========================================================= -->
+
+<section class="section reading">
+
+    <div class="container">
+
+
+        <div class="section-head">
+
+            <div class="eyebrow"
+                 data-ar="تجربة القراءة"
+                 data-en="Reading Experience">
+
+                تجربة القراءة
+
+            </div>
+
+
+            <h2
+                data-ar="من الكتاب إلى الفكرة"
+                data-en="From Book to Idea">
+
+                من الكتاب إلى الفكرة
+
+            </h2>
+
+
+            <p
+                data-ar="نريد للقراءة أن تكون بداية لنقاش وتعلّم ومبادرة."
+
+                data-en="We want reading to become the beginning of dialogue, learning, and initiative.">
+
+                نريد للقراءة أن تكون بداية لنقاش وتعلّم ومبادرة.
+
+            </p>
+
+        </div>
+
+
+        <div class="reading-grid">
+
+
+            <div class="reading-card">
+
+                <h3
+                    data-ar="ماذا يمكن أن تقرأ؟"
+                    data-en="What Can You Read?">
+
+                    ماذا يمكن أن تقرأ؟
+
+                </h3>
+
+
+                <p
+
+                    data-ar="يضم المنتدى كتباً في مجالات متعددة، بما يتيح للقارئ اكتشاف موضوعات جديدة خارج تخصصه المعتاد."
+
+                    data-en="The forum includes books across multiple areas, allowing readers to explore subjects beyond their usual field.">
+
+                    يضم المنتدى كتباً في مجالات متعددة، بما يتيح للقارئ اكتشاف موضوعات جديدة خارج تخصصه المعتاد.
+
+                </p>
+
+
+                <ul class="list">
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+
+                        <span
+                            data-ar="الأدب"
+                            data-en="Literature">
+
+                            الأدب
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+
+                        <span
+                            data-ar="التاريخ"
+                            data-en="History">
+
+                            التاريخ
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+
+                        <span
+                            data-ar="اللغة العربية"
+                            data-en="Arabic Language">
+
+                            اللغة العربية
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+
+                        <span
+                            data-ar="التنمية وتطوير الذات"
+                            data-en="Personal Development">
+
+                            التنمية وتطوير الذات
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+
+                        <span
+                            data-ar="ومجالات معرفية أخرى"
+                            data-en="And other knowledge areas">
+
+                            ومجالات معرفية أخرى
+
+                        </span>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="reading-card">
+
+                <h3
+                    data-ar="تحديات القراءة"
+                    data-en="Reading Challenges">
+
+                    تحديات القراءة
+
+                </h3>
+
+
+                <p
+
+                    data-ar="تتحول القراءة إلى تجربة تفاعلية من خلال التحديات، والملخصات، والمنافسات، والتقدير للقراء المشاركين."
+
+                    data-en="Reading becomes an interactive experience through challenges, summaries, competitions, and recognition.">
+
+                    تتحول القراءة إلى تجربة تفاعلية من خلال التحديات، والملخصات، والمنافسات، والتقدير للقراء المشاركين.
+
+                </p>
+
+
+                <ul class="list">
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+
+                        <span
+                            data-ar="اختيار كتاب"
+                            data-en="Choose a book">
+
+                            اختيار كتاب
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+
+                        <span
+                            data-ar="قراءة خلال مدة محددة"
+                            data-en="Read within a set period">
+
+                            قراءة خلال مدة محددة
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+
+                        <span
+                            data-ar="إعداد ملخص أو مشاركة"
+                            data-en="Prepare a summary or reflection">
+
+                            إعداد ملخص أو مشاركة
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+
+                        <span
+                            data-ar="الحصول على شهادة أو تكريم"
+                            data-en="Recognition or certificate">
+
+                            الحصول على شهادة أو تكريم
+
+                        </span>
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ACTIVITIES
+========================================================= -->
+
+<section class="section">
+
+    <div class="container">
+
+
+        <div class="section-head">
+
+            <div class="eyebrow"
+                 data-ar="الأنشطة والفعاليات"
+                 data-en="Activities & Events">
+
+                الأنشطة والفعاليات
+
+            </div>
+
+
+            <h2
+                data-ar="المنتدى مساحة تتغير مع المجتمع"
+                data-en="A Forum That Grows with the Community">
+
+                المنتدى مساحة تتغير مع المجتمع
+
+            </h2>
+
+
+            <p
+                data-ar="من القراءة إلى الورشات والجلسات والأمسيات الثقافية."
+
+                data-en="From reading to workshops, discussions, and cultural evenings.">
+
+                من القراءة إلى الورشات والجلسات والأمسيات الثقافية.
+
+            </p>
+
+        </div>
+
+
+        <div class="activities-grid">
+
+
+            <div class="activity">
+
+                <div class="activity-icon">
+                    <i class="fa-solid fa-book-medical"></i>
+                </div>
+
+                <div>
+
+                    <h3
+                        data-ar="لقاءات القراءة"
+                        data-en="Reading Gatherings">
+
+                        لقاءات القراءة
+
+                    </h3>
+
+                    <p
+
+                        data-ar="أنشطة تشجع على مشاركة ما تم تعلمه أو قراءته مع الآخرين."
+
+                        data-en="Activities encouraging readers to share what they learned or read.">
+
+                        أنشطة تشجع على مشاركة ما تم تعلمه أو قراءته مع الآخرين.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity">
+
+                <div class="activity-icon">
+                    <i class="fa-solid fa-chalkboard"></i>
+                </div>
+
+                <div>
+
+                    <h3
+                        data-ar="ورشات تدريبية"
+                        data-en="Training Workshops">
+
+                        ورشات تدريبية
+
+                    </h3>
+
+                    <p
+
+                        data-ar="مساحة للمدربين والمدرسين والمهتمين بتنفيذ أنشطة تعليمية."
+
+                        data-en="A space for trainers, teachers, and facilitators to conduct educational activities.">
+
+                        مساحة للمدربين والمدرسين والمهتمين بتنفيذ أنشطة تعليمية.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity">
+
+                <div class="activity-icon">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+
+                <div>
+
+                    <h3
+                        data-ar="جلسات حوارية"
+                        data-en="Dialogue Sessions">
+
+                        جلسات حوارية
+
+                    </h3>
+
+                    <p
+
+                        data-ar="نقاشات حول الكتب والأفكار والموضوعات الثقافية والمجتمعية."
+
+                        data-en="Discussions around books, ideas, culture, and community topics.">
+
+                        نقاشات حول الكتب والأفكار والموضوعات الثقافية والمجتمعية.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity">
+
+                <div class="activity-icon">
+                    <i class="fa-solid fa-film"></i>
+                </div>
+
+                <div>
+
+                    <h3
+                        data-ar="الأمسيات الثقافية"
+                        data-en="Cultural Evenings">
+
+                        الأمسيات الثقافية
+
+                    </h3>
+
+                    <p
+
+                        data-ar="فعاليات يمكن أن تشمل السينما الكلاسيكية واللقاءات الثقافية المفتوحة."
+
+                        data-en="Events may include classic cinema and open cultural gatherings.">
+
+                        فعاليات يمكن أن تشمل السينما الكلاسيكية واللقاءات الثقافية المفتوحة.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     TIMELINE
+========================================================= -->
+
+<section class="section timeline-section">
+
+    <div class="container">
+
+
+        <div class="section-head">
+
+            <div class="eyebrow"
+                 data-ar="رحلة المنتدى"
+                 data-en="Forum Journey">
+
+                رحلة المنتدى
+
+            </div>
+
+
+            <h2
+                data-ar="من الافتتاح إلى مساحة ثقافية متنامية"
+                data-en="From Launch to a Growing Cultural Space">
+
+                من الافتتاح إلى مساحة ثقافية متنامية
+
+            </h2>
+
+
+            <p
+                data-ar="محطات مختارة من تجربة المنتدى."
+                data-en="Selected milestones from the forum journey.">
+
+                محطات مختارة من تجربة المنتدى.
+
+            </p>
+
+        </div>
+
+
+        <div class="timeline">
+
+
+            <div class="timeline-item">
+
+                <div class="timeline-year">
+                    21.02.2026
+                </div>
+
+                <div class="timeline-dot"></div>
+
+
+                <div class="timeline-card">
+
+                    <h3
+                        data-ar="الافتتاح"
+                        data-en="Opening">
+
+                        الافتتاح
+
+                    </h3>
+
+                    <p
+
+                        data-ar="افتتاح منتدى ميدلايف في طرطوس كمبادرة لتشجيع القراءة المتعمقة وتوفير مساحة هادئة للمعرفة."
+
+                        data-en="MedLife Forum opened in Tartous to encourage deeper reading and provide a calm space for knowledge.">
+
+                        افتتاح منتدى ميدلايف في طرطوس كمبادرة لتشجيع القراءة المتعمقة وتوفير مساحة هادئة للمعرفة.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="timeline-item">
+
+                <div class="timeline-year">
+                    2026
+                </div>
+
+                <div class="timeline-dot"></div>
+
+
+                <div class="timeline-card">
+
+                    <h3
+                        data-ar="مكتبة وأنشطة معرفية"
+                        data-en="Library & Knowledge Activities">
+
+                        مكتبة وأنشطة معرفية
+
+                    </h3>
+
+                    <p
+
+                        data-ar="توفير مجموعة كتب متنوعة وإطلاق تحديات القراءة والأنشطة المرتبطة بها."
+
+                        data-en="Building a diverse book collection and launching reading challenges and related activities.">
+
+                        توفير مجموعة كتب متنوعة وإطلاق تحديات القراءة والأنشطة المرتبطة بها.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="timeline-item">
+
+                <div class="timeline-year">
+                    28.05.2026
+                </div>
+
+                <div class="timeline-dot"></div>
+
+
+                <div class="timeline-card">
+
+                    <h3
+                        data-ar="أمسية سينمائية كلاسيكية"
+                        data-en="Classic Cinema Evening">
+
+                        أمسية سينمائية كلاسيكية
+
+                    </h3>
+
+                    <p
+
+                        data-ar="فعالية ثقافية معلنة في المنتدى مع تصويت للجمهور لاختيار الفيلم."
+
+                        data-en="A cultural event announced at the forum, with audience voting to choose the film.">
+
+                        فعالية ثقافية معلنة في المنتدى مع تصويت للجمهور لاختيار الفيلم.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     EVENTS
+========================================================= -->
+
+<section class="section"
+         id="events">
+
+    <div class="container">
+
+
+        <div class="section-head">
+
+            <div class="eyebrow"
+                 data-ar="الفعاليات"
+                 data-en="Events">
+
+                الفعاليات
+
+            </div>
+
+
+            <h2
+                data-ar="آخر الفعاليات والأنشطة"
+                data-en="Recent & Upcoming Activities">
+
+                آخر الفعاليات والأنشطة
+
+            </h2>
+
+
+            <p
+
+                data-ar="سيتم تحديث هذا القسم عند اعتماد فعاليات جديدة."
+
+                data-en="This section will be updated as new activities are confirmed.">
+
+                سيتم تحديث هذا القسم عند اعتماد فعاليات جديدة.
+
+            </p>
+
+        </div>
+
+
+        <div class="events">
+
+
+            <div class="event">
+
+                <div class="event-date">
+
+                    <i class="fa-solid fa-film"></i>
+
+                    <span>
+                        28<br>
+                        مايو
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <h3
+                        data-ar="أمسية سينمائية كلاسيكية"
+                        data-en="Classic Cinema Evening">
+
+                        أمسية سينمائية كلاسيكية
+
+                    </h3>
+
+
+                    <p
+                        data-ar="أمسية ثقافية مع تصويت الجمهور لاختيار الفيلم."
+
+                        data-en="A cultural evening with audience voting to choose the film.">
+
+                        أمسية ثقافية مع تصويت الجمهور لاختيار الفيلم.
+
+                    </p>
+
+                </div>
+
+
+                <div class="badge"
+                     data-ar="فعالية سابقة"
+                     data-en="Past Event">
+
+                    فعالية سابقة
+
+                </div>
+
+            </div>
+
+
+            <div class="event">
+
+                <div class="event-date">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <span>
+                        قريباً
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <h3
+                        data-ar="فعاليات جديدة"
+                        data-en="New Activities">
+
+                        فعاليات جديدة
+
+                    </h3>
+
+
+                    <p
+
+                        data-ar="تابع منصات ميدلايف لمعرفة مواعيد الورشات والجلسات والتحديات القادمة."
+
+                        data-en="Follow MedLife channels for upcoming workshops, sessions, and challenges.">
+
+                        تابع منصات ميدلايف لمعرفة مواعيد الورشات والجلسات والتحديات القادمة.
+
+                    </p>
+
+                </div>
+
+
+                <div class="badge"
+                     data-ar="قريباً"
+                     data-en="Coming Soon">
+
+                    قريباً
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="event-note">
+
+            <i class="fa-solid fa-circle-info"></i>
+
+            <span
+                data-ar="يتم تحديث برنامج المنتدى وفق الفعاليات التي يتم اعتمادها وإعلانها رسمياً."
+
+                data-en="The forum schedule is updated as activities are officially confirmed and announced.">
+
+                يتم تحديث برنامج المنتدى وفق الفعاليات التي يتم اعتمادها وإعلانها رسمياً.
+
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     CONTACT
+========================================================= -->
+
+<section class="section contact">
+
+    <div class="container">
+
+
+        <div class="section-head">
+
+            <div class="eyebrow">
+
+                MedLife Forum
+
+            </div>
+
+
+            <h2
+                style="color:#fff;"
+                data-ar="تواصل مع المنتدى"
+                data-en="Contact the Forum">
+
+                تواصل مع المنتدى
+
+            </h2>
+
+
+            <p
+                style="color:#CBD5E1;"
+                data-ar="للاستفسارات، التسجيل، الشراكات والأنشطة الثقافية والتعليمية."
+
+                data-en="For inquiries, registration, partnerships, and educational or cultural activities.">
+
+                للاستفسارات، التسجيل، الشراكات والأنشطة الثقافية والتعليمية.
+
+            </p>
+
+        </div>
+
+
+        <div class="contact-grid">
+
+
+            <div>
+
+                <div class="contact-list">
+
+
+                    <div class="contact-item">
+
+                        <div class="contact-icon">
+
+                            <i class="fa-solid fa-location-dot"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <small
+                                data-ar="العنوان"
+                                data-en="Address">
+
+                                العنوان
+
+                            </small>
+
+
+                            <span
+                                data-ar="طرطوس — الجمعية — خلف مستوصف السل"
+
+                                data-en="Tartous — Al-Jamiah — Behind the Tuberculosis Dispensary">
+
+                                طرطوس — الجمعية — خلف مستوصف السل
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="contact-item">
+
+                        <div class="contact-icon">
+
+                            <i class="fa-solid fa-phone"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <small
+                                data-ar="الهاتف"
+                                data-en="Phone">
+
+                                الهاتف
+
+                            </small>
+
+
+                            <a href="tel:+963182220555"
+                               dir="ltr">
+
+                                +963 182 220 555
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="contact-item">
+
+                        <div class="contact-icon">
+
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <small
+                                data-ar="الهاتف المحمول"
+                                data-en="Mobile">
+
+                                الهاتف المحمول
+
+                            </small>
+
+
+                            <a href="tel:+963989913713"
+                               dir="ltr">
+
+                                +963 989 913 713
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="contact-item">
+
+                        <div class="contact-icon">
+
+                            <i class="fa-solid fa-envelope"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <small
+                                data-ar="البريد الإلكتروني"
+                                data-en="Email">
+
+                                البريد الإلكتروني
+
+                            </small>
+
+
+                            <a href="mailto:forum@medlifesy.org"
+                               dir="ltr">
+
+                                forum@medlifesy.org
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+
+                <div class="contact-cards">
+
+
+                    <a href="mailto:forum@medlifesy.org"
+                       class="contact-card">
+
+                        <i class="fa-solid fa-envelope"></i>
+
+                        <h3
+                            data-ar="راسل المنتدى"
+                            data-en="Email the Forum">
+
+                            راسل المنتدى
+
+                        </h3>
+
+                        <span>
+
+                            forum@medlifesy.org
+
+                        </span>
+
+                    </a>
+
+
+                    <a href="tel:+963182220555"
+                       class="contact-card">
+
+                        <i class="fa-solid fa-phone"></i>
+
+                        <h3
+                            data-ar="اتصال"
+                            data-en="Call">
+
+                            اتصال
+
+                        </h3>
+
+                        <span dir="ltr">
+
+                            +963 182 220 555
+
+                        </span>
+
+                    </a>
+
+
+                    <a href="tel:+963989913713"
+                       class="contact-card">
+
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+
+                        <h3
+                            data-ar="هاتف محمول"
+                            data-en="Mobile">
+
+                            هاتف محمول
+
+                        </h3>
+
+                        <span dir="ltr">
+
+                            +963 989 913 713
+
+                        </span>
+
+                    </a>
+
+
+                    <a href="index.html#contact"
+                       class="contact-card">
+
+                        <i class="fa-solid fa-heart-pulse"></i>
+
+                        <h3
+                            data-ar="ميدلايف"
+                            data-en="MedLife">
+
+                            ميدلايف
+
+                        </h3>
+
+                        <span
+                            data-ar="الجهة المشرفة"
+                            data-en="Organization">
+
+                            الجهة المشرفة
+
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+                <a href="mailto:forum@medlifesy.org"
+                   class="email-btn">
+
+                    <i class="fa-solid fa-paper-plane"></i>
+
+                    <span
+                        data-ar="تواصل مع المنتدى"
+                        data-en="Contact the Forum">
+
+                        تواصل مع المنتدى
+
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer>
+
+    <div class="container footer-grid">
+
+
+        <div>
+
+            <div class="footer-logo">
+
+                <img
+                    src="./logo.PNG"
+                    alt="MedLife Syria">
+
+            </div>
+
+
+            <p class="footer-description"
+
+               data-ar="منتدى ميدلايف — مساحة للقراءة والمعرفة والحوار وStudy Zone والأنشطة الثقافية والتعليمية ضمن مؤسسة ميدلايف."
+
+               data-en="MedLife Forum — a space for reading, knowledge, dialogue, Study Zone, and cultural and educational activities within MedLife.">
+
+                منتدى ميدلايف — مساحة للقراءة والمعرفة والحوار وStudy Zone والأنشطة الثقافية والتعليمية ضمن مؤسسة ميدلايف.
+
+            </p>
+
+
+            <div class="footer-socials">
+
+                <a
+                    href="https://www.facebook.com/Medlifesy/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="footer-social"
+                    aria-label="Facebook">
+
+                    <i class="fa-brands fa-facebook-f"></i>
+
+                </a>
+
+
+                <a
+                    href="https://www.linkedin.com/company/med-life-syria/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="footer-social"
+                    aria-label="LinkedIn">
+
+                    <i class="fa-brands fa-linkedin-in"></i>
+
+                </a>
+
+
+                <a
+                    href="https://www.youtube.com/@medlifesy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="footer-social"
+                    aria-label="YouTube">
+
+                    <i class="fa-brands fa-youtube"></i>
+
+                </a>
+
+
+                <a
+                    href="https://t.me/Medlife2024bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="footer-social"
+                    aria-label="Telegram">
+
+                    <i class="fa-brands fa-telegram"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4
+                data-ar="روابط سريعة"
+                data-en="Quick Links">
+
+                روابط سريعة
+
+            </h4>
+
+
+            <a href="index.html"
+               data-ar="الرئيسية"
+               data-en="Home">
+
+                الرئيسية
+
+            </a>
+
+
+            <a href="index.html#about"
+               data-ar="من نحن"
+               data-en="About Us">
+
+                من نحن
+
+            </a>
+
+
+            <a href="articles.html"
+               data-ar="المقالات"
+               data-en="Articles">
+
+                المقالات
+
+            </a>
+
+
+            <a href="#study-zone"
+               data-ar="Study Zone"
+               data-en="Study Zone">
+
+                Study Zone
+
+            </a>
+
+
+            <a href="forum.html"
+               data-ar="منتدى ميدلايف"
+               data-en="MedLife Forum">
+
+                منتدى ميدلايف
+
+            </a>
+
+
+            <a href="index.html#contact"
+               data-ar="تواصل معنا"
+               data-en="Contact">
+
+                تواصل معنا
+
+            </a>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4
+                data-ar="معلومات المنتدى"
+                data-en="Forum Information">
+
+                معلومات المنتدى
+
+            </h4>
+
+
+            <a href="mailto:forum@medlifesy.org">
+
+                forum@medlifesy.org
+
+            </a>
+
+
+            <a href="tel:+963182220555"
+               dir="ltr">
+
+                +963 182 220 555
+
+            </a>
+
+
+            <a href="tel:+963989913713"
+               dir="ltr">
+
+                +963 989 913 713
+
+            </a>
+
+
+            <a href="index.html#contact"
+               data-ar="مؤسسة ميدلايف"
+               data-en="MedLife Organization">
+
+                مؤسسة ميدلايف
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="container">
+
+        <div class="copyright">
+
+            © 2026 MedLife Forum —
+            مؤسسة ميدلايف الطبية الخيرية التطوعية
+
+            <br>
+
+            We save life, we are med.life
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+<script>
+
+/* =========================================================
+   LANGUAGE
+========================================================= */
+
+const languageBtn =
+    document.getElementById(
+        "languageBtn"
+    );
+
+
+let currentLanguage =
+    localStorage.getItem(
+        "medlifeLanguage"
+    ) || "ar";
+
+
+function applyLanguage(
+    language
+){
+
+    currentLanguage =
+        language;
+
+
+    const isEnglish =
+        language === "en";
+
+
+    document.documentElement.lang =
+        isEnglish
+            ? "en"
+            : "ar";
+
+
+    document.documentElement.dir =
+        isEnglish
+            ? "ltr"
+            : "rtl";
+
+
+    languageBtn.innerText =
+        isEnglish
+            ? "AR"
+            : "EN";
+
+
+    document
+        .querySelectorAll(
+            "[data-ar][data-en]"
+        )
+        .forEach(
+            element => {
+
+                const value =
+                    isEnglish
+                        ? element.getAttribute(
+                            "data-en"
+                        )
+                        : element.getAttribute(
+                            "data-ar"
+                        );
+
+
+                if(
+                    value !== null
+                ){
+
+                    element.textContent =
+                        value;
+
+                }
+
+            }
+        );
+
+
+    localStorage.setItem(
+        "medlifeLanguage",
+        language
+    );
+
+}
+
+
+languageBtn.addEventListener(
+    "click",
+    () => {
+
+        applyLanguage(
+
+            currentLanguage === "ar"
+                ? "en"
+                : "ar"
+
+        );
+
+    }
+);
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+const mobileMenu =
+    document.getElementById(
+        "mobileMenu"
+    );
+
+
+const menuToggle =
+    document.getElementById(
+        "menuToggle"
+    );
+
+
+function closeMobileMenu(){
+
+    mobileMenu.classList.remove(
+        "active"
+    );
+
+
+    menuToggle.setAttribute(
+        "aria-expanded",
+        "false"
+    );
+
+
+    menuToggle.innerHTML =
+        '<i class="fa-solid fa-bars"></i>';
+
+}
+
+
+menuToggle.addEventListener(
+    "click",
+    () => {
+
+        const open =
+            mobileMenu.classList.toggle(
+                "active"
+            );
+
+
+        menuToggle.setAttribute(
+            "aria-expanded",
+            String(open)
+        );
+
+
+        menuToggle.innerHTML =
+            open
+                ? '<i class="fa-solid fa-xmark"></i>'
+                : '<i class="fa-solid fa-bars"></i>';
+
+    }
+);
+
+
+document
+    .querySelectorAll(
+        "[data-mobile-link]"
+    )
+    .forEach(
+        link => {
+
+            link.addEventListener(
+                "click",
+                closeMobileMenu
+            );
+
+        }
+    );
+
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        if(
+            window.innerWidth > 1050
+        ){
+
+            closeMobileMenu();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIAL LANGUAGE
+========================================================= */
+
+applyLanguage(
+    currentLanguage
+);
+
+</script>
+
+
+</body>
+
+</html>
