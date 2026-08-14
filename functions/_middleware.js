@@ -38,6 +38,10 @@ export async function onRequest(context) {
                     '<script src="/js/home-enhancements.js" defer></script>',
                     { html: true }
                 );
+                element.append(
+                    '<script src="/js/home-articles-cleanup.js" defer></script>',
+                    { html: true }
+                );
             }
         })
         .transform(response);
