@@ -26,6 +26,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let articles = [];
 
+    const featuredStaticArticle = {
+        id: "tension-headache",
+        title_ar: "صداع التوتر: رحلتك نحو الراحة",
+        title_en: "Tension-Type Headache: Your Journey to Relief",
+        excerpt_ar: "تعرف على صداع التوتر، أسبابه وأعراضه وعلامات الخطر والعلاج المتكامل وطرق الوقاية.",
+        excerpt_en: "Learn about tension-type headache, its symptoms, warning signs, integrated treatment and prevention.",
+        author_name: "الصيدلانية دلع باسل العباس",
+        category: "توعية صحية",
+        image_url: "",
+        status: "published",
+        created_at: "2026-08-14T00:00:00"
+    };
+
 
     /* =====================================================
        LOAD ARTICLES
@@ -59,13 +72,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 await response.json();
 
 
-            if (!response.ok) {
-
+            if (!response.ok || !data.success) {
                 throw new Error(
                     data.error ||
                     "Unable to load articles."
                 );
-
             }
 
 
@@ -77,14 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         : [];
 
 
-            /*
-             * The API already returns only published
-             * articles to public visitors.
-             *
-             * We use the correct status:
-             * published
-             */
-
             articles =
                 articles.filter(
                     article =>
@@ -94,8 +97,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-            populateCategories();
+            /* Keep the featured article visible once it exists in the static site. */
+            if (!articles.some(article => String(article.id) === "tension-headache")) {
+                articles.unshift(featuredStaticArticle);
+            }
 
+
+            populateCategories();
             renderArticles();
 
 
@@ -106,7 +114,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 error
             );
 
-            showError();
+            /*
+             * The D1 API is still being finalized.
+             * Do not leave the public Articles page blank:
+             * show the currently published static article.
+             */
+            articles = [featuredStaticArticle];
+
+            populateCategories();
+            renderArticles();
 
         }
 
@@ -230,9 +246,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function createArticleCard(article) {
 
-        const id =
-            article.id;
-
+        const isStaticTensionArticle =
+            String(article.id) === "tension-headache";
 
         const title =
             escapeHTML(
@@ -246,11 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
             escapeHTML(
                 article.excerpt_ar ||
                 article.excerpt_en ||
-                createExcerpt(
-                    article.content_ar ||
-                    article.content_en ||
-                    ""
-                )
+                "اضغط لقراءة المقال كاملاً."
             );
 
 
@@ -294,13 +305,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 : `
                     <div class="article-placeholder">
-
-                        <i
-                            class="fa-solid fa-book-medical">
-                        </i>
-
+                        <i class="fa-solid fa-head-side-virus"></i>
                     </div>
                   `;
+
+
+        const articleUrl =
+            isStaticTensionArticle
+                ? "articles/tension-headache.html"
+                : `article.html?id=${encodeURIComponent(article.id)}`;
 
 
         return `
@@ -309,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 class="public-article-card">
 
                 <a
-                    href="article.html?id=${encodeURIComponent(id)}"
+                    href="${articleUrl}"
                     class="article-image">
 
                     ${imageHTML}
@@ -331,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <h3>
 
                         <a
-                            href="article.html?id=${encodeURIComponent(id)}">
+                            href="${articleUrl}">
 
                             ${title}
 
@@ -375,7 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     <a
-                        href="article.html?id=${encodeURIComponent(id)}"
+                        href="${articleUrl}"
                         class="public-article-link">
 
                         اقرأ المقال
@@ -453,10 +466,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =====================================================
-       SEARCH
-    ===================================================== */
-
     if (searchInput) {
 
         searchInput.addEventListener(
@@ -466,10 +475,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    /* =====================================================
-       CATEGORY FILTER
-    ===================================================== */
 
     if (categoryFilter) {
 
@@ -481,30 +486,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =====================================================
-       LOADING STATE
-    ===================================================== */
-
     function showLoading() {
 
         if (articlesLoading) {
-
             articlesLoading.style.display = "flex";
-
         }
-
 
         if (articlesEmpty) {
-
             articlesEmpty.style.display = "none";
-
         }
 
-
         if (articlesError) {
-
             articlesError.style.display = "none";
-
         }
 
     }
@@ -513,104 +506,37 @@ document.addEventListener("DOMContentLoaded", () => {
     function hideLoading() {
 
         if (articlesLoading) {
-
             articlesLoading.style.display = "none";
-
         }
 
     }
 
-
-    /* =====================================================
-       ERROR STATE
-    ===================================================== */
-
-    function showError() {
-
-        hideLoading();
-
-
-        if (articlesEmpty) {
-
-            articlesEmpty.style.display = "none";
-
-        }
-
-
-        if (articlesError) {
-
-            articlesError.style.display = "block";
-
-        }
-
-
-        if (articlesContainer) {
-
-            articlesContainer.innerHTML = "";
-
-        }
-
-    }
-
-
-    /* =====================================================
-       CREATE EXCERPT
-    ===================================================== */
 
     function createExcerpt(text) {
 
         const cleanText =
-            stripHTML(
-                String(text || "")
-            )
-            .replace(
-                /\s+/g,
-                " "
-            )
-            .trim();
-
+            stripHTML(String(text || ""))
+                .replace(/\s+/g, " ")
+                .trim();
 
         if (cleanText.length <= 150) {
-
             return cleanText;
-
         }
 
-
-        return (
-            cleanText.substring(0, 150) +
-            "..."
-        );
+        return cleanText.substring(0, 150) + "...";
 
     }
 
-
-    /* =====================================================
-       STRIP HTML
-    ===================================================== */
 
     function stripHTML(html) {
 
-        const div =
-            document.createElement("div");
+        const div = document.createElement("div");
+        div.innerHTML = html;
 
-
-        div.innerHTML =
-            html;
-
-
-        return (
-            div.textContent ||
-            div.innerText ||
-            ""
-        );
+        return div.textContent || div.innerText || "";
 
     }
 
-
-    /* =====================================================
-       DATE
-    ===================================================== */
 
     function formatDate(value) {
 
@@ -618,20 +544,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return "";
         }
 
+        const date = new Date(value);
 
-        const date =
-            new Date(value);
-
-
-        if (
-            Number.isNaN(
-                date.getTime()
-            )
-        ) {
-
+        if (Number.isNaN(date.getTime())) {
             return "";
         }
-
 
         return date.toLocaleDateString(
             "ar-SY",
@@ -645,69 +562,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =====================================================
-       ESCAPE HTML
-    ===================================================== */
-
     function escapeHTML(value) {
 
         return String(value ?? "")
-
-            .replace(
-                /&/g,
-                "&amp;"
-            )
-
-            .replace(
-                /</g,
-                "&lt;"
-            )
-
-            .replace(
-                />/g,
-                "&gt;"
-            )
-
-            .replace(
-                /"/g,
-                "&quot;"
-            )
-
-            .replace(
-                /'/g,
-                "&#039;"
-            );
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
 
     }
 
 
-    /* =====================================================
-       ESCAPE ATTRIBUTE
-    ===================================================== */
-
     function escapeAttribute(value) {
 
         return String(value ?? "")
-
-            .replace(
-                /&/g,
-                "&amp;"
-            )
-
-            .replace(
-                /"/g,
-                "&quot;"
-            )
-
-            .replace(
-                /</g,
-                "&lt;"
-            )
-
-            .replace(
-                />/g,
-                "&gt;"
-            );
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
 
     }
 
