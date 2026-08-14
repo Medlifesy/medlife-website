@@ -911,6 +911,33 @@
 
                             <button
                                 type="button"
+                                id="generateImagesButton"
+                                class="ai-button"
+                            >
+                                🎨 توليد الصور تلقائياً
+                            </button>
+
+                        </div>
+
+                        <div
+                            id="imageGenerationStatus"
+                            class="ai-status"
+                        ></div>
+
+                        <div
+                            id="generatedImages"
+                            style="
+                                display:grid;
+                                grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+                                gap:16px;
+                                margin-top:16px;
+                            "
+                        ></div>
+
+                        <div class="button-row">
+
+                            <button
+                                type="button"
                                 id="applyAiButton"
                                 class="primary-button"
                             >
@@ -1045,7 +1072,18 @@ const aiStatus =
 const aiPreview =
     document.getElementById("aiPreview");
 
+const generateImagesButton =
+    document.getElementById("generateImagesButton");
+
+const imageGenerationStatus =
+    document.getElementById("imageGenerationStatus");
+
+const generatedImages =
+    document.getElementById("generatedImages");
+
 let formattedAiArticle = null;
+
+let generatedArticleImages = [];
 
 
 // =====================================================
@@ -1163,6 +1201,111 @@ applyAiButton.addEventListener(
 );
 
 
+generateImagesButton.addEventListener(
+    "click",
+    async function() {
+
+        if (!formattedAiArticle) {
+            showImageGenerationStatus(
+                "جهّز المقال بالذكاء الاصطناعي أولاً حتى نحصل على image_prompts.",
+                true
+            );
+            return;
+        }
+
+        const prompts =
+            Array.isArray(formattedAiArticle.image_prompts)
+                ? formattedAiArticle.image_prompts
+                : [];
+
+        if (!prompts.length) {
+            showImageGenerationStatus(
+                "لم يقترح AI أي صور لهذا المقال.",
+                true
+            );
+            return;
+        }
+
+        generateImagesButton.disabled = true;
+        generateImagesButton.textContent =
+            "⏳ جاري توليد الصور...";
+
+        generatedImages.innerHTML = "";
+
+        showImageGenerationStatus(
+            `سيتم توليد ${prompts.length} صورة. سيتم عرض كل صورة فور اكتمالها.`,
+            false
+        );
+
+        try {
+
+            generatedArticleImages = [];
+
+            for (let index = 0; index < prompts.length; index++) {
+
+                showImageGenerationStatus(
+                    `جاري توليد الصورة ${index + 1} من ${prompts.length}...`,
+                    false
+                );
+
+                const response =
+                    await fetch("/api/generate-image", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify({
+                            prompt: prompts[index].prompt,
+                            placement: prompts[index].placement,
+                            purpose: prompts[index].purpose
+                        })
+                    });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success || !data.image) {
+                    throw new Error(
+                        data.error ||
+                        `تعذر توليد الصورة رقم ${index + 1}.`
+                    );
+                }
+
+                generatedArticleImages.push(data.image);
+
+                renderGeneratedImages(
+                    generatedArticleImages
+                );
+            }
+
+            showImageGenerationStatus(
+                `تم توليد ${generatedArticleImages.length} صورة بنجاح.`,
+                false
+            );
+
+        } catch (error) {
+
+            console.error(
+                "MedLife image generation error:",
+                error
+            );
+
+            showImageGenerationStatus(
+                error.message || "حدث خطأ أثناء توليد الصور.",
+                true
+            );
+
+        } finally {
+
+            generateImagesButton.disabled = false;
+            generateImagesButton.textContent =
+                "🎨 توليد الصور تلقائياً";
+
+        }
+    }
+);
+
+
 function showAIStatus(text, isError) {
 
     aiStatus.style.display = "block";
@@ -1173,6 +1316,67 @@ function showAIStatus(text, isError) {
         isError ? "#dc3545" : "#5b21b6";
     aiStatus.style.borderColor =
         isError ? "#f7caca" : "#ddd3ff";
+}
+
+
+function showImageGenerationStatus(text, isError) {
+
+    imageGenerationStatus.style.display = "block";
+    imageGenerationStatus.textContent = text;
+    imageGenerationStatus.style.background =
+        isError ? "#fdecec" : "#f3efff";
+    imageGenerationStatus.style.color =
+        isError ? "#dc3545" : "#5b21b6";
+    imageGenerationStatus.style.borderColor =
+        isError ? "#f7caca" : "#ddd3ff";
+}
+
+
+function renderGeneratedImages(images) {
+
+    generatedImages.innerHTML = "";
+
+    images.forEach((image, index) => {
+
+        const card =
+            document.createElement("div");
+
+        card.style.background = "#ffffff";
+        card.style.border = "1px solid #e5ddff";
+        card.style.borderRadius = "12px";
+        card.style.padding = "12px";
+
+        const img =
+            document.createElement("img");
+
+        img.src =
+            `data:${image.mime_type || "image/png"};base64,${image.b64_json}`;
+
+        img.alt =
+            image.purpose || `Generated image ${index + 1}`;
+
+        img.style.width = "100%";
+        img.style.aspectRatio = "16 / 10";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "9px";
+        img.style.display = "block";
+
+        const meta =
+            document.createElement("div");
+
+        meta.style.marginTop = "9px";
+        meta.style.fontSize = "13px";
+        meta.style.color = "#5b21b6";
+        meta.textContent =
+            `${image.placement || "section"} — ${image.purpose || "صورة توضيحية"}`;
+
+        card.appendChild(img);
+        card.appendChild(meta);
+
+        generatedImages.appendChild(card);
+
+    });
+
 }
 
 
