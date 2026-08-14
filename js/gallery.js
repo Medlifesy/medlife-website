@@ -8,6 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const photoTrack =
         document.getElementById("photoTrack");
 
+    /* =====================================================
+       FEATURED HOMEPAGE ARTICLE
+       Added here because this script is already loaded
+       on the MedLife homepage.
+    ===================================================== */
+
+    addFeaturedArticle();
+
     if (!photoTrack) {
         return;
     }
@@ -101,9 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
         photoTrack.innerHTML = "";
 
 
-        /*
-         * First set of images
-         */
         galleryImages.forEach(
             image => {
 
@@ -117,12 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-        /*
-         * Duplicate the complete set.
-         *
-         * This is required for the CSS marquee animation
-         * to loop smoothly.
-         */
         galleryImages.forEach(
             image => {
 
@@ -175,19 +174,12 @@ document.addEventListener("DOMContentLoaded", () => {
             "async";
 
 
-        /*
-         * First set loads immediately.
-         * Duplicate set can load lazily.
-         */
         img.loading =
             duplicate
                 ? "lazy"
                 : "eager";
 
 
-        /*
-         * If an image fails, hide its card.
-         */
         img.onerror = () => {
 
             card.remove();
@@ -200,9 +192,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-        /*
-         * Open image on click.
-         */
         card.addEventListener(
             "click",
             () => {
@@ -216,9 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-        /*
-         * Keyboard accessibility.
-         */
         card.setAttribute(
             "tabindex",
             "0"
@@ -247,7 +233,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 ) {
 
                     event.preventDefault();
-
 
                     openLightbox(
                         image.url,
@@ -278,9 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-        /*
-         * Create Lightbox only once.
-         */
         if (!lightbox) {
 
             lightbox =
@@ -524,6 +506,80 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
         `;
+    }
+
+
+    /* =====================================================
+       FEATURED ARTICLE CARD
+    ===================================================== */
+
+    function addFeaturedArticle() {
+
+        const articleGrid =
+            document.querySelector(
+                "#articles .article-grid"
+            );
+
+        if (!articleGrid) {
+            return;
+        }
+
+        const existing =
+            document.getElementById(
+                "tension-headache-home-article"
+            );
+
+        if (existing) {
+            return;
+        }
+
+        const card =
+            document.createElement("article");
+
+        card.id =
+            "tension-headache-home-article";
+
+        card.className =
+            "article-card reveal show";
+
+        card.innerHTML = `
+
+            <div class="article-top">
+
+                <i class="fa-solid fa-head-side-virus"></i>
+
+            </div>
+
+            <div class="article-body">
+
+                <div class="article-category">
+                    توعية صحية
+                </div>
+
+                <h3>
+                    صداع التوتر: رحلتك نحو الراحة
+                </h3>
+
+                <p>
+                    تعرف على صداع التوتر، أسبابه وأعراضه
+                    وعلامات الخطر والعلاج المتكامل وطرق الوقاية.
+                </p>
+
+                <a
+                    href="article.html"
+                    class="article-link"
+                >
+                    اقرأ المقال ←
+                </a>
+
+            </div>
+
+        `;
+
+        articleGrid.insertBefore(
+            card,
+            articleGrid.firstElementChild
+        );
     }
 
 
