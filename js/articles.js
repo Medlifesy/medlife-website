@@ -1,208 +1,756 @@
 /* =========================================================
-   MEDLIFE — PUBLIC ARTICLES
+   MEDLIFE ARTICLES
+   Public Articles Page
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    const articlesContainer =
+        document.getElementById("articlesContainer");
+
+    const articlesLoading =
+        document.getElementById("articlesLoading");
+
+    const articlesEmpty =
+        document.getElementById("articlesEmpty");
+
+    const articlesError =
+        document.getElementById("articlesError");
+
+    const searchInput =
+        document.getElementById("articleSearch");
+
+    const categoryFilter =
+        document.getElementById("categoryFilter");
+
+
+    let articles = [];
+
+
+    /* =====================================================
+       LOAD ARTICLES
+    ===================================================== */
+
     loadArticles();
 
-});
+
+    async function loadArticles() {
+
+        showLoading();
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/articles",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+
+                        cache: "no-store"
+                    }
+                );
 
 
-async function loadArticles() {
-
-    const container =
-        document.querySelector(".article-grid");
+            const data =
+                await response.json();
 
 
-    if (!container) return;
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Unable to load articles."
+                );
+            }
 
 
-    try {
+            articles =
+                Array.isArray(data.articles)
+                    ? data.articles
+                    : Array.isArray(data)
+                        ? data
+                        : [];
 
-        const response =
-            await fetch("/api/articles");
+
+            /*
+             * Public page should show only approved articles.
+             */
+
+            articles =
+                articles.filter(
+                    article =>
+                        article.status ===
+                        "approved"
+                );
 
 
-        if (!response.ok) {
-            throw new Error("Failed to load articles");
+            populateCategories();
+
+            renderArticles();
+
+
+        } catch (error) {
+
+            console.error(
+                "MedLife articles error:",
+                error
+            );
+
+
+            showError();
+
+        }
+    }
+
+
+    /* =====================================================
+       RENDER ARTICLES
+    ===================================================== */
+
+    function renderArticles() {
+
+        if (!articlesContainer) {
+            return;
         }
 
 
-        const data =
-            await response.json();
+        const search =
+            searchInput
+                ? searchInput.value
+                    .trim()
+                    .toLowerCase()
+                : "";
 
 
-        const articles =
-            data.articles || [];
+        const category =
+            categoryFilter
+                ? categoryFilter.value
+                : "all";
 
 
-        if (!articles.length) {
+        const filtered =
+            articles.filter(
+                article => {
 
-            container.innerHTML = `
-                <div class="articles-empty">
-                    <i class="fa-solid fa-book-open"></i>
+                    /* Category */
 
-                    <h3>
-                        لا توجد مقالات منشورة حالياً
-                    </h3>
+                    if (
+                        category !== "all" &&
+                        String(
+                            article.category || ""
+                        ) !== category
+                    ) {
 
-                    <p>
-                        سيتم نشر المقالات الجديدة بعد مراجعتها واعتمادها من فريق ميدلايف.
-                    </p>
-                </div>
-            `;
+                        return false;
+                    }
+
+
+                    /* Search */
+
+                    if (!search) {
+                        return true;
+                    }
+
+
+                    const title =
+                        String(
+                            article.title_ar ||
+                            article.title_en ||
+                            ""
+                        ).toLowerCase();
+
+
+                    const excerpt =
+                        String(
+                            article.excerpt_ar ||
+                            article.excerpt_en ||
+                            ""
+                        ).toLowerCase();
+
+
+                    const content =
+                        String(
+                            article.content_ar ||
+                            article.content_en ||
+                            ""
+                        ).toLowerCase();
+
+
+                    const author =
+                        String(
+                            article.author_name ||
+                            ""
+                        ).toLowerCase();
+
+
+                    return (
+                        title.includes(search) ||
+                        excerpt.includes(search) ||
+                        content.includes(search) ||
+                        author.includes(search)
+                    );
+                }
+            );
+
+
+        hideLoading();
+
+
+        if (
+            articlesEmpty
+        ) {
+
+            articlesEmpty.style.display =
+                filtered.length === 0
+                    ? "block"
+                    : "none";
+        }
+
+
+        if (
+            filtered.length === 0
+        ) {
+
+            articlesContainer.innerHTML =
+                "";
 
             return;
         }
 
 
-        container.innerHTML =
-            articles
-                .map(article => createArticleCard(article))
+        articlesContainer.innerHTML =
+            filtered
+                .map(
+                    article =>
+                        createArticleCard(
+                            article
+                        )
+                )
                 .join("");
-
-
-    } catch (error) {
-
-        console.error(
-            "Articles error:",
-            error
-        );
-
-        container.innerHTML = `
-            <div class="articles-empty">
-
-                <i class="fa-solid fa-circle-exclamation"></i>
-
-                <h3>
-                    تعذر تحميل المقالات
-                </h3>
-
-                <p>
-                    يرجى المحاولة لاحقاً.
-                </p>
-
-            </div>
-        `;
     }
-}
 
 
-/* =========================================================
-   ARTICLE CARD
-========================================================= */
+    /* =====================================================
+       ARTICLE CARD
+    ===================================================== */
 
-function createArticleCard(article) {
+    function createArticleCard(
+        article
+    ) {
 
-    const image =
-        article.image_url
-            ? `
-                <img
-                    src="${escapeHTML(article.image_url)}"
-                    alt="${escapeHTML(article.title_ar)}">
-              `
-            : `
-                <div class="article-top">
-                    <i class="fa-solid fa-book-medical"></i>
-                </div>
-              `;
+        const id =
+            article.id;
 
 
-    return `
-        <article class="article-card reveal">
-
-            ${image}
-
-            <div class="article-body">
-
-                <div class="article-category">
-
-                    ${getCategoryName(article.category)}
-
-                </div>
+        const title =
+            escapeHTML(
+                article.title_ar ||
+                article.title_en ||
+                "بدون عنوان"
+            );
 
 
-                <h3>
+        const excerpt =
+            escapeHTML(
+                article.excerpt_ar ||
+                article.excerpt_en ||
+                createExcerpt(
+                    article.content_ar ||
+                    article.content_en ||
+                    ""
+                )
+            );
 
-                    ${escapeHTML(article.title_ar)}
 
-                </h3>
+        const category =
+            escapeHTML(
+                article.category ||
+                "Medical Knowledge"
+            );
 
 
-                <p>
+        const author =
+            escapeHTML(
+                article.author_name ||
+                "MedLife"
+            );
 
-                    ${escapeHTML(
-                        article.excerpt_ar || ""
-                    )}
 
-                </p>
+        const date =
+            formatDate(
+                article.created_at
+            );
+
+
+        /*
+         * Image handling.
+         */
+
+        const image =
+            article.image_url
+                ? escapeAttribute(
+                    article.image_url
+                )
+                : "";
+
+
+        const imageHTML =
+            image
+
+                ? `
+                    <img
+                        src="${image}"
+                        alt="${title}"
+                        loading="lazy">
+                  `
+
+                : `
+                    <div class="article-placeholder">
+
+                        <i
+                            class="fa-solid fa-book-medical">
+                        </i>
+
+                    </div>
+                  `;
+
+
+        return `
+
+            <article
+                class="public-article-card">
 
 
                 <a
-                    href="article.html?id=${article.id}"
-                    class="article-link">
+                    href="article.html?id=${encodeURIComponent(id)}"
+                    class="article-image">
 
-                    قراءة المقال ←
+                    ${imageHTML}
 
                 </a>
 
-            </div>
 
-        </article>
-    `;
-}
+                <div
+                    class="public-article-content">
 
 
-/* =========================================================
-   CATEGORY
-========================================================= */
+                    <div
+                        class="public-article-category">
 
-function getCategoryName(category) {
+                        ${category}
 
-    const categories = {
-
-        "health-awareness":
-            "توعية صحية",
-
-        "medical-education":
-            "تعليم طبي",
-
-        "research":
-            "أبحاث",
-
-        "volunteering":
-            "تطوع",
-
-        "humanitarian":
-            "إنساني",
-
-        "other":
-            "أخرى"
-    };
+                    </div>
 
 
-    return categories[category] || "مقالات";
-}
+                    <h3>
+
+                        <a
+                            href="article.html?id=${encodeURIComponent(id)}">
+
+                            ${title}
+
+                        </a>
+
+                    </h3>
 
 
-/* =========================================================
-   BASIC HTML ESCAPE
-========================================================= */
+                    <p>
 
-function escapeHTML(value) {
+                        ${excerpt}
 
-    if (value === null ||
-        value === undefined) {
+                    </p>
 
-        return "";
+
+                    <div
+                        class="public-article-meta">
+
+                        <span>
+
+                            <i
+                                class="fa-solid fa-user">
+                            </i>
+
+                            ${author}
+
+                        </span>
+
+
+                        <span>
+
+                            <i
+                                class="fa-regular fa-calendar">
+                            </i>
+
+                            ${date}
+
+                        </span>
+
+                    </div>
+
+
+                    <a
+                        href="article.html?id=${encodeURIComponent(id)}"
+                        class="public-article-link">
+
+                        اقرأ المقال
+
+                        <i
+                            class="fa-solid fa-arrow-left">
+                        </i>
+
+                    </a>
+
+                </div>
+
+            </article>
+
+        `;
     }
 
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+    /* =====================================================
+       CATEGORIES
+    ===================================================== */
+
+    function populateCategories() {
+
+        if (!categoryFilter) {
+            return;
+        }
+
+
+        const categories =
+            [
+                ...new Set(
+                    articles
+                        .map(
+                            article =>
+                                String(
+                                    article.category || ""
+                                ).trim()
+                        )
+                        .filter(Boolean)
+                )
+            ];
+
+
+        categoryFilter.innerHTML = `
+
+            <option value="all">
+                جميع التصنيفات
+            </option>
+
+            ${
+                categories
+                    .map(
+                        category => `
+
+                            <option
+                                value="${escapeAttribute(
+                                    category
+                                )}">
+
+                                ${escapeHTML(
+                                    category
+                                )}
+
+                            </option>
+
+                        `
+                    )
+                    .join("")
+            }
+
+        `;
+    }
+
+
+    /* =====================================================
+       SEARCH
+    ===================================================== */
+
+    if (
+        searchInput
+    ) {
+
+        searchInput.addEventListener(
+            "input",
+            renderArticles
+        );
+    }
+
+
+    /* =====================================================
+       CATEGORY FILTER
+    ===================================================== */
+
+    if (
+        categoryFilter
+    ) {
+
+        categoryFilter.addEventListener(
+            "change",
+            renderArticles
+        );
+    }
+
+
+    /* =====================================================
+       LOADING STATE
+    ===================================================== */
+
+    function showLoading() {
+
+        if (
+            articlesLoading
+        ) {
+
+            articlesLoading.style.display =
+                "flex";
+        }
+
+
+        if (
+            articlesEmpty
+        ) {
+
+            articlesEmpty.style.display =
+                "none";
+        }
+
+
+        if (
+            articlesError
+        ) {
+
+            articlesError.style.display =
+                "none";
+        }
+    }
+
+
+    function hideLoading() {
+
+        if (
+            articlesLoading
+        ) {
+
+            articlesLoading.style.display =
+                "none";
+        }
+    }
+
+
+    /* =====================================================
+       ERROR STATE
+    ===================================================== */
+
+    function showError() {
+
+        hideLoading();
+
+
+        if (
+            articlesEmpty
+        ) {
+
+            articlesEmpty.style.display =
+                "none";
+        }
+
+
+        if (
+            articlesError
+        ) {
+
+            articlesError.style.display =
+                "block";
+        }
+
+
+        if (
+            articlesContainer
+        ) {
+
+            articlesContainer.innerHTML =
+                "";
+        }
+    }
+
+
+    /* =====================================================
+       CREATE EXCERPT
+    ===================================================== */
+
+    function createExcerpt(
+        text
+    ) {
+
+        const cleanText =
+            stripHTML(
+                String(
+                    text || ""
+                )
+            )
+            .replace(
+                /\s+/g,
+                " "
+            )
+            .trim();
+
+
+        if (
+            cleanText.length <= 150
+        ) {
+
+            return cleanText;
+        }
+
+
+        return (
+            cleanText.substring(
+                0,
+                150
+            ) + "..."
+        );
+    }
+
+
+    /* =====================================================
+       STRIP HTML
+    ===================================================== */
+
+    function stripHTML(
+        html
+    ) {
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.innerHTML =
+            html;
+
+
+        return div.textContent ||
+            div.innerText ||
+            "";
+    }
+
+
+    /* =====================================================
+       DATE
+    ===================================================== */
+
+    function formatDate(
+        value
+    ) {
+
+        if (!value) {
+            return "";
+        }
+
+
+        const date =
+            new Date(
+                value
+            );
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return "";
+        }
+
+
+        return date.toLocaleDateString(
+            "ar-SY",
+            {
+                year:
+                    "numeric",
+
+                month:
+                    "long",
+
+                day:
+                    "numeric"
+            }
+        );
+    }
+
+
+    /* =====================================================
+       ESCAPE HTML
+    ===================================================== */
+
+    function escapeHTML(
+        value
+    ) {
+
+        return String(
+            value ?? ""
+        )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+    }
+
+
+    /* =====================================================
+       ESCAPE ATTRIBUTE
+    ===================================================== */
+
+    function escapeAttribute(
+        value
+    ) {
+
+        return String(
+            value ?? ""
+        )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        );
+    }
+
+});
