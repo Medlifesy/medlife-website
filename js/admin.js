@@ -1475,3 +1475,500 @@ window.MedLifeAdmin = {
 /* =========================================================
    END OF ADMIN.JS
 ========================================================= */
+
+/* =========================================================
+   MEDLIFE ADMIN — ARTICLES
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    loadAdminArticles();
+
+});
+
+
+async function loadAdminArticles() {
+
+    const container =
+        document.getElementById(
+            "articlesTableBody"
+        );
+
+
+    if (!container) return;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/admin/articles"
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load articles"
+            );
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const articles =
+            data.articles || [];
+
+
+        updateStatistics(
+            articles
+        );
+
+
+        container.innerHTML =
+            articles
+                .map(article =>
+                    createAdminRow(article)
+                )
+                .join("");
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML = `
+            <tr>
+                <td colspan="7">
+                    تعذر تحميل المقالات.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+function updateStatistics(articles) {
+
+    const pending =
+        articles.filter(
+            article =>
+                article.status === "pending"
+        ).length;
+
+
+    const approved =
+        articles.filter(
+            article =>
+                article.status === "approved"
+        ).length;
+
+
+    const rejected =
+        articles.filter(
+            article =>
+                article.status === "rejected"
+        ).length;
+
+
+    const total =
+        articles.length;
+
+
+    setText(
+        "pendingCount",
+        pending
+    );
+
+    setText(
+        "approvedCount",
+        approved
+    );
+
+    setText(
+        "rejectedCount",
+        rejected
+    );
+
+    setText(
+        "totalArticles",
+        total
+    );
+}
+
+
+function setText(id, value) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+
+/* =========================================================
+   ROW
+========================================================= */
+
+function createAdminRow(article) {
+
+    const statusClass =
+        article.status;
+
+
+    const statusText = {
+
+        pending:
+            "بانتظار المراجعة",
+
+        approved:
+            "منشور",
+
+        rejected:
+            "مرفوض"
+
+    }[article.status];
+
+
+    return `
+        <tr data-id="${article.id}">
+
+            <td>
+
+                <strong>
+                    ${escapeHTML(
+                        article.title_ar
+                    )}
+                </strong>
+
+            </td>
+
+
+            <td>
+
+                ${escapeHTML(
+                    article.author_name
+                )}
+
+            </td>
+
+
+            <td>
+
+                ${getCategoryName(
+                    article.category
+                )}
+
+            </td>
+
+
+            <td>
+
+                <span class="status ${statusClass}">
+                    ${statusText}
+                </span>
+
+            </td>
+
+
+            <td>
+
+                ${formatDate(
+                    article.created_at
+                )}
+
+            </td>
+
+
+            <td>
+
+                <div class="admin-actions">
+
+                    <button
+                        type="button"
+                        onclick="approveArticle(${article.id})"
+                        class="approve-btn"
+                        ${article.status !== "pending"
+                            ? "disabled"
+                            : ""}>
+
+                        <i class="fa-solid fa-check"></i>
+
+                        موافقة
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        onclick="rejectArticle(${article.id})"
+                        class="reject-btn"
+                        ${article.status !== "pending"
+                            ? "disabled"
+                            : ""}>
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                        رفض
+
+                    </button>
+
+                </div>
+
+            </td>
+
+        </tr>
+    `;
+}
+
+
+/* =========================================================
+   APPROVE
+========================================================= */
+
+async function approveArticle(id) {
+
+    if (
+        !confirm(
+            "هل أنت متأكد من الموافقة على نشر هذا المقال؟"
+        )
+    ) {
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/admin/articles/${id}/approve`,
+                {
+                    method: "PATCH"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok ||
+            !data.success) {
+
+            throw new Error(
+                data.message ||
+                "فشلت عملية الموافقة."
+            );
+        }
+
+
+        showAdminMessage(
+            "تمت الموافقة على المقال ونشره.",
+            "success"
+        );
+
+
+        loadAdminArticles();
+
+
+    } catch (error) {
+
+        showAdminMessage(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   REJECT
+========================================================= */
+
+async function rejectArticle(id) {
+
+    const reason =
+        prompt(
+            "اكتب سبب رفض المقال:"
+        );
+
+
+    if (
+        reason === null
+    ) {
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/admin/articles/${id}/reject`,
+                {
+
+                    method: "PATCH",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            reason:
+                                reason.trim()
+                        })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok ||
+            !data.success) {
+
+            throw new Error(
+                data.message ||
+                "فشلت عملية الرفض."
+            );
+        }
+
+
+        showAdminMessage(
+            "تم رفض المقال.",
+            "success"
+        );
+
+
+        loadAdminArticles();
+
+
+    } catch (error) {
+
+        showAdminMessage(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function formatDate(date) {
+
+    if (!date) return "-";
+
+
+    return new Date(date)
+        .toLocaleDateString(
+            "ar-SY",
+            {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+}
+
+
+function showAdminMessage(
+    text,
+    type
+) {
+
+    const box =
+        document.getElementById(
+            "adminNotification"
+        );
+
+
+    if (!box) {
+
+        alert(text);
+
+        return;
+    }
+
+
+    box.className =
+        `admin-notification ${type}`;
+
+
+    box.textContent =
+        text;
+
+
+    setTimeout(() => {
+
+        box.className =
+            "admin-notification";
+
+    }, 4000);
+}
+
+
+function getCategoryName(category) {
+
+    const categories = {
+
+        "health-awareness":
+            "توعية صحية",
+
+        "medical-education":
+            "تعليم طبي",
+
+        "research":
+            "أبحاث",
+
+        "volunteering":
+            "تطوع",
+
+        "humanitarian":
+            "إنساني",
+
+        "other":
+            "أخرى"
+
+    };
+
+
+    return categories[category]
+        || "أخرى";
+}
+
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+    }
+
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
