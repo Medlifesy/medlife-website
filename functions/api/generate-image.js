@@ -129,7 +129,7 @@ export async function onRequestPost(context) {
                             "application/json",
 
                         "Authorization":
-                            `Bearer ${env.OPENAI_API_KEY}`
+                            "Bearer " + env.OPENAI_API_KEY
 
                     },
 
