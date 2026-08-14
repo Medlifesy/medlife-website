@@ -3,502 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedLife Syria - ميد لايف سوريا</title>
-    <meta name="description" content="مؤسسة ميد لايف سوريا - تقديم الرعاية الصحية والدعم الطبي الإنساني للأسر والمجتمعات المحتاجة.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>MedLife Syria | مؤسسة ميدلايف الطبية الخيرية التطوعية</title>
+    
+    <!-- CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary-color: #d9383a;
-            --primary-hover: #b82a2c;
-            --secondary-color: #1a2b4c;
-            --accent-color: #38bdf8;
-            --bg-light: #f8fafc;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --white: #ffffff;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Cairo', 'Poppins', sans-serif;
+            --primary-blue: #0A3663;
+            --secondary-blue: #1A5288;
+            --accent-teal: #00B4D8;
+            --light-teal: #90E0EF;
+            --soft-bg: #F8FAFC;
+            --dark-navy: #051923;
+            --gradient-primary: linear-gradient(135deg, #0A3663 0%, #00B4D8 100%);
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 25px -5px rgba(10, 54, 99, 0.15);
         }
 
         body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            line-height: 1.6;
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--soft-bg);
+            color: #333;
             overflow-x: hidden;
         }
 
         /* Top Bar */
         .top-bar {
-            background-color: var(--secondary-color);
-            color: var(--white);
-            padding: 8px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background-color: var(--dark-navy);
+            color: #fff;
             font-size: 0.85rem;
-        }
-
-        .top-info {
-            display: flex;
-            gap: 20px;
-        }
-
-        .top-info span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .top-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .lang-btn {
-            background: rgba(255,255,255,0.15);
-            border: none;
-            color: var(--white);
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: var(--transition);
-        }
-
-        .lang-btn:hover {
-            background: rgba(255,255,255,0.3);
+            padding: 8px 0;
         }
 
         /* Navbar */
         .navbar {
-            background: var(--white);
-            padding: 15px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            transition: all 0.3s ease;
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-
-        .logo img {
+        
+        .navbar-brand img {
             height: 48px;
-            width: auto;
         }
 
-        .logo-text {
-            font-weight: 800;
-            font-size: 1.4rem;
-            color: var(--secondary-color);
+        .nav-link {
+            font-weight: 500;
+            color: var(--primary-blue) !important;
+            margin: 0 5px;
+            transition: color 0.3s ease;
         }
 
-        .logo-text span {
-            color: var(--primary-color);
+        .nav-link:hover {
+            color: var(--accent-teal) !important;
         }
 
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 25px;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
-
-        .nav-btns {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 8px 18px;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: var(--transition);
+        .btn-custom-primary {
+            background: var(--gradient-primary);
+            color: white;
             border: none;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-weight: 700;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-
-        .menu-toggle {
-            display: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--secondary-color);
+        .btn-custom-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
         }
 
         /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, rgba(26,43,76,0.9) 0%, rgba(217,56,58,0.85) 100%), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
-            color: var(--white);
-            padding: 100px 5% 120px;
-            text-align: center;
+        .hero-section {
+            padding: 100px 0 60px;
+            background: radial-gradient(circle at top right, rgba(0, 180, 216, 0.08), transparent);
         }
 
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
+        .hero-title {
+            font-weight: 900;
+            color: var(--primary-blue);
             font-size: 2.8rem;
-            font-weight: 800;
-            margin-bottom: 20px;
             line-height: 1.2;
         }
 
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            opacity: 0.95;
+        .hero-title span {
+            color: var(--accent-teal);
         }
 
-        .hero-btns {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        /* Photo Gallery Section */
-        .photo-section {
-            padding: 60px 5%;
-            background: var(--white);
-            text-align: center;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-            position: relative;
-            display: inline-block;
-        }
-
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 50px;
-            height: 4px;
-            background: var(--primary-color);
-            margin: 8px auto 0;
-            border-radius: 2px;
-        }
-
-        .section-subtitle {
-            color: var(--text-muted);
-            margin-bottom: 40px;
-            font-size: 1rem;
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .gallery-card {
-            position: relative;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-            height: 240px;
-            cursor: pointer;
-        }
-
-        .gallery-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .gallery-card:hover img {
-            transform: scale(1.08);
-        }
-
-        .gallery-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            display: flex;
-            align-items: flex-end;
-            padding: 20px;
-            color: var(--white);
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .gallery-card:hover .gallery-overlay {
-            opacity: 1;
-        }
-
-        /* Programs Section */
-        .programs {
-            padding: 80px 5%;
-            background: var(--bg-light);
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .program-card {
-            background: var(--white);
-            border-radius: var(--radius-md);
+        /* Cards & Features */
+        .feature-card {
+            background: white;
+            border-radius: 20px;
             padding: 30px;
             box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-            border-top: 4px solid var(--primary-color);
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            height: 100%;
         }
 
-        .program-card:hover {
-            transform: translateY(-8px);
+        .feature-card:hover {
+            transform: translateY(-5px);
             box-shadow: var(--shadow-lg);
         }
 
-        .card-icon {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-
-        .program-card h3 {
-            font-size: 1.3rem;
-            color: var(--secondary-color);
-            margin-bottom: 12px;
-        }
-
-        .program-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        /* Floating AI Chat Button */
-        .ai-chat-btn {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            background: var(--primary-color);
-            color: var(--white);
+        .icon-wrapper {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
+            border-radius: 15px;
+            background: rgba(0, 180, 216, 0.1);
+            color: var(--accent-teal);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 60px 0;
+            border-radius: 30px;
+            margin: 40px 0;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        /* AI Floating Panel */
+        .ai-floating-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 1000;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
             box-shadow: var(--shadow-lg);
             cursor: pointer;
-            z-index: 999;
-            transition: var(--transition);
-        }
-
-        .ai-chat-btn:hover {
-            transform: scale(1.1);
-        }
-
-        /* Modals */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
             display: flex;
             align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: var(--transition);
-            z-index: 2000;
-            padding: 20px;
+            gap: 10px;
+            font-weight: 700;
         }
 
-        .modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-content {
-            background: var(--white);
-            border-radius: var(--radius-md);
-            width: 100%;
-            max-width: 500px;
-            padding: 30px;
-            position: relative;
+        .ai-panel {
+            position: fixed;
+            bottom: 90px;
+            left: 30px;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 20px;
             box-shadow: var(--shadow-lg);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: var(--text-muted);
+        .ai-header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 15px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .form-group {
-            margin-bottom: 18px;
-            text-align: right;
+        .ai-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            font-size: 0.9rem;
+        .ai-footer {
+            padding: 10px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 5px;
         }
 
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: var(--radius-sm);
-            font-size: 0.95rem;
-            outline: none;
-            transition: var(--transition);
+        /* Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
         }
 
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--primary-color);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--secondary-color);
-            color: var(--white);
-            padding: 60px 5% 20px;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-col h4 {
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-            color: var(--accent-color);
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-
-        .footer-links a {
-            color: #94a3b8;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-links a:hover {
-            color: var(--white);
-        }
-
-        .copyright {
-            text-align: center;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
-
-        /* Responsive Media Queries */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                right: 0;
-                width: 100%;
-                background: var(--white);
-                flex-direction: column;
-                padding: 20px;
-                box-shadow: var(--shadow-md);
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -506,254 +212,254 @@
 
     <!-- Top Bar -->
     <div class="top-bar">
-        <div class="top-info">
-            <span><i class="fas fa-phone"></i> +963 11 000 0000</span>
-            <span><i class="fas fa-envelope"></i> info@medlife-syria.org</span>
-        </div>
-        <div class="top-actions">
-            <button class="lang-btn" id="languageBtn">English</button>
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-phone-alt me-2"></i> +963 11 000 0000
+                <span class="mx-2">|</span>
+                <i class="fas fa-envelope me-2"></i> info@medlife-syria.org
+            </div>
+            <div>
+                <a href="#" class="text-white me-2"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-white"><i class="fab fa-linkedin"></i></a>
+            </div>
         </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="navbar">
-        <a href="#" class="logo">
-            <img src="logo.PNG" alt="MedLife Logo" onerror="this.src='https://via.placeholder.com/150x50?text=MedLife+Syria'">
-            <div class="logo-text">MedLife <span>Syria</span></div>
-        </a>
-        
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#home" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
-            <li><a href="#about" data-ar="من نحن" data-en="About Us">من نحن</a></li>
-            <li><a href="#programs" data-ar="برامجنا" data-en="Programs">برامجنا</a></li>
-            <li><a href="#gallery" data-ar="معرض الصور" data-en="Gallery">معرض الصور</a></li>
-            <li><a href="#contact" data-ar="اتصل بنا" data-en="Contact">اتصل بنا</a></li>
-        </ul>
-
-        <div class="nav-btns">
-            <button class="btn btn-outline" id="openLoginBtn" data-ar="تسجيل الدخول" data-en="Login">تسجيل الدخول</button>
-            <button class="btn btn-primary" data-volunteer-trigger data-ar="تطوع معنا" data-en="Volunteer">تطوع معنا</button>
-            <div class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand font-weight-bold fw-bold text-primary" href="#">
+                <i class="fas fa-heartbeat text-info me-2"></i>MedLife Syria
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#home">الرئيسية</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">عن المؤسسة</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">خدماتنا</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#impact">أثرنا</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <a href="#volunteer" class="btn btn-custom-primary">انضم كمتطوع</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <h1 data-ar="نعمل لأجل صحة وكرامة الإنسان في سوريا" data-en="Working for Health and Dignity in Syria">نعمل لأجل صحة وكرامة الإنسان في سوريا</h1>
-            <p data-ar="مؤسسة إنسانية تهدف لتقديم الخدمات الطبية والصحية للأسر والمجتمعات الأكثر احتياجاً." data-en="A humanitarian organization aiming to provide medical and health services to communities in need.">مؤسسة إنسانية تهدف لتقديم الخدمات الطبية والصحية للأسر والمجتمعات الأكثر احتياجاً.</p>
-            <div class="hero-btns">
-                <a href="#programs" class="btn btn-primary" data-ar="استكشف برامجنا" data-en="Explore Programs">استكشف برامجنا</a>
-                <button class="btn btn-outline" style="border-color: #fff; color: #fff;" data-volunteer-trigger data-ar="انضم كمتطوع" data-en="Join as Volunteer">انضم كمتطوع</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Programs Section -->
-    <section class="programs" id="programs">
-        <div style="text-align: center;">
-            <h2 class="section-title" data-ar="برامجنا الطبية الإنسانية" data-en="Our Medical Programs">برامجنا الطبية الإنسانية</h2>
-            <p class="section-subtitle" data-ar="نقدم مجموعة شاملة من الخدمات الصحية والإغاثية" data-en="Providing a comprehensive range of health and relief services">نقدم مجموعة شاملة من الخدمات الصحية والإغاثية</p>
-        </div>
-
-        <div class="cards-grid">
-            <div class="program-card">
-                <i class="fas fa-user-md card-icon"></i>
-                <h3 data-ar="العيادات النقالـة" data-en="Mobile Clinics">العيادات النقالـة</h3>
-                <p data-ar="وصول الخدمات الطبية الأساسية والأدوية إلى المناطق النائية والمخيمات." data-en="Reaching remote areas and camps with essential medical services and medications.">وصول الخدمات الطبية الأساسية والأدوية إلى المناطق النائية والمخيمات.</p>
-            </div>
-
-            <div class="program-card">
-                <i class="fas fa-pills card-icon"></i>
-                <h3 data-ar="توفير الأدوية والمستلزمات" data-en="Medicine Supply">توفير الأدوية والمستلزمات</h3>
-                <p data-ar="تأمين الأدوية المزمنة والمعدات الطبية للمستشفيات والمراكز الصحية." data-en="Supplying chronic medications and medical equipment to hospitals and health centers.">تأمين الأدوية المزمنة والمعدات الطبية للمستشفيات والمراكز الصحية.</p>
-            </div>
-
-            <div class="program-card">
-                <i class="fas fa-heartbeat card-icon"></i>
-                <h3 data-ar="الدعم النفسي والاجتماعي" data-en="Psychosocial Support">الدعم النفسي والاجتماعي</h3>
-                <p data-ar="جلسات برامج دعم نفسي للأطفال والعائلات المتأثرة بالأزمات." data-en="Psychosocial support sessions for children and families affected by crisis.">جلسات برامج دعم نفسي للأطفال والعائلات المتأثرة بالأزمات.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Photo Gallery Section -->
-    <section class="photo-section" id="gallery">
-        <h2 class="section-title" data-ar="معرض الصور" data-en="Photo Gallery">معرض الصور</h2>
-        <p class="section-subtitle" data-ar="لقطات من ميدان العمل الإنساني والطبي" data-en="Snapshots from our humanitarian and medical fieldwork">لقطات من ميدان العمل الإنساني والطبي</p>
-        
-        <div class="gallery-grid">
-            <div class="gallery-card">
-                <img src="https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80" alt="Medical team">
-                <div class="gallery-overlay">
-                    <span data-ar="الفريق الطبي الميداني" data-en="Field Medical Team">الفريق الطبي الميداني</span>
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 reveal">
+                    <h1 class="hero-title mb-4">نعيد الأمل.. <span>ننقذ الأرواح</span> في سوريا</h1>
+                    <p class="lead mb-4 text-muted">مؤسسة ميدلايف الطبية الخيرية التطوعية تسعى لتقديم الرعاية الصحية الشاملة والمجانية للمجتمعات الأكثر حاجة، بجهود أطباء ومتطوعين متخصصين.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#volunteer" class="btn btn-custom-primary">تطوع معنا الآن</a>
+                        <a href="#services" class="btn btn-outline-secondary rounded-pill px-4 align-self-center">برامجنا الطبية</a>
+                    </div>
                 </div>
-            </div>
-            <div class="gallery-card">
-                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=600&q=80" alt="Consultation">
-                <div class="gallery-overlay">
-                    <span data-ar="تقديم الاستشارات والعيادات" data-en="Providing Consultations">تقديم الاستشارات والعيادات</span>
-                </div>
-            </div>
-            <div class="gallery-card">
-                <img src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=600&q=80" alt="Healthcare">
-                <div class="gallery-overlay">
-                    <span data-ar="رعاية كبار السن والأطفال" data-en="Care for Elderly & Children">رعاية كبار السن والأطفال</span>
+                <div class="col-lg-6 mt-5 mt-lg-0 text-center reveal">
+                    <img src="https://via.placeholder.com/600x400/0A3663/FFFFFF?text=MedLife+Syria" class="img-fluid rounded-4 shadow-lg" alt="MedLife Team">
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Floating AI Chat Button -->
-    <div class="ai-chat-btn" title="MedLife AI Assistant">
-        <i class="fas fa-robot"></i>
-    </div>
-
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal" aria-hidden="true">
-        <div class="modal-content">
-            <span class="close-modal" id="closeLogin">&times;</span>
-            <h3 style="margin-bottom: 20px; color: var(--secondary-color);" data-ar="تسجيل الدخول" data-en="Login">تسجيل الدخول</h3>
-            <form>
-                <div class="form-group">
-                    <label data-ar="البريد الإلكتروني" data-en="Email Address">البريد الإلكتروني</label>
-                    <input type="email" placeholder="example@domain.com" required>
+    <!-- Services Section -->
+    <section id="services" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <h2 class="fw-bold text-primary">مجالات عملنا الطبية</h2>
+                <p class="text-muted">نعمل على تقديم حلول صحية مستدامة وإغاثية عاجلة</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4 reveal">
+                    <div class="feature-card">
+                        <div class="icon-wrapper"><i class="fas fa-user-md"></i></div>
+                        <h4 class="fw-bold mb-3">القافلات الطبية</h4>
+                        <p class="text-muted">تسيير عيادات متنقلة للمناطق النائية ومخيمات النزوح لتقديم المعاينات والدواء مجاناً.</p>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
-                    <input type="password" placeholder="********" required>
+                <div class="col-md-4 reveal">
+                    <div class="feature-card">
+                        <div class="icon-wrapper"><i class="fas fa-pills"></i></div>
+                        <h4 class="fw-bold mb-3">توفير الدواء</h4>
+                        <p class="text-muted">تأمين الأدوية للمصابين بأمراض مزمنة والأسر المعوزة بالتعاون مع الصيدليات والموردين.</p>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;" data-ar="دخول" data-en="Sign In">دخول</button>
-            </form>
+                <div class="col-md-4 reveal">
+                    <div class="feature-card">
+                        <div class="icon-wrapper"><i class="fas fa-notes-medical"></i></div>
+                        <h4 class="fw-bold mb-3">التوعية والتثقيف</h4>
+                        <p class="text-muted">حملات توعوية دورية للوقاية من الأمراض الشائعة والتعليم على الإسعافات الأولية.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Volunteer Modal -->
-    <div class="modal" id="volunteerModal" aria-hidden="true">
-        <div class="modal-content">
-            <span class="close-modal" id="closeVolunteer">&times;</span>
-            <h3 style="margin-bottom: 20px; color: var(--secondary-color);" data-ar="طلب الانضمام كمتطوع" data-en="Volunteer Application">طلب الانضمام كمتطوع</h3>
-            <form>
-                <div class="form-group">
-                    <label data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</label>
-                    <input type="text" placeholder="الاسم الثلاثي" required>
+    <!-- Stats Section -->
+    <section id="impact" class="container reveal">
+        <div class="stats-section text-center">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="stat-number" data-target="15000">0</div>
+                    <p class="mb-0">مستفيد من الرعاية</p>
                 </div>
-                <div class="form-group">
-                    <label data-ar="التخصص الطبية / المهنة" data-en="Specialization / Profession">التخصص الطبية / المهنة</label>
-                    <input type="text" placeholder="طبيب، ممرض، إداري..." required>
+                <div class="col-md-4">
+                    <div class="stat-number" data-target="350">0</div>
+                    <p class="mb-0">متطوع طبي ومتخصص</p>
                 </div>
-                <div class="form-group">
-                    <label data-ar="رقم الهاتف" data-en="Phone Number">رقم الهاتف</label>
-                    <input type="tel" placeholder="+963 ..." required>
+                <div class="col-md-4">
+                    <div class="stat-number" data-target="85">0</div>
+                    <p class="mb-0">حملة وقافلة طبية</p>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;" data-ar="إرسال الطلب" data-en="Submit Application">إرسال الطلب</button>
-            </form>
+            </div>
         </div>
-    </div>
+    </section>
 
     <!-- Footer -->
-    <footer>
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h4 data-ar="عن المؤسسة" data-en="About Us">عن المؤسسة</h4>
-                <p style="color: #94a3b8; font-size: 0.9rem;" data-ar="مؤسسة ميد لايف سوريا تسعى لتقديم أفضل الخدمات الصحية والإغاثية الإنسانية في مختلف المناطق." data-en="MedLife Syria strives to offer best health and humanitarian relief services across regions.">مؤسسة ميد لايف سوريا تسعى لتقديم أفضل الخدمات الصحية والإغاثية الإنسانية في مختلف المناطق.</p>
+    <footer class="bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h5 class="fw-bold text-info mb-3">MedLife Syria</h5>
+                    <p class="text-secondary">مؤسسة غير ربحية تعنى بالجانب الطبي والإنساني، تعمل بشفافية كاملة لإيصال العلاج لمن يستحقه.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 text-secondary">&copy; 2026 MedLife Syria. جميع الحقوق محفوظة.</p>
+                </div>
             </div>
-            <div class="footer-col">
-                <h4 data-ar="روابط سريعة" data-en="Quick Links">روابط سريعة</h4>
-                <ul class="footer-links">
-                    <li><a href="#about" data-ar="عن المؤسسة" data-en="About Us">عن المؤسسة</a></li>
-                    <li><a href="#programs" data-ar="برامجنا" data-en="Our Programs">برامجنا</a></li>
-                    <li><a href="#gallery" data-ar="معرض الصور" data-en="Gallery">معرض الصور</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4 data-ar="تواصل معنا" data-en="Contact Us">تواصل معنا</h4>
-                <ul class="footer-links">
-                    <li><i class="fas fa-map-marker-alt"></i> دمشق، سوريا</li>
-                    <li><i class="fas fa-phone"></i> +963 11 000 0000</li>
-                    <li><i class="fas fa-envelope"></i> info@medlife-syria.org</li>
-                </ul>
-            </div>
-        </div>
-        <div class="copyright">
-            <p>&copy; 2026 MedLife Syria. All Rights Reserved.</p>
         </div>
     </footer>
 
-    <!-- JavaScript Logic -->
+    <!-- AI Panel Button -->
+    <button class="ai-floating-btn" id="aiBtn">
+        <i class="fas fa-robot"></i>
+        <span>مساعد MedLife AI</span>
+    </button>
+
+    <!-- AI Panel -->
+    <div class="ai-panel" id="aiPanel">
+        <div class="ai-header">
+            <span><i class="fas fa-brain me-2"></i>MedLife AI Assistant</span>
+            <button class="btn-close btn-close-white" id="aiClose"></button>
+        </div>
+        <div class="ai-body" id="aiBody">
+            <div class="p-2 mb-2 bg-light rounded text-dark">
+                أهلاً بك! أنا المساعد الذكي لمؤسسة ميدلايف. كيف يمكنني مساعدتك اليوم؟
+            </div>
+        </div>
+        <div class="ai-footer">
+            <input type="text" id="aiInput" class="form-control form-control-sm" placeholder="اكتب سؤالك هنا...">
+            <button class="btn btn-sm btn-primary" id="aiSend"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- JS Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Script -->
     <script>
-        const languageBtn = document.getElementById("languageBtn");
-        const menuToggle = document.getElementById("menuToggle");
-        const navLinks = document.getElementById("navLinks");
-        const openLoginBtn = document.getElementById("openLoginBtn");
-        const closeLogin = document.getElementById("closeLogin");
-        const loginModal = document.getElementById("loginModal");
-        const volunteerModal = document.getElementById("volunteerModal");
-        const closeVolunteer = document.getElementById("closeVolunteer");
+        // Reveal elements on scroll
+        const revealElements = document.querySelectorAll('.reveal');
 
-        let currentLanguage = "ar";
-
-        // Mobile Nav Toggle
-        menuToggle.addEventListener("click", () => {
-            navLinks.classList.toggle("active");
-        });
-
-        // Language Switcher Function
-        function applyLanguage(lang) {
-            currentLanguage = lang;
-            document.documentElement.lang = lang;
-            document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-
-            const elements = document.querySelectorAll("[data-ar][data-en]");
-            elements.forEach(el => {
-                el.textContent = el.getAttribute(`data-${lang}`);
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    
+                    // Trigger counters if inside impact section
+                    if(entry.target.id === 'impact' || entry.target.querySelector('.stat-number')) {
+                        startCounters();
+                    }
+                }
             });
+        }, { threshold: 0.15 });
 
-            languageBtn.textContent = lang === "ar" ? "English" : "العربية";
-        }
+        revealElements.forEach(el => observer.observe(el));
 
-        languageBtn.addEventListener("click", () => {
-            applyLanguage(currentLanguage === "ar" ? "en" : "ar");
-        });
+        // Animated Counters
+        let animated = false;
+        function startCounters() {
+            if (animated) return;
+            animated = true;
+            
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                let count = 0;
+                const speed = target / 50;
 
-        // Login Modal Controls
-        function openLoginModal() {
-            loginModal.classList.add("active");
-            loginModal.setAttribute("aria-hidden", "false");
-        }
-
-        function closeLoginModal() {
-            loginModal.classList.remove("active");
-            loginModal.setAttribute("aria-hidden", "true");
-        }
-
-        openLoginBtn.addEventListener("click", openLoginModal);
-        closeLogin.addEventListener("click", closeLoginModal);
-
-        // Volunteer Modal Controls
-        function openVolunteerModal() {
-            volunteerModal.classList.add("active");
-            volunteerModal.setAttribute("aria-hidden", "false");
-        }
-
-        function closeVolunteerModal() {
-            volunteerModal.classList.remove("active");
-            volunteerModal.setAttribute("aria-hidden", "true");
-        }
-
-        document.querySelectorAll('[data-volunteer-trigger]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                openVolunteerModal();
+                const updateCount = () => {
+                    count += speed;
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count).toLocaleString();
+                        setTimeout(updateCount, 30);
+                    } else {
+                        counter.innerText = target.toLocaleString() + '+';
+                    }
+                };
+                updateCount();
             });
+        }
+
+        // MedLife AI Assistant Panel Toggle
+        const aiBtn = document.getElementById('aiBtn');
+        const aiPanel = document.getElementById('aiPanel');
+        const aiClose = document.getElementById('aiClose');
+        const aiSend = document.getElementById('aiSend');
+        const aiInput = document.getElementById('aiInput');
+        const aiBody = document.getElementById('aiBody');
+
+        aiBtn.addEventListener('click', () => {
+            aiPanel.style.display = aiPanel.style.display === 'flex' ? 'none' : 'flex';
         });
 
-        closeVolunteer.addEventListener("click", closeVolunteerModal);
+        aiClose.addEventListener('click', () => {
+            aiPanel.style.display = 'none';
+        });
 
-        // Close Modals on Outside Click
-        window.addEventListener("click", (e) => {
-            if (e.target === loginModal) closeLoginModal();
-            if (e.target === volunteerModal) closeVolunteerModal();
+        // Basic AI Interaction Logic
+        function sendMessage() {
+            const text = aiInput.value.trim();
+            if (!text) return;
+
+            // User Message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'p-2 mb-2 bg-primary text-white rounded ms-auto text-start';
+            userMsg.style.maxWidth = '80%';
+            userMsg.innerText = text;
+            aiBody.appendChild(userMsg);
+
+            aiInput.value = '';
+            aiBody.scrollTop = aiBody.scrollHeight;
+
+            // Simulated AI Response
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'p-2 mb-2 bg-light rounded text-dark me-auto text-start';
+                botMsg.style.maxWidth = '80%';
+                
+                if(text.includes('تطوع') || text.includes('انضمام')) {
+                    botMsg.innerText = 'يمكنك الانضمام لفريقنا عبر الضغط على زر "انضم كمتطوع" أعلى الصفحة وتعبئة النموذج المخصص!';
+                } else if(text.includes('خدمات') || text.includes('علاج')) {
+                    botMsg.innerText = 'نقدم خدمات القوافل الطبية وتوفير الأدوية والتثقيف الصحي مجاناً بالكامل.';
+                } else {
+                    botMsg.innerText = 'شكراً لتواصلك مع ميدلايف سوريا. سيقوم أحد أعضاء الفريق بالرد على استفسارك بالتفصيل قريباً!';
+                }
+
+                aiBody.appendChild(botMsg);
+                aiBody.scrollTop = aiBody.scrollHeight;
+            }, 800);
+        }
+
+        aiSend.addEventListener('click', sendMessage);
+        aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
         });
     </script>
 </body>
