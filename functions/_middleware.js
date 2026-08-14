@@ -34,6 +34,10 @@ export async function onRequest(context) {
                     '<script src="/js/members.js" defer></script>',
                     { html: true }
                 );
+                element.append(
+                    '<script src="/js/home-enhancements.js" defer></script>',
+                    { html: true }
+                );
             }
         })
         .transform(response);
