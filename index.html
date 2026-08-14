@@ -1,415 +1,2143 @@
-```text
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="MedLife Syria — مؤسسة طبية خيرية تطوعية تعمل في الصحة والتوعية والتعليم والمبادرات الإنسانية والابتكار.">
-    <title>MedLife Syria | مؤسسة ميدلايف الطبية الخيرية التطوعية</title>
 
-    <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <!-- Main Stylesheet -->
-    <link rel="stylesheet" href="css/style.css">
+<head>
+
+    <!-- =====================================================
+         BASIC META
+    ====================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="MedLife Syria — مؤسسة طبية خيرية تطوعية تعمل في الصحة والتوعية والتعليم والمبادرات الإنسانية والابتكار.">
+
+    <meta name="keywords"
+          content="MedLife, MedLife Syria, ميدلايف, سوريا, مؤسسة طبية, تطوع, صحة, توعية صحية">
+
+    <meta name="author"
+          content="MedLife Syria">
+
+    <meta name="theme-color"
+          content="#0b3b60">
+
+
+    <!-- =====================================================
+         TITLE
+    ====================================================== -->
+
+    <title>
+        MedLife Syria | مؤسسة ميدلايف الطبية الخيرية التطوعية
+    </title>
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <!-- =====================================================
+         MAIN CSS
+    ====================================================== -->
+
+    <link rel="stylesheet"
+          href="css/style.css">
+
 </head>
+
 
 <body>
 
-    <!-- ========================= HEADER ========================= -->
-    <header>
-        <div class="container nav">
-            <a href="#home" class="logo-brand" aria-label="MedLife Syria">
-                <img src="images/logo.PNG" alt="MedLife Syria" class="logo-img">
-            </a>
 
-            <nav aria-label="Main navigation">
-                <ul class="nav-links">
-                    <li><a href="#home" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
-                    <li><a href="#about" data-ar="من نحن" data-en="About Us">من نحن</a></li>
-                    <li><a href="#journey" data-ar="رحلتنا" data-en="Our Journey">رحلتنا</a></li>
-                    <li><a href="#programs" data-ar="ماذا نفعل" data-en="What We Do">ماذا نفعل</a></li>
-                    <li><a href="#articles" data-ar="المقالات" data-en="Articles">المقالات</a></li>
-                    <li><a href="#consultation" data-ar="الاستشارات" data-en="Consultation">الاستشارات</a></li>
-                    <li><a href="#contact" data-ar="تواصل معنا" data-en="Contact">تواصل معنا</a></li>
-                </ul>
-            </nav>
+<!-- =========================================================
+     HEADER
+========================================================= -->
 
-            <div class="nav-actions">
-                <button class="lang-btn" id="languageBtn" aria-label="Switch language">EN</button>
-                <button class="login-btn" id="loginBtn">
-                    <i class="fa-solid fa-right-to-bracket"></i>
-                    <span data-ar="دخول الأعضاء" data-en="Members Login">دخول الأعضاء</span>
-                </button>
-                <a href="#volunteer" class="volunteer-btn" data-volunteer-trigger>
-                    <i class="fa-solid fa-hand-holding-heart"></i>
-                    <span data-ar="تطوع معنا" data-en="Join Us">تطوع معنا</span>
-                </a>
-                <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-        </div>
-    </header>
+<header class="site-header">
 
-    <!-- ========================= MOBILE MENU ========================= -->
-    <div class="mobile-menu" id="mobileMenu">
-        <div class="container">
-            <ul>
-                <li><a href="#home" data-mobile-link data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
-                <li><a href="#about" data-mobile-link data-ar="من نحن" data-en="About Us">من نحن</a></li>
-                <li><a href="#journey" data-mobile-link data-ar="رحلتنا" data-en="Our Journey">رحلتنا</a></li>
-                <li><a href="#programs" data-mobile-link data-ar="ماذا نفعل" data-en="What We Do">ماذا نفعل</a></li>
-                <li><a href="#articles" data-mobile-link data-ar="المقالات" data-en="Articles">المقالات</a></li>
-                <li><a href="#consultation" data-mobile-link data-ar="الاستشارات" data-en="Consultation">الاستشارات</a></li>
-                <li><a href="#contact" data-mobile-link data-ar="تواصل معنا" data-en="Contact">تواصل معنا</a></li>
+    <div class="container nav">
+
+        <!-- LOGO -->
+
+        <a href="#home"
+           class="logo-brand"
+           aria-label="MedLife Syria">
+
+            <img src="logo.PNG"
+                 alt="MedLife Syria"
+                 class="logo-img">
+
+        </a>
+
+
+        <!-- DESKTOP NAVIGATION -->
+
+        <nav class="desktop-nav"
+             aria-label="Main navigation">
+
+            <ul class="nav-links">
+
+                <li>
+                    <a href="#home"
+                       data-ar="الرئيسية"
+                       data-en="Home">
+                        الرئيسية
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#about"
+                       data-ar="من نحن"
+                       data-en="About Us">
+                        من نحن
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#journey"
+                       data-ar="رحلتنا"
+                       data-en="Our Journey">
+                        رحلتنا
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#programs"
+                       data-ar="ماذا نفعل"
+                       data-en="What We Do">
+                        ماذا نفعل
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#articles"
+                       data-ar="المقالات"
+                       data-en="Articles">
+                        المقالات
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#consultation"
+                       data-ar="الاستشارات"
+                       data-en="Consultation">
+                        الاستشارات
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#contact"
+                       data-ar="تواصل معنا"
+                       data-en="Contact">
+                        تواصل معنا
+                    </a>
+                </li>
+
             </ul>
 
-            <div class="mobile-actions">
-                <button class="btn btn-outline" id="mobileLoginBtn">
-                    <i class="fa-solid fa-right-to-bracket"></i>
-                    <span data-ar="دخول الأعضاء" data-en="Members Login">دخول الأعضاء</span>
-                </button>
-                <button class="btn btn-primary" data-volunteer-trigger>
-                    <i class="fa-solid fa-hand-holding-heart"></i>
-                    <span data-ar="تطوع معنا" data-en="Join Us">تطوع معنا</span>
-                </button>
-            </div>
+        </nav>
+
+
+        <!-- HEADER ACTIONS -->
+
+        <div class="nav-actions">
+
+            <!-- LANGUAGE -->
+
+            <button
+                type="button"
+                class="lang-btn"
+                id="languageBtn"
+                aria-label="Switch language">
+
+                EN
+
+            </button>
+
+
+            <!-- LOGIN -->
+
+            <button
+                type="button"
+                class="login-btn"
+                id="loginBtn">
+
+                <i class="fa-solid fa-right-to-bracket"></i>
+
+                <span
+                    data-ar="دخول الأعضاء"
+                    data-en="Members Login">
+                    دخول الأعضاء
+                </span>
+
+            </button>
+
+
+            <!-- VOLUNTEER -->
+
+            <a href="#volunteer"
+               class="volunteer-btn"
+               data-volunteer-trigger>
+
+                <i class="fa-solid fa-hand-holding-heart"></i>
+
+                <span
+                    data-ar="تطوع معنا"
+                    data-en="Join Us">
+                    تطوع معنا
+                </span>
+
+            </a>
+
+
+            <!-- MOBILE MENU BUTTON -->
+
+            <button
+                type="button"
+                class="menu-toggle"
+                id="menuToggle"
+                aria-label="Open menu"
+                aria-expanded="false">
+
+                <i class="fa-solid fa-bars"></i>
+
+            </button>
+
         </div>
+
     </div>
 
-    <!-- ========================= MAIN ========================= -->
-    <main id="home">
+</header>
 
-        <!-- HERO -->
-        <section class="hero">
-            <div class="container hero-grid">
-                <div class="hero-content reveal">
-                    <div class="badge">
+
+<!-- =========================================================
+     MOBILE MENU
+========================================================= -->
+
+<div class="mobile-menu"
+     id="mobileMenu">
+
+    <div class="container">
+
+        <nav aria-label="Mobile navigation">
+
+            <ul>
+
+                <li>
+                    <a href="#home"
+                       data-mobile-link
+                       data-ar="الرئيسية"
+                       data-en="Home">
+                        الرئيسية
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#about"
+                       data-mobile-link
+                       data-ar="من نحن"
+                       data-en="About Us">
+                        من نحن
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#journey"
+                       data-mobile-link
+                       data-ar="رحلتنا"
+                       data-en="Our Journey">
+                        رحلتنا
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#programs"
+                       data-mobile-link
+                       data-ar="ماذا نفعل"
+                       data-en="What We Do">
+                        ماذا نفعل
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#articles"
+                       data-mobile-link
+                       data-ar="المقالات"
+                       data-en="Articles">
+                        المقالات
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#consultation"
+                       data-mobile-link
+                       data-ar="الاستشارات"
+                       data-en="Consultation">
+                        الاستشارات
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#contact"
+                       data-mobile-link
+                       data-ar="تواصل معنا"
+                       data-en="Contact">
+                        تواصل معنا
+                    </a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+
+        <div class="mobile-actions">
+
+            <button
+                type="button"
+                class="btn btn-outline"
+                id="mobileLoginBtn">
+
+                <i class="fa-solid fa-right-to-bracket"></i>
+
+                <span
+                    data-ar="دخول الأعضاء"
+                    data-en="Members Login">
+                    دخول الأعضاء
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                data-volunteer-trigger>
+
+                <i class="fa-solid fa-hand-holding-heart"></i>
+
+                <span
+                    data-ar="تطوع معنا"
+                    data-en="Join Us">
+                    تطوع معنا
+                </span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main id="home">
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="hero">
+
+        <div class="container hero-grid">
+
+
+            <!-- HERO CONTENT -->
+
+            <div class="hero-content reveal">
+
+                <div class="badge">
+
+                    <i class="fa-solid fa-heart-pulse"></i>
+
+                    <span
+                        data-ar="مؤسسة طبية خيرية تطوعية"
+                        data-en="Voluntary Medical Charity Organization">
+                        مؤسسة طبية خيرية تطوعية
+                    </span>
+
+                </div>
+
+
+                <h1>
+
+                    <span
+                        class="hero-title-main"
+                        data-ar="بالعمل التطوعي"
+                        data-en="Through Volunteerism">
+                        بالعمل التطوعي
+                    </span>
+
+                    <br>
+
+                    <span
+                        class="hero-title-accent"
+                        data-ar="نصنع الأثر"
+                        data-en="We Create Impact">
+                        نصنع الأثر
+                    </span>
+
+                </h1>
+
+
+                <div class="hero-slogan">
+                    We save life, we are med.life
+                </div>
+
+
+                <p class="hero-description"
+                   data-ar="ميدلايف هي مؤسسة طبية خيرية تطوعية تؤمن بأن العمل التطوعي ليس مجرد تقديم الوقت، بل مساحة لصناعة الأفكار، وتطوير المهارات، وبناء الإنسان، وتحويل المعرفة إلى أثر حقيقي في المجتمع."
+                   data-en="MedLife is a voluntary medical charity organization that believes volunteering is more than giving time. It is a space for creativity, skills development, human development, and turning knowledge into meaningful community impact.">
+
+                    ميدلايف هي مؤسسة طبية خيرية تطوعية تؤمن بأن العمل التطوعي ليس مجرد تقديم الوقت،
+                    بل مساحة لصناعة الأفكار، وتطوير المهارات، وبناء الإنسان، وتحويل المعرفة إلى أثر حقيقي في المجتمع.
+
+                </p>
+
+
+                <div class="hero-buttons">
+
+                    <a href="#about"
+                       class="btn btn-primary">
+
+                        <i class="fa-solid fa-circle-info"></i>
+
+                        <span
+                            data-ar="اكتشف ميدلايف"
+                            data-en="Discover MedLife">
+                            اكتشف ميدلايف
+                        </span>
+
+                    </a>
+
+
+                    <a href="#volunteer"
+                       class="btn btn-outline"
+                       data-volunteer-trigger>
+
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+
+                        <span
+                            data-ar="كن جزءاً من الأثر"
+                            data-en="Be Part of the Impact">
+                            كن جزءاً من الأثر
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- HERO VISUAL -->
+
+            <div class="hero-visual reveal">
+
+                <div class="hero-brand-card">
+
+                    <div class="floating-icon one">
                         <i class="fa-solid fa-heart-pulse"></i>
-                        <span data-ar="مؤسسة طبية خيرية تطوعية" data-en="Voluntary Medical Charity Organization">مؤسسة طبية خيرية تطوعية</span>
                     </div>
 
-                    <h1>
-                        <span style="color:var(--navy)" data-ar="بالعمل التطوعي" data-en="Through Volunteerism">بالعمل التطوعي</span>
-                        <br>
-                        <span data-ar="نصنع الأثر" data-en="We Create Impact">نصنع الأثر</span>
-                    </h1>
-
-                    <span class="hero-slogan">We save life, we are med.life</span>
-
-                    <p class="hero-description" data-ar="ميدلايف هي مؤسسة طبية خيرية تطوعية تؤمن بأن العمل التطوعي ليس مجرد تقديم الوقت، بل مساحة لصناعة الأفكار، وتطوير المهارات، وبناء الإنسان، وتحويل المعرفة إلى أثر حقيقي في المجتمع." data-en="MedLife is a voluntary medical charity organization that believes volunteering is more than giving time. It is a space for creativity, skills development, human development, and turning knowledge into meaningful community impact.">
-                        ميدلايف هي مؤسسة طبية خيرية تطوعية تؤمن بأن العمل التطوعي ليس مجرد تقديم الوقت، بل مساحة لصناعة الأفكار، وتطوير المهارات، وبناء الإنسان، وتحويل المعرفة إلى أثر حقيقي في المجتمع.
-                    </p>
-
-                    <div class="hero-buttons">
-                        <a href="#about" class="btn btn-primary">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <span data-ar="اكتشف ميدلايف" data-en="Discover MedLife">اكتشف ميدلايف</span>
-                        </a>
-                        <a href="#volunteer" class="btn btn-outline" data-volunteer-trigger>
-                            <i class="fa-solid fa-hand-holding-heart"></i>
-                            <span data-ar="كن جزءاً من الأثر" data-en="Be Part of the Impact">كن جزءاً من الأثر</span>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="hero-visual reveal">
-                    <div class="hero-brand-card">
-                        <div class="floating-icon one"><i class="fa-solid fa-heart-pulse"></i></div>
-                        <div class="floating-icon two"><i class="fa-solid fa-users"></i></div>
-                        <div class="floating-icon three"><i class="fa-solid fa-lightbulb"></i></div>
-                        <img src="images/logo.PNG" alt="MedLife Syria Logo" class="hero-logo">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- STATS -->
-        <section class="stats">
-            <div class="container">
-                <div class="stats-box reveal">
-                    <div class="stat"><div class="stat-number">600+</div><div class="stat-title" data-ar="متطوع ومتطوعة" data-en="Volunteers">متطوع ومتطوعة</div></div>
-                    <div class="stat"><div class="stat-number">400+</div><div class="stat-title" data-ar="طبيب وكادر طبي" data-en="Doctors & Healthcare Professionals">طبيب وكادر طبي</div></div>
-                    <div class="stat"><div class="stat-number">6+</div><div class="stat-title" data-ar="محافظات سورية" data-en="Syrian Governorates">محافظات سورية</div></div>
-                    <div class="stat"><div class="stat-number">2019</div><div class="stat-title" data-ar="عام الانطلاق" data-en="Founded">عام الانطلاق</div></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABOUT -->
-        <section class="section about" id="about">
-            <div class="container about-grid">
-                <div class="about-card reveal">
-                    <img src="images/logo.PNG" alt="MedLife Logo">
-                    <h3 data-ar="ميدلايف... مساحة لصناعة الأثر" data-en="MedLife... A Space to Create Impact">ميدلايف... مساحة لصناعة الأثر</h3>
-                    <p data-ar="مؤسسة طبية خيرية تطوعية تجمع المعرفة الطبية والطاقة الشبابية والعمل المجتمعي." data-en="A voluntary medical charity organization connecting medical knowledge, youth energy, and community action.">مؤسسة طبية خيرية تطوعية تجمع المعرفة الطبية والطاقة الشبابية والعمل المجتمعي.</p>
-                </div>
-
-                <div class="about-content reveal">
-                    <div class="eyebrow" data-ar="من نحن" data-en="About Us">من نحن</div>
-                    <div class="section-header" style="text-align:inherit;margin:0 0 25px;">
-                        <h2 data-ar="من فكرة تطوعية إلى مؤسسة تصنع الأثر" data-en="From a Volunteer Initiative to an Impact-Driven Organization">من فكرة تطوعية إلى مؤسسة تصنع الأثر</h2>
+                    <div class="floating-icon two">
+                        <i class="fa-solid fa-users"></i>
                     </div>
 
-                    <p data-ar="تأسست ميدلايف عام 2019 كمبادرة تطوعية طبية تهدف إلى توظيف المعرفة الطبية والطاقات الشبابية في خدمة المجتمع." data-en="MedLife was founded in 2019 as a voluntary medical initiative aiming to use medical knowledge and youth energy to serve communities.">تأسست ميدلايف عام 2019 كمبادرة تطوعية طبية تهدف إلى توظيف المعرفة الطبية والطاقات الشبابية في خدمة المجتمع.</p>
-                    <p data-ar="ومع مرور السنوات، تطورت ميدلايف من مجموعة من المتطوعين إلى مؤسسة طبية خيرية تطوعية تعمل ضمن شبكة من الفرق والكوادر في عدد من المحافظات السورية." data-en="Over the years, MedLife evolved from a group of volunteers into a voluntary medical charity organization working through teams and healthcare professionals across several Syrian governorates.">ومع مرور السنوات، تطورت ميدلايف من مجموعة من المتطوعين إلى مؤسسة طبية خيرية تطوعية تعمل ضمن شبكة من الفرق والكوادر في عدد من المحافظات السورية.</p>
-                    <p data-ar="وفي عام 2023 حصلت المؤسسة على الترخيص الرسمي، لتواصل عملها ضمن إطار مؤسسي يركز على المبادرات الصحية والإنسانية، والتوعية، والتعليم والتدريب، والعمل المجتمعي." data-en="In 2023, the organization obtained official registration and continued its work through a structured framework focused on health, humanitarian action, awareness, education, training, and community initiatives.">وفي عام 2023 حصلت المؤسسة على الترخيص الرسمي، لتواصل عملها ضمن إطار مؤسسي يركز على المبادرات الصحية والإنسانية، والتوعية، والتعليم والتدريب، والعمل المجتمعي.</p>
-
-                    <div class="about-points">
-                        <div class="about-point"><i class="fa-solid fa-heart-pulse"></i><div><strong data-ar="الصحة" data-en="Health">الصحة</strong><span data-ar="مبادرات وخدمات صحية" data-en="Health initiatives and services">مبادرات وخدمات صحية</span></div></div>
-                        <div class="about-point"><i class="fa-solid fa-people-group"></i><div><strong data-ar="المجتمع" data-en="Community">المجتمع</strong><span data-ar="عمل مجتمعي وإنساني" data-en="Community and humanitarian work">عمل مجتمعي وإنساني</span></div></div>
-                        <div class="about-point"><i class="fa-solid fa-graduation-cap"></i><div><strong data-ar="التعليم" data-en="Education">التعليم</strong><span data-ar="تعلم وتدريب مستمر" data-en="Learning and training">تعلم وتدريب مستمر</span></div></div>
-                        <div class="about-point"><i class="fa-solid fa-lightbulb"></i><div><strong data-ar="الابتكار" data-en="Innovation">الابتكار</strong><span data-ar="أفكار وحلول جديدة" data-en="Ideas and digital solutions">أفكار وحلول جديدة</span></div></div>
+                    <div class="floating-icon three">
+                        <i class="fa-solid fa-lightbulb"></i>
                     </div>
+
+                    <img src="logo.PNG"
+                         alt="MedLife Syria Logo"
+                         class="hero-logo">
+
                 </div>
+
             </div>
-        </section>
 
-        <!-- CREATIVE VOLUNTEERING -->
-        <section class="section creative">
-            <div class="container">
-                <div class="section-header reveal">
-                    <div class="eyebrow" data-ar="لماذا ميدلايف؟" data-en="Why MedLife?">لماذا ميدلايف؟</div>
-                    <h2 data-ar="أكثر من مجرد تطوع" data-en="More Than Volunteering">أكثر من مجرد تطوع</h2>
-                    <p data-ar="نريد أن يكون التطوع تجربة يتعلم فيها الإنسان، ويبدع، ويبني علاقات، ويترك أثراً." data-en="We want volunteering to be a journey of learning, creativity, relationships, and meaningful impact.">نريد أن يكون التطوع تجربة يتعلم فيها الإنسان، ويبدع، ويبني علاقات، ويترك أثراً.</p>
-                </div>
-
-                <div class="creative-grid">
-                    <div class="creative-card reveal"><div class="creative-icon"><i class="fa-solid fa-people-group"></i></div><h3 data-ar="فريق يصنع الفرق" data-en="A Team That Makes a Difference">فريق يصنع الفرق</h3><p data-ar="تعمل ميدلايف من خلال فرق متعددة الاختصاصات تجمع الأطباء والصيادلة والطلاب والمصممين والإعلاميين والتقنيين وغيرهم." data-en="MedLife brings together doctors, pharmacists, students, designers, media professionals, developers, and many others.">تعمل ميدلايف من خلال فرق متعددة الاختصاصات تجمع الأطباء والصيادلة والطلاب والمصممين والإعلاميين والتقنيين وغيرهم.</p></div>
-                    <div class="creative-card reveal"><div class="creative-icon"><i class="fa-solid fa-rocket"></i></div><h3 data-ar="حوّل فكرتك إلى مبادرة" data-en="Turn Ideas Into Initiatives">حوّل فكرتك إلى مبادرة</h3><p data-ar="الفكرة الجيدة يمكن أن تتحول إلى نشاط أو حملة أو محتوى أو مشروع تقني أو مبادرة مجتمعية." data-en="A good idea can become an activity, campaign, content project, digital solution, or community initiative.">الفكرة الجيدة يمكن أن تتحول إلى نشاط أو حملة أو محتوى أو مشروع تقني أو مبادرة مجتمعية.</p></div>
-                    <div class="creative-card reveal"><div class="creative-icon"><i class="fa-solid fa-graduation-cap"></i></div><h3 data-ar="تعلّم وتطوّر" data-en="Learn and Grow">تعلّم وتطوّر</h3><p data-ar="التطوع فرصة عملية لتطوير القيادة والتواصل والعمل الجماعي وصناعة المحتوى والتخطيط وإدارة المشاريع." data-en="Volunteering is a practical opportunity to develop leadership, communication, teamwork, content creation, planning, and project management skills.">التطوع فرصة عملية لتطوير القيادة والتواصل والعمل الجماعي وصناعة المحتوى والتخطيط وإدارة المشاريع.</p></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- JOURNEY -->
-        <section class="section journey" id="journey">
-            <div class="container">
-                <div class="section-header reveal">
-                    <div class="eyebrow" data-ar="رحلتنا" data-en="Our Journey">رحلتنا</div>
-                    <h2 data-ar="من فكرة تطوعية إلى مؤسسة" data-en="From an Idea to an Organization">من فكرة تطوعية إلى مؤسسة</h2>
-                    <p data-ar="محطات أساسية في رحلة ميدلايف." data-en="Key milestones in the MedLife journey.">محطات أساسية في رحلة ميدلايف.</p>
-                </div>
-
-                <div class="journey-list">
-                    <div class="journey-item reveal"><div class="journey-year">2019</div><div class="journey-content"><h3 data-ar="البداية" data-en="The Beginning">البداية</h3><p data-ar="انطلقت ميدلايف كمبادرة تطوعية تجمع طلاباً وأطباء ومتخصصين بهدف تقديم المعرفة والخدمة الطبية للمجتمع." data-en="MedLife started as a volunteer initiative bringing together students, doctors, and professionals to provide medical knowledge and community service.">انطلقت ميدلايف كمبادرة تطوعية تجمع طلاباً وأطباء ومتخصصين بهدف تقديم المعرفة والخدمة الطبية للمجتمع.</p></div></div>
-                    <div class="journey-item reveal"><div class="journey-year">2021</div><div class="journey-content"><h3 data-ar="التوسع" data-en="Expansion">التوسع</h3><p data-ar="بدأت الفرق بالتوسع والعمل ضمن محافظات سورية مختلفة، مع ازدياد عدد المتطوعين وتنوع مجالات العمل." data-en="Teams expanded across different Syrian governorates while volunteer numbers and areas of work continued to grow.">بدأت الفرق بالتوسع والعمل ضمن محافظات سورية مختلفة، مع ازدياد عدد المتطوعين وتنوع مجالات العمل.</p></div></div>
-                    <div class="journey-item reveal"><div class="journey-year">2023</div><div class="journey-content"><h3 data-ar="الترخيص الرسمي" data-en="Official Registration">الترخيص الرسمي</h3><p data-ar="تم ترخيص المؤسسة رسمياً بموجب قرار الإشهار رقم 1899، لتنتقل ميدلايف إلى مرحلة مؤسسية أكثر تنظيماً." data-en="The organization received official registration under declaration decision No. 1899, entering a more structured institutional phase.">تم ترخيص المؤسسة رسمياً بموجب قرار الإشهار رقم 1899، لتنتقل ميدلايف إلى مرحلة مؤسسية أكثر تنظيماً.</p></div></div>
-                    <div class="journey-item reveal"><div class="journey-year">2024–2026</div><div class="journey-content"><h3 data-ar="التوسع والابتكار" data-en="Growth & Innovation">التوسع والابتكار</h3><p data-ar="توسعت المبادرات الصحية والإنسانية والتعليمية، وظهرت مشاريع رقمية، استشارات طبية، محتوى طبي، وحملات مجتمعية متنوعة." data-en="Health, humanitarian, and educational initiatives expanded alongside digital projects, medical consultations, medical content, and community campaigns.">توسعت المبادرات الصحية والإنسانية والتعليمية، وظهرت مشاريع رقمية، استشارات طبية، محتوى طبي، وحملات مجتمعية متنوعة.</p></div></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PROGRAMS -->
-        <section class="section" id="programs">
-            <div class="container">
-                <div class="section-header reveal">
-                    <div class="eyebrow" data-ar="مجالات العمل" data-en="Our Areas of Work">مجالات العمل</div>
-                    <h2 data-ar="ماذا نفعل؟" data-en="What We Do">ماذا نفعل؟</h2>
-                    <p data-ar="نعمل عبر مجموعة من المجالات الصحية والإنسانية والتعليمية والتقنية." data-en="We work across health, humanitarian, educational, community, and technology-focused areas.">نعمل عبر مجموعة من المجالات الصحية والإنسانية والتعليمية والتقنية.</p>
-                </div>
-
-                <div class="program-grid">
-                    <div class="program reveal"><div class="program-icon"><i class="fa-solid fa-stethoscope"></i></div><h3 data-ar="الخدمات والاستشارات الطبية" data-en="Medical Services & Consultation">الخدمات والاستشارات الطبية</h3><p data-ar="المساهمة في تسهيل الوصول إلى المعرفة والاستشارة الطبية عبر مبادرات ومنصات تطوعية." data-en="Helping improve access to medical knowledge and consultation through volunteer initiatives and platforms.">المساهمة في تسهيل الوصول إلى المعرفة والاستشارة الطبية عبر مبادرات ومنصات تطوعية.</p></div>
-                    <div class="program reveal"><div class="program-icon"><i class="fa-solid fa-heart-pulse"></i></div><h3 data-ar="التوعية الصحية" data-en="Health Awareness">التوعية الصحية</h3><p data-ar="محتوى وحملات توعوية تهدف إلى نشر المعرفة الصحية بطريقة بسيطة وموثوقة." data-en="Awareness content and campaigns designed to share health knowledge in a simple and reliable way.">محتوى وحملات توعوية تهدف إلى نشر المعرفة الصحية بطريقة بسيطة وموثوقة.</p></div>
-                    <div class="program reveal"><div class="program-icon"><i class="fa-solid fa-chalkboard-user"></i></div><h3 data-ar="التعليم والتدريب" data-en="Education & Training">التعليم والتدريب</h3><p data-ar="محاضرات ودورات وفعاليات علمية تساعد الطلاب والكوادر الطبية على تطوير معارفهم ومهاراتهم." data-en="Lectures, courses, and scientific activities supporting students and healthcare professionals.">محاضرات ودورات وفعاليات علمية تساعد الطلاب والكوادر الطبية على تطوير معارفهم ومهاراتهم.</p></div>
-                    <div class="program reveal"><div class="program-icon"><i class="fa-solid fa-hand-holding-medical"></i></div><h3 data-ar="المبادرات الإنسانية" data-en="Humanitarian Initiatives">المبادرات الإنسانية</h3><p data-ar="مبادرات تستهدف دعم المرضى والمجتمعات الأكثر احتياجاً وتعزيز التضامن المجتمعي." data-en="Initiatives supporting patients, vulnerable communities, and stronger community solidarity.">مبادرات تستهدف دعم المرضى والمجتمعات الأكثر احتياجاً وتعزيز التضامن المجتمعي.</p></div>
-                    <div class="program reveal"><div class="program-icon"><i class="fa-solid fa-laptop-code"></i></div><h3 data-ar="التقنية والابتكار" data-en="Technology & Innovation">التقنية والابتكار</h3><p data-ar="تطوير حلول رقمية وأفكار تقنية تساعد على تحسين الوصول إلى المعلومات والخدمات الصحية." data-en="Building digital ideas and solutions that improve access to health information and services.">تطوير حلول رقمية وأفكار تقنية تساعد على تحسين الوصول إلى المعلومات والخدمات الصحية.</p></div>
-                    <div class="program reveal"><div class="program-icon"><i class="fa-solid fa-users"></i></div><h3 data-ar="تمكين الشباب" data-en="Youth Empowerment">تمكين الشباب</h3><p data-ar="خلق مساحة للشباب لتطوير مهاراتهم والعمل ضمن فرق متعددة الاختصاصات وصناعة مبادراتهم الخاصة." data-en="Creating space for young people to develop skills, work across disciplines, and build their own initiatives.">خلق مساحة للشباب لتطوير مهاراتهم والعمل ضمن فرق متعددة الاختصاصات وصناعة مبادراتهم الخاصة.</p></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CONSULTATION -->
-        <section class="section consultation" id="consultation">
-            <div class="container consultation-grid">
-                <div class="reveal">
-                    <div class="eyebrow">MedLife Medical Consultation</div>
-                    <h2 data-ar="الاستشارات الطبية" data-en="Medical Consultation">الاستشارات الطبية</h2>
-                    <p data-ar="لديك سؤال طبي أو دوائي؟ يمكنك التواصل مع بوت الاستشارات الطبية الخاص بميدلايف عبر Telegram والوصول إلى الخدمة بطريقة سهلة ومباشرة." data-en="Have a medical or medication-related question? Contact MedLife's medical consultation bot through Telegram and access the service directly and easily.">لديك سؤال طبي أو دوائي؟ يمكنك التواصل مع بوت الاستشارات الطبية الخاص بميدلايف عبر Telegram والوصول إلى الخدمة بطريقة سهلة ومباشرة.</p>
-                    <a href="https://t.me/Medlife2024bot" target="_blank" rel="noopener noreferrer" class="telegram-button"><i class="fa-brands fa-telegram"></i><span data-ar="ابدأ الاستشارة" data-en="Start Consultation">ابدأ الاستشارة</span></a>
-                </div>
-                <div class="telegram-visual reveal"><div class="telegram-circle"><i class="fa-brands fa-telegram"></i></div></div>
-            </div>
-        </section>
-
-        <!-- ARTICLES -->
-        <section class="section articles" id="articles">
-            <div class="container">
-                <div class="section-header reveal">
-                    <div class="eyebrow">MedLife Knowledge</div>
-                    <h2 data-ar="المقالات والمعرفة الطبية" data-en="Medical Knowledge & Articles">المقالات والمعرفة الطبية</h2>
-                    <p data-ar="مساحة لنشر المقالات الطبية والتوعوية التي يكتبها أعضاء ومتطوعو ميدلايف." data-en="A space for medical and awareness articles written by MedLife members and volunteers.">مساحة لنشر المقالات الطبية والتوعوية التي يكتبها أعضاء ومتطوعو ميدلايف.</p>
-                </div>
-
-                <div class="article-grid">
-                    <article class="article-card reveal"><div class="article-top"><i class="fa-solid fa-book-medical"></i></div><div class="article-body"><div class="article-category" data-ar="توعية صحية" data-en="Health Awareness">توعية صحية</div><h3 data-ar="المعرفة الطبية في خدمة المجتمع" data-en="Medical Knowledge for the Community">المعرفة الطبية في خدمة المجتمع</h3><p data-ar="مساحة لنشر مقالات ومحتوى طبي وتوعوي يشارك في إعداده كوادر ومتطوعو ميدلايف." data-en="A space for medical and awareness content created by MedLife healthcare professionals and volunteers.">مساحة لنشر مقالات ومحتوى طبي وتوعوي يشارك في إعداده كوادر ومتطوعو ميدلايف.</p><a href="#contact" class="article-link" data-ar="قريباً ←" data-en="Coming Soon →">قريباً ←</a></div></article>
-                    <article class="article-card reveal"><div class="article-top"><i class="fa-solid fa-microscope"></i></div><div class="article-body"><div class="article-category" data-ar="التعليم الطبي" data-en="Medical Education">التعليم الطبي</div><h3 data-ar="التعليم الطبي والتعلم المستمر" data-en="Medical Education & Lifelong Learning">التعليم الطبي والتعلم المستمر</h3><p data-ar="مواد تعليمية وأفكار تساعد الطلاب والكوادر الصحية على التعلم وتبادل المعرفة." data-en="Educational resources and ideas supporting students and healthcare professionals in continuous learning.">مواد تعليمية وأفكار تساعد الطلاب والكوادر الصحية على التعلم وتبادل المعرفة.</p><a href="#contact" class="article-link" data-ar="قريباً ←" data-en="Coming Soon →">قريباً ←</a></div></article>
-                    <article class="article-card reveal"><div class="article-top"><i class="fa-solid fa-people-arrows"></i></div><div class="article-body"><div class="article-category" data-ar="التطوع" data-en="Volunteering">التطوع</div><h3 data-ar="التطوع وصناعة الأثر" data-en="Volunteering & Impact">التطوع وصناعة الأثر</h3><p data-ar="قصص وتجارب وأفكار من العمل التطوعي والطريق الذي تسلكه ميدلايف لصناعة أثر مستدام." data-en="Stories, experiences, and ideas from volunteering and the MedLife journey toward sustainable impact.">قصص وتجارب وأفكار من العمل التطوعي والطريق الذي تسلكه ميدلايف لصناعة أثر مستدام.</p><a href="#contact" class="article-link" data-ar="قريباً ←" data-en="Coming Soon →">قريباً ←</a></div></article>
-                </div>
-            </div>
-        </section>
-
-        <!-- SOCIAL MEDIA -->
-        <section class="section">
-            <div class="container">
-                <div class="section-header reveal">
-                    <div class="eyebrow" data-ar="ابقَ على تواصل" data-en="Stay Connected">ابقَ على تواصل</div>
-                    <h2 data-ar="تابع ميدلايف" data-en="Follow MedLife">تابع ميدلايف</h2>
-                    <p data-ar="تابع أخبارنا ومبادراتنا ومحتوانا من خلال منصاتنا الرسمية." data-en="Follow our news, initiatives, and content through our official platforms.">تابع أخبارنا ومبادراتنا ومحتوانا من خلال منصاتنا الرسمية.</p>
-                </div>
-
-                <div class="social-grid">
-                    <a href="https://www.facebook.com/Medlifesy/" target="_blank" rel="noopener noreferrer" class="social-card reveal"><i class="fa-brands fa-facebook-f"></i><h3>Facebook</h3><span>Med-life</span></a>
-                    <a href="https://www.linkedin.com/company/med-life-syria/" target="_blank" rel="noopener noreferrer" class="social-card reveal"><i class="fa-brands fa-linkedin-in"></i><h3>LinkedIn</h3><span>Med Life Syria</span></a>
-                    <a href="https://www.youtube.com/@medlifesy" target="_blank" rel="noopener noreferrer" class="social-card reveal"><i class="fa-brands fa-youtube"></i><h3>YouTube</h3><span>MedLife Syria</span></a>
-                    <a href="https://t.me/Medlife2024bot" target="_blank" rel="noopener noreferrer" class="social-card reveal"><i class="fa-brands fa-telegram"></i><h3>Telegram</h3><span>Medical Consultation Bot</span></a>
-                </div>
-            </div>
-        </section>
-
-        <!-- VOLUNTEER CTA -->
-        <section class="section">
-            <div class="container">
-                <div class="cta-box reveal" id="volunteer">
-                    <h2 data-ar="مكانك يمكن أن يكون معنا" data-en="There Is a Place for You at MedLife">مكانك يمكن أن يكون معنا</h2>
-                    <p data-ar="في ميدلايف، لا نبحث فقط عن الأشخاص الذين يمتلكون الخبرة. نبحث أيضاً عن الأشخاص الذين يمتلكون الشغف والرغبة بالتعلم وصناعة الأثر. حالياً لا توجد فرص تطوع مفتوحة، لكننا سنعلن عن فرص الانضمام فور توفرها." data-en="At MedLife, we look not only for people with experience, but also for people with passion, curiosity, and a desire to create impact. There are currently no open volunteer opportunities, but we will announce new opportunities when available.">في ميدلايف، لا نبحث فقط عن الأشخاص الذين يمتلكون الخبرة. نبحث أيضاً عن الأشخاص الذين يمتلكون الشغف والرغبة بالتعلم وصناعة الأثر. حالياً لا توجد فرص تطوع مفتوحة، لكننا سنعلن عن فرص الانضمام فور توفرها.</p>
-                    <button class="btn btn-primary" id="volunteerBtn"><i class="fa-solid fa-bell"></i><span data-ar="ابقَ متابعاً" data-en="Stay Updated">ابقَ متابعاً</span></button>
-                </div>
-            </div>
-        </section>
-
-        <!-- CONTACT -->
-        <section class="section contact" id="contact">
-            <div class="container contact-grid">
-                <div class="reveal">
-                    <div class="eyebrow" data-ar="تواصل مع ميدلايف" data-en="Contact MedLife">تواصل مع ميدلايف</div>
-                    <h2 data-ar="نحن هنا للتعاون" data-en="Let's Work Together">نحن هنا للتعاون</h2>
-                    <p class="contact-intro" data-ar="للاستفسارات العامة، الشراكات، المبادرات والتعاون." data-en="For general inquiries, partnerships, initiatives, and collaboration.">للاستفسارات العامة، الشراكات، المبادرات والتعاون.</p>
-
-                    <div class="contact-list">
-                        <div class="contact-item"><div class="contact-icon"><i class="fa-solid fa-globe"></i></div><div><small data-ar="الموقع الإلكتروني" data-en="Website">الموقع الإلكتروني</small><a href="https://medlifesy.org" target="_blank" rel="noopener noreferrer">medlifesy.org</a></div></div>
-                        <div class="contact-item"><div class="contact-icon"><i class="fa-brands fa-telegram"></i></div><div><small data-ar="الاستشارات الطبية" data-en="Medical Consultation">الاستشارات الطبية</small><a href="https://t.me/Medlife2024bot" target="_blank" rel="noopener noreferrer">@Medlife2024bot</a></div></div>
-                        <div class="contact-item"><div class="contact-icon"><i class="fa-solid fa-location-dot"></i></div><div><small data-ar="المقر الرئيسي" data-en="Headquarters">المقر الرئيسي</small><span data-ar="طرطوس — سوريا" data-en="Tartous — Syria">طرطوس — سوريا</span></div></div>
-                    </div>
-                </div>
-                <div class="contact-logo reveal"><img src="images/logo.PNG" alt="MedLife Syria"></div>
-            </div>
-        </section>
-    </main>
-
-    <!-- ========================= LOGIN MODAL ========================= -->
-    <div class="modal" id="loginModal" role="dialog" aria-modal="true" aria-hidden="true">
-        <div class="modal-box">
-            <button class="modal-close" id="closeLogin" aria-label="Close">×</button>
-            <div class="modal-icon"><i class="fa-solid fa-code"></i></div>
-            <h3 data-ar="دخول الأعضاء" data-en="Members Login">دخول الأعضاء</h3>
-            <p data-ar="هذه الخدمة قيد التطوير حالياً. سيتم إطلاق نظام دخول الأعضاء والكوادر في مرحلة لاحقة." data-en="This service is currently under development. The members and team login system will be launched in a later phase.">هذه الخدمة قيد التطوير حالياً. سيتم إطلاق نظام دخول الأعضاء والكوادر في مرحلة لاحقة.</p>
-            <button class="btn btn-primary" id="closeLogin2"><span data-ar="حسناً" data-en="OK">حسناً</span></button>
         </div>
-    </div>
 
-    <!-- ========================= VOLUNTEER MODAL ========================= -->
-    <div class="modal" id="volunteerModal" role="dialog" aria-modal="true" aria-hidden="true">
-        <div class="modal-box">
-            <button class="modal-close" id="closeVolunteer" aria-label="Close">×</button>
-            <div class="modal-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
-            <h3 data-ar="التطوع في ميدلايف" data-en="Volunteering at MedLife">التطوع في ميدلايف</h3>
-            <p data-ar="لا توجد حالياً فرص تطوع مفتوحة. ابقَ متابعاً لمنصات ميدلايف الرسمية، وسنعلن عن فتح باب الانضمام عند توفر فرص جديدة." data-en="There are currently no open volunteer opportunities. Follow MedLife's official platforms and we will announce new opportunities when available.">لا توجد حالياً فرص تطوع مفتوحة. ابقَ متابعاً لمنصات ميدلايف الرسمية، وسنعلن عن فتح باب الانضمام عند توفر فرص جديدة.</p>
-            <a href="https://www.facebook.com/Medlifesy/" target="_blank" rel="noopener noreferrer" class="btn btn-primary"><i class="fa-brands fa-facebook-f"></i><span data-ar="تابع ميدلايف" data-en="Follow MedLife">تابع ميدلايف</span></a>
-        </div>
-    </div>
+    </section>
 
-    <!-- ========================= MEDLIFE AI ========================= -->
-    <button class="ai-floating-btn" id="aiOpenBtn" aria-label="Open MedLife AI" type="button">
-        <span class="ai-pulse"></span>
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
-        <span class="ai-floating-label">MedLife AI</span>
-    </button>
 
-    <div class="ai-overlay" id="aiOverlay" aria-hidden="true">
-        <div class="ai-panel" role="dialog" aria-modal="true" aria-labelledby="aiTitle">
-            <div class="ai-header">
-                <div class="ai-brand">
-                    <div class="ai-logo-wrap"><img src="images/logo.PNG" alt="MedLife" class="ai-logo"></div>
-                    <div><strong id="aiTitle">MedLife AI</strong><span data-ar="مساعد ميدلايف الذكي" data-en="MedLife Smart Assistant">مساعد ميدلايف الذكي</span></div>
-                </div>
-                <button class="ai-close" id="aiCloseBtn" aria-label="Close MedLife AI" type="button"><i class="fa-solid fa-xmark"></i></button>
-            </div>
+    <!-- =====================================================
+         STATS
+    ====================================================== -->
 
-            <div class="ai-messages" id="aiMessages">
-                <div class="ai-message ai-bot">
-                    <div class="ai-message-avatar"><img src="images/logo.PNG" alt="MedLife"></div>
-                    <div class="ai-message-content"><p data-ar="مرحباً 👋 أنا MedLife AI. كيف يمكنني مساعدتك؟ يمكنك أن تسألني عن ميدلايف، برامجنا، مبادراتنا، التطوع أو المقالات." data-en="Hello 👋 I’m MedLife AI. How can I help you? You can ask me about MedLife, our programs, initiatives, volunteering, or articles.">مرحباً 👋 أنا MedLife AI. كيف يمكنني مساعدتك؟ يمكنك أن تسألني عن ميدلايف، برامجنا، مبادراتنا، التطوع أو المقالات.</p></div>
-                </div>
-
-                <div class="ai-suggestions">
-                    <button type="button" data-question-ar="ما هي مؤسسة ميدلايف؟" data-question-en="What is MedLife?"><i class="fa-solid fa-heart-pulse"></i><span data-ar="ما هي ميدلايف؟" data-en="What is MedLife?">ما هي ميدلايف؟</span></button>
-                    <button type="button" data-question-ar="كيف يمكنني التطوع مع ميدلايف؟" data-question-en="How can I volunteer with MedLife?"><i class="fa-solid fa-hand-holding-heart"></i><span data-ar="كيف يمكنني التطوع؟" data-en="How can I volunteer?">كيف يمكنني التطوع؟</span></button>
-                    <button type="button" data-question-ar="ما هي مجالات عمل ميدلايف؟" data-question-en="What are MedLife's areas of work?"><i class="fa-solid fa-layer-group"></i><span data-ar="مجالات عمل ميدلايف" data-en="MedLife areas of work">مجالات عمل ميدلايف</span></button>
-                </div>
-            </div>
-
-            <form class="ai-input-area" id="aiForm">
-                <textarea id="aiInput" rows="1" maxlength="1200" autocomplete="off" data-placeholder-ar="اكتب سؤالك هنا..." data-placeholder-en="Type your question here..." placeholder="اكتب سؤالك هنا..."></textarea>
-                <button type="submit" class="ai-send" id="aiSendBtn" aria-label="Send message"><i class="fa-solid fa-paper-plane"></i></button>
-            </form>
-
-            <div class="ai-disclaimer">
-                <i class="fa-solid fa-shield-heart"></i>
-                <span data-ar="MedLife AI مساعد معلوماتي، ولا يحل محل الطبيب أو الاستشارة الطبية المتخصصة." data-en="MedLife AI provides informational assistance and does not replace a doctor or professional medical advice.">MedLife AI مساعد معلوماتي، ولا يحل محل الطبيب أو الاستشارة الطبية المتخصصة.</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================= FOOTER ========================= -->
-    <footer>
-        <div class="container footer-grid">
-            <div>
-                <div class="footer-logo"><img src="images/logo.PNG" alt="MedLife Syria"></div>
-                <p class="footer-description" data-ar="مؤسسة ميدلايف الطبية الخيرية التطوعية. بالعمل التطوعي نصنع الأثر، ونؤمن بأن لكل شخص مساحة يستطيع من خلالها أن يتعلم ويبدع ويخدم مجتمعه." data-en="MedLife is a voluntary medical charity organization. Through volunteerism we create impact, and we believe everyone can find a space to learn, create, and serve their community.">مؤسسة ميدلايف الطبية الخيرية التطوعية. بالعمل التطوعي نصنع الأثر، ونؤمن بأن لكل شخص مساحة يستطيع من خلالها أن يتعلم ويبدع ويخدم مجتمعه.</p>
-                <div class="footer-socials">
-                    <a href="https://www.facebook.com/Medlifesy/" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="https://www.linkedin.com/company/med-life-syria/" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-                    <a href="https://www.youtube.com/@medlifesy" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://t.me/Medlife2024bot" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
-                </div>
-            </div>
-
-            <div class="footer-column">
-                <h4 data-ar="روابط سريعة" data-en="Quick Links">روابط سريعة</h4>
-                <a href="#home" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
-                <a href="#about" data-ar="من نحن" data-en="About Us">من نحن</a>
-                <a href="#journey" data-ar="رحلتنا" data-en="Our Journey">رحلتنا</a>
-                <a href="#programs" data-ar="مجالات العمل" data-en="Our Work">مجالات العمل</a>
-                <a href="#articles" data-ar="المقالات" data-en="Articles">المقالات</a>
-                <a href="#consultation" data-ar="الاستشارات" data-en="Consultation">الاستشارات</a>
-            </div>
-
-            <div class="footer-column">
-                <h4 data-ar="منصات ميدلايف" data-en="MedLife Platforms">منصات ميدلايف</h4>
-                <a href="https://www.facebook.com/Medlifesy/" target="_blank" rel="noopener noreferrer">Facebook</a>
-                <a href="https://www.linkedin.com/company/med-life-syria/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                <a href="https://www.youtube.com/@medlifesy" target="_blank" rel="noopener noreferrer">YouTube</a>
-                <a href="https://t.me/Medlife2024bot" target="_blank" rel="noopener noreferrer">Telegram — Medical Consultation</a>
-            </div>
-        </div>
+    <section class="stats">
 
         <div class="container">
-            <div class="copyright">
-                © 2026 MedLife Syria —
-                <span data-ar="مؤسسة ميدلايف الطبية الخيرية التطوعية" data-en="MedLife Voluntary Medical Charity Organization">مؤسسة ميدلايف الطبية الخيرية التطوعية</span>
-                <br>
-                We save life, we are med.life
-            </div>
-        </div>
-    </footer>
 
-    <!-- Main JavaScript -->
-    <script src="js/main.js" defer></script>
-    <script src="js/ai.js" defer></script>
+            <div class="stats-box reveal">
+
+                <div class="stat">
+
+                    <div class="stat-number">
+                        600+
+                    </div>
+
+                    <div class="stat-title"
+                         data-ar="متطوع ومتطوعة"
+                         data-en="Volunteers">
+                        متطوع ومتطوعة
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-number">
+                        400+
+                    </div>
+
+                    <div class="stat-title"
+                         data-ar="طبيب وكادر طبي"
+                         data-en="Doctors & Healthcare Professionals">
+                        طبيب وكادر طبي
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-number">
+                        6+
+                    </div>
+
+                    <div class="stat-title"
+                         data-ar="محافظات سورية"
+                         data-en="Syrian Governorates">
+                        محافظات سورية
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-number">
+                        2019
+                    </div>
+
+                    <div class="stat-title"
+                         data-ar="عام الانطلاق"
+                         data-en="Founded">
+                        عام الانطلاق
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ABOUT
+    ====================================================== -->
+
+    <section class="section about"
+             id="about">
+
+        <div class="container about-grid">
+
+
+            <div class="about-card reveal">
+
+                <img src="logo.PNG"
+                     alt="MedLife Logo">
+
+                <h3
+                    data-ar="ميدلايف... مساحة لصناعة الأثر"
+                    data-en="MedLife... A Space to Create Impact">
+                    ميدلايف... مساحة لصناعة الأثر
+                </h3>
+
+                <p
+                    data-ar="مؤسسة طبية خيرية تطوعية تجمع المعرفة الطبية والطاقة الشبابية والعمل المجتمعي."
+                    data-en="A voluntary medical charity organization connecting medical knowledge, youth energy, and community action.">
+                    مؤسسة طبية خيرية تطوعية تجمع المعرفة الطبية والطاقة الشبابية والعمل المجتمعي.
+                </p>
+
+            </div>
+
+
+            <div class="about-content reveal">
+
+                <div class="eyebrow"
+                     data-ar="من نحن"
+                     data-en="About Us">
+                    من نحن
+                </div>
+
+
+                <div class="section-header section-header-left">
+
+                    <h2
+                        data-ar="من فكرة تطوعية إلى مؤسسة تصنع الأثر"
+                        data-en="From a Volunteer Initiative to an Impact-Driven Organization">
+                        من فكرة تطوعية إلى مؤسسة تصنع الأثر
+                    </h2>
+
+                </div>
+
+
+                <p
+                    data-ar="تأسست ميدلايف عام 2019 كمبادرة تطوعية طبية تهدف إلى توظيف المعرفة الطبية والطاقات الشبابية في خدمة المجتمع."
+                    data-en="MedLife was founded in 2019 as a voluntary medical initiative aiming to use medical knowledge and youth energy to serve communities.">
+                    تأسست ميدلايف عام 2019 كمبادرة تطوعية طبية تهدف إلى توظيف المعرفة الطبية والطاقات الشبابية في خدمة المجتمع.
+                </p>
+
+
+                <p
+                    data-ar="ومع مرور السنوات، تطورت ميدلايف من مجموعة من المتطوعين إلى مؤسسة طبية خيرية تطوعية تعمل ضمن شبكة من الفرق والكوادر في عدد من المحافظات السورية."
+                    data-en="Over the years, MedLife evolved from a group of volunteers into a voluntary medical charity organization working through teams and healthcare professionals across several Syrian governorates.">
+                    ومع مرور السنوات، تطورت ميدلايف من مجموعة من المتطوعين إلى مؤسسة طبية خيرية تطوعية تعمل ضمن شبكة من الفرق والكوادر في عدد من المحافظات السورية.
+                </p>
+
+
+                <p
+                    data-ar="وفي عام 2023 حصلت المؤسسة على الترخيص الرسمي، لتواصل عملها ضمن إطار مؤسسي يركز على المبادرات الصحية والإنسانية، والتوعية، والتعليم والتدريب، والعمل المجتمعي."
+                    data-en="In 2023, the organization obtained official registration and continued its work through a structured framework focused on health, humanitarian action, awareness, education, training, and community initiatives.">
+                    وفي عام 2023 حصلت المؤسسة على الترخيص الرسمي، لتواصل عملها ضمن إطار مؤسسي يركز على المبادرات الصحية والإنسانية، والتوعية، والتعليم والتدريب، والعمل المجتمعي.
+                </p>
+
+
+                <div class="about-points">
+
+
+                    <div class="about-point">
+
+                        <i class="fa-solid fa-heart-pulse"></i>
+
+                        <div>
+
+                            <strong
+                                data-ar="الصحة"
+                                data-en="Health">
+                                الصحة
+                            </strong>
+
+                            <span
+                                data-ar="مبادرات وخدمات صحية"
+                                data-en="Health initiatives and services">
+                                مبادرات وخدمات صحية
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="about-point">
+
+                        <i class="fa-solid fa-people-group"></i>
+
+                        <div>
+
+                            <strong
+                                data-ar="المجتمع"
+                                data-en="Community">
+                                المجتمع
+                            </strong>
+
+                            <span
+                                data-ar="عمل مجتمعي وإنساني"
+                                data-en="Community and humanitarian work">
+                                عمل مجتمعي وإنساني
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="about-point">
+
+                        <i class="fa-solid fa-graduation-cap"></i>
+
+                        <div>
+
+                            <strong
+                                data-ar="التعليم"
+                                data-en="Education">
+                                التعليم
+                            </strong>
+
+                            <span
+                                data-ar="تعلم وتدريب مستمر"
+                                data-en="Learning and training">
+                                تعلم وتدريب مستمر
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="about-point">
+
+                        <i class="fa-solid fa-lightbulb"></i>
+
+                        <div>
+
+                            <strong
+                                data-ar="الابتكار"
+                                data-en="Innovation">
+                                الابتكار
+                            </strong>
+
+                            <span
+                                data-ar="أفكار وحلول جديدة"
+                                data-en="Ideas and digital solutions">
+                                أفكار وحلول جديدة
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         WHY MEDLIFE
+    ====================================================== -->
+
+    <section class="section creative">
+
+        <div class="container">
+
+            <div class="section-header reveal">
+
+                <div class="eyebrow"
+                     data-ar="لماذا ميدلايف؟"
+                     data-en="Why MedLife?">
+                    لماذا ميدلايف؟
+                </div>
+
+                <h2
+                    data-ar="أكثر من مجرد تطوع"
+                    data-en="More Than Volunteering">
+                    أكثر من مجرد تطوع
+                </h2>
+
+                <p
+                    data-ar="نريد أن يكون التطوع تجربة يتعلم فيها الإنسان، ويبدع، ويبني علاقات، ويترك أثراً."
+                    data-en="We want volunteering to be a journey of learning, creativity, relationships, and meaningful impact.">
+                    نريد أن يكون التطوع تجربة يتعلم فيها الإنسان، ويبدع، ويبني علاقات، ويترك أثراً.
+                </p>
+
+            </div>
+
+
+            <div class="creative-grid">
+
+
+                <div class="creative-card reveal">
+
+                    <div class="creative-icon">
+                        <i class="fa-solid fa-people-group"></i>
+                    </div>
+
+                    <h3
+                        data-ar="فريق يصنع الفرق"
+                        data-en="A Team That Makes a Difference">
+                        فريق يصنع الفرق
+                    </h3>
+
+                    <p
+                        data-ar="تعمل ميدلايف من خلال فرق متعددة الاختصاصات تجمع الأطباء والصيادلة والطلاب والمصممين والإعلاميين والتقنيين وغيرهم."
+                        data-en="MedLife brings together doctors, pharmacists, students, designers, media professionals, developers, and many others.">
+                        تعمل ميدلايف من خلال فرق متعددة الاختصاصات تجمع الأطباء والصيادلة والطلاب والمصممين والإعلاميين والتقنيين وغيرهم.
+                    </p>
+
+                </div>
+
+
+                <div class="creative-card reveal">
+
+                    <div class="creative-icon">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+
+                    <h3
+                        data-ar="حوّل فكرتك إلى مبادرة"
+                        data-en="Turn Ideas Into Initiatives">
+                        حوّل فكرتك إلى مبادرة
+                    </h3>
+
+                    <p
+                        data-ar="الفكرة الجيدة يمكن أن تتحول إلى نشاط أو حملة أو محتوى أو مشروع تقني أو مبادرة مجتمعية."
+                        data-en="A good idea can become an activity, campaign, content project, digital solution, or community initiative.">
+                        الفكرة الجيدة يمكن أن تتحول إلى نشاط أو حملة أو محتوى أو مشروع تقني أو مبادرة مجتمعية.
+                    </p>
+
+                </div>
+
+
+                <div class="creative-card reveal">
+
+                    <div class="creative-icon">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+
+                    <h3
+                        data-ar="تعلّم وتطوّر"
+                        data-en="Learn and Grow">
+                        تعلّم وتطوّر
+                    </h3>
+
+                    <p
+                        data-ar="التطوع فرصة عملية لتطوير القيادة والتواصل والعمل الجماعي وصناعة المحتوى والتخطيط وإدارة المشاريع."
+                        data-en="Volunteering is a practical opportunity to develop leadership, communication, teamwork, content creation, planning, and project management skills.">
+                        التطوع فرصة عملية لتطوير القيادة والتواصل والعمل الجماعي وصناعة المحتوى والتخطيط وإدارة المشاريع.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         JOURNEY
+    ====================================================== -->
+
+    <section class="section journey"
+             id="journey">
+
+        <div class="container">
+
+            <div class="section-header reveal">
+
+                <div class="eyebrow"
+                     data-ar="رحلتنا"
+                     data-en="Our Journey">
+                    رحلتنا
+                </div>
+
+                <h2
+                    data-ar="من فكرة تطوعية إلى مؤسسة"
+                    data-en="From an Idea to an Organization">
+                    من فكرة تطوعية إلى مؤسسة
+                </h2>
+
+                <p
+                    data-ar="محطات أساسية في رحلة ميدلايف."
+                    data-en="Key milestones in the MedLife journey.">
+                    محطات أساسية في رحلة ميدلايف.
+                </p>
+
+            </div>
+
+
+            <div class="journey-list">
+
+
+                <div class="journey-item reveal">
+
+                    <div class="journey-year">
+                        2019
+                    </div>
+
+                    <div class="journey-content">
+
+                        <h3
+                            data-ar="البداية"
+                            data-en="The Beginning">
+                            البداية
+                        </h3>
+
+                        <p
+                            data-ar="انطلقت ميدلايف كمبادرة تطوعية تجمع طلاباً وأطباء ومتخصصين بهدف تقديم المعرفة والخدمة الطبية للمجتمع."
+                            data-en="MedLife started as a volunteer initiative bringing together students, doctors, and professionals to provide medical knowledge and community service.">
+                            انطلقت ميدلايف كمبادرة تطوعية تجمع طلاباً وأطباء ومتخصصين بهدف تقديم المعرفة والخدمة الطبية للمجتمع.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="journey-item reveal">
+
+                    <div class="journey-year">
+                        2021
+                    </div>
+
+                    <div class="journey-content">
+
+                        <h3
+                            data-ar="التوسع"
+                            data-en="Expansion">
+                            التوسع
+                        </h3>
+
+                        <p
+                            data-ar="بدأت الفرق بالتوسع والعمل ضمن محافظات سورية مختلفة، مع ازدياد عدد المتطوعين وتنوع مجالات العمل."
+                            data-en="Teams expanded across different Syrian governorates while volunteer numbers and areas of work continued to grow.">
+                            بدأت الفرق بالتوسع والعمل ضمن محافظات سورية مختلفة، مع ازدياد عدد المتطوعين وتنوع مجالات العمل.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="journey-item reveal">
+
+                    <div class="journey-year">
+                        2023
+                    </div>
+
+                    <div class="journey-content">
+
+                        <h3
+                            data-ar="الترخيص الرسمي"
+                            data-en="Official Registration">
+                            الترخيص الرسمي
+                        </h3>
+
+                        <p
+                            data-ar="تم ترخيص المؤسسة رسمياً بموجب قرار الإشهار رقم 1899، لتنتقل ميدلايف إلى مرحلة مؤسسية أكثر تنظيماً."
+                            data-en="The organization received official registration under declaration decision No. 1899, entering a more structured institutional phase.">
+                            تم ترخيص المؤسسة رسمياً بموجب قرار الإشهار رقم 1899، لتنتقل ميدلايف إلى مرحلة مؤسسية أكثر تنظيماً.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="journey-item reveal">
+
+                    <div class="journey-year">
+                        2024–2026
+                    </div>
+
+                    <div class="journey-content">
+
+                        <h3
+                            data-ar="التوسع والابتكار"
+                            data-en="Growth & Innovation">
+                            التوسع والابتكار
+                        </h3>
+
+                        <p
+                            data-ar="توسعت المبادرات الصحية والإنسانية والتعليمية، وظهرت مشاريع رقمية، استشارات طبية، محتوى طبي، وحملات مجتمعية متنوعة."
+                            data-en="Health, humanitarian, and educational initiatives expanded alongside digital projects, medical consultations, medical content, and community campaigns.">
+                            توسعت المبادرات الصحية والإنسانية والتعليمية، وظهرت مشاريع رقمية، استشارات طبية، محتوى طبي، وحملات مجتمعية متنوعة.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PROGRAMS
+    ====================================================== -->
+
+    <section class="section"
+             id="programs">
+
+        <div class="container">
+
+            <div class="section-header reveal">
+
+                <div class="eyebrow"
+                     data-ar="مجالات العمل"
+                     data-en="Our Areas of Work">
+                    مجالات العمل
+                </div>
+
+                <h2
+                    data-ar="ماذا نفعل؟"
+                    data-en="What We Do">
+                    ماذا نفعل؟
+                </h2>
+
+                <p
+                    data-ar="نعمل عبر مجموعة من المجالات الصحية والإنسانية والتعليمية والتقنية."
+                    data-en="We work across health, humanitarian, educational, community, and technology-focused areas.">
+                    نعمل عبر مجموعة من المجالات الصحية والإنسانية والتعليمية والتقنية.
+                </p>
+
+            </div>
+
+
+            <div class="program-grid">
+
+
+                <div class="program reveal">
+
+                    <div class="program-icon">
+                        <i class="fa-solid fa-stethoscope"></i>
+                    </div>
+
+                    <h3
+                        data-ar="الخدمات والاستشارات الطبية"
+                        data-en="Medical Services & Consultation">
+                        الخدمات والاستشارات الطبية
+                    </h3>
+
+                    <p
+                        data-ar="المساهمة في تسهيل الوصول إلى المعرفة والاستشارة الطبية عبر مبادرات ومنصات تطوعية."
+                        data-en="Helping improve access to medical knowledge and consultation through volunteer initiatives and platforms.">
+                        المساهمة في تسهيل الوصول إلى المعرفة والاستشارة الطبية عبر مبادرات ومنصات تطوعية.
+                    </p>
+
+                </div>
+
+
+                <div class="program reveal">
+
+                    <div class="program-icon">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+
+                    <h3
+                        data-ar="التوعية الصحية"
+                        data-en="Health Awareness">
+                        التوعية الصحية
+                    </h3>
+
+                    <p
+                        data-ar="محتوى وحملات توعوية تهدف إلى نشر المعرفة الصحية بطريقة بسيطة وموثوقة."
+                        data-en="Awareness content and campaigns designed to share health knowledge in a simple and reliable way.">
+                        محتوى وحملات توعوية تهدف إلى نشر المعرفة الصحية بطريقة بسيطة وموثوقة.
+                    </p>
+
+                </div>
+
+
+                <div class="program reveal">
+
+                    <div class="program-icon">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+
+                    <h3
+                        data-ar="التعليم والتدريب"
+                        data-en="Education & Training">
+                        التعليم والتدريب
+                    </h3>
+
+                    <p
+                        data-ar="محاضرات ودورات وفعاليات علمية تساعد الطلاب والكوادر الطبية على تطوير معارفهم ومهاراتهم."
+                        data-en="Lectures, courses, and scientific activities supporting students and healthcare professionals.">
+                        محاضرات ودورات وفعاليات علمية تساعد الطلاب والكوادر الطبية على تطوير معارفهم ومهاراتهم.
+                    </p>
+
+                </div>
+
+
+                <div class="program reveal">
+
+                    <div class="program-icon">
+                        <i class="fa-solid fa-hand-holding-medical"></i>
+                    </div>
+
+                    <h3
+                        data-ar="المبادرات الإنسانية"
+                        data-en="Humanitarian Initiatives">
+                        المبادرات الإنسانية
+                    </h3>
+
+                    <p
+                        data-ar="مبادرات تستهدف دعم المرضى والمجتمعات الأكثر احتياجاً وتعزيز التضامن المجتمعي."
+                        data-en="Initiatives supporting patients, vulnerable communities, and stronger community solidarity.">
+                        مبادرات تستهدف دعم المرضى والمجتمعات الأكثر احتياجاً وتعزيز التضامن المجتمعي.
+                    </p>
+
+                </div>
+
+
+                <div class="program reveal">
+
+                    <div class="program-icon">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+
+                    <h3
+                        data-ar="التقنية والابتكار"
+                        data-en="Technology & Innovation">
+                        التقنية والابتكار
+                    </h3>
+
+                    <p
+                        data-ar="تطوير حلول رقمية وأفكار تقنية تساعد على تحسين الوصول إلى المعلومات والخدمات الصحية."
+                        data-en="Building digital ideas and solutions that improve access to health information and services.">
+                        تطوير حلول رقمية وأفكار تقنية تساعد على تحسين الوصول إلى المعلومات والخدمات الصحية.
+                    </p>
+
+                </div>
+
+
+                <div class="program reveal">
+
+                    <div class="program-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <h3
+                        data-ar="تمكين الشباب"
+                        data-en="Youth Empowerment">
+                        تمكين الشباب
+                    </h3>
+
+                    <p
+                        data-ar="خلق مساحة للشباب لتطوير مهاراتهم والعمل ضمن فرق متعددة الاختصاصات وصناعة مبادراتهم الخاصة."
+                        data-en="Creating space for young people to develop skills, work across disciplines, and build their own initiatives.">
+                        خلق مساحة للشباب لتطوير مهاراتهم والعمل ضمن فرق متعددة الاختصاصات وصناعة مبادراتهم الخاصة.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CONSULTATION
+    ====================================================== -->
+
+    <section class="section consultation"
+             id="consultation">
+
+        <div class="container consultation-grid">
+
+
+            <div class="reveal">
+
+                <div class="eyebrow">
+                    MedLife Medical Consultation
+                </div>
+
+                <h2
+                    data-ar="الاستشارات الطبية"
+                    data-en="Medical Consultation">
+                    الاستشارات الطبية
+                </h2>
+
+                <p
+                    data-ar="لديك سؤال طبي أو دوائي؟ يمكنك التواصل مع بوت الاستشارات الطبية الخاص بميدلايف عبر Telegram والوصول إلى الخدمة بطريقة سهلة ومباشرة."
+                    data-en="Have a medical or medication-related question? Contact MedLife's medical consultation bot through Telegram and access the service directly and easily.">
+                    لديك سؤال طبي أو دوائي؟
+
+                    يمكنك التواصل مع بوت الاستشارات الطبية الخاص بميدلايف عبر Telegram
+                    والوصول إلى الخدمة بطريقة سهلة ومباشرة.
+                </p>
+
+                <a href="https://t.me/Medlife2024bot"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="telegram-button">
+
+                    <i class="fa-brands fa-telegram"></i>
+
+                    <span
+                        data-ar="ابدأ الاستشارة"
+                        data-en="Start Consultation">
+                        ابدأ الاستشارة
+                    </span>
+
+                </a>
+
+            </div>
+
+
+            <div class="telegram-visual reveal">
+
+                <div class="telegram-circle">
+
+                    <i class="fa-brands fa-telegram"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ARTICLES
+    ====================================================== -->
+
+    <section class="section articles"
+             id="articles">
+
+        <div class="container">
+
+            <div class="section-header reveal">
+
+                <div class="eyebrow">
+                    MedLife Knowledge
+                </div>
+
+                <h2
+                    data-ar="المقالات والمعرفة الطبية"
+                    data-en="Medical Knowledge & Articles">
+                    المقالات والمعرفة الطبية
+                </h2>
+
+                <p
+                    data-ar="مساحة لنشر المقالات الطبية والتوعوية التي يكتبها أعضاء ومتطوعو ميدلايف."
+                    data-en="A space for medical and awareness articles written by MedLife members and volunteers.">
+                    مساحة لنشر المقالات الطبية والتوعوية التي يكتبها أعضاء ومتطوعو ميدلايف.
+                </p>
+
+            </div>
+
+
+            <div class="article-grid">
+
+
+                <article class="article-card reveal">
+
+                    <div class="article-top">
+                        <i class="fa-solid fa-book-medical"></i>
+                    </div>
+
+                    <div class="article-body">
+
+                        <div class="article-category"
+                             data-ar="توعية صحية"
+                             data-en="Health Awareness">
+                            توعية صحية
+                        </div>
+
+                        <h3
+                            data-ar="المعرفة الطبية في خدمة المجتمع"
+                            data-en="Medical Knowledge for the Community">
+                            المعرفة الطبية في خدمة المجتمع
+                        </h3>
+
+                        <p
+                            data-ar="مساحة لنشر مقالات ومحتوى طبي وتوعوي يشارك في إعداده كوادر ومتطوعو ميدلايف."
+                            data-en="A space for medical and awareness content created by MedLife healthcare professionals and volunteers.">
+                            مساحة لنشر مقالات ومحتوى طبي وتوعوي يشارك في إعداده كوادر ومتطوعو ميدلايف.
+                        </p>
+
+                        <a href="#contact"
+                           class="article-link"
+                           data-ar="قريباً ←"
+                           data-en="Coming Soon →">
+                            قريباً ←
+                        </a>
+
+                    </div>
+
+                </article>
+
+
+                <article class="article-card reveal">
+
+                    <div class="article-top">
+                        <i class="fa-solid fa-microscope"></i>
+                    </div>
+
+                    <div class="article-body">
+
+                        <div class="article-category"
+                             data-ar="التعليم الطبي"
+                             data-en="Medical Education">
+                            التعليم الطبي
+                        </div>
+
+                        <h3
+                            data-ar="التعليم الطبي والتعلم المستمر"
+                            data-en="Medical Education & Lifelong Learning">
+                            التعليم الطبي والتعلم المستمر
+                        </h3>
+
+                        <p
+                            data-ar="مواد تعليمية وأفكار تساعد الطلاب والكوادر الصحية على التعلم وتبادل المعرفة."
+                            data-en="Educational resources and ideas supporting students and healthcare professionals in continuous learning.">
+                            مواد تعليمية وأفكار تساعد الطلاب والكوادر الصحية على التعلم وتبادل المعرفة.
+                        </p>
+
+                        <a href="#contact"
+                           class="article-link"
+                           data-ar="قريباً ←"
+                           data-en="Coming Soon →">
+                            قريباً ←
+                        </a>
+
+                    </div>
+
+                </article>
+
+
+                <article class="article-card reveal">
+
+                    <div class="article-top">
+                        <i class="fa-solid fa-people-arrows"></i>
+                    </div>
+
+                    <div class="article-body">
+
+                        <div class="article-category"
+                             data-ar="التطوع"
+                             data-en="Volunteering">
+                            التطوع
+                        </div>
+
+                        <h3
+                            data-ar="التطوع وصناعة الأثر"
+                            data-en="Volunteering & Impact">
+                            التطوع وصناعة الأثر
+                        </h3>
+
+                        <p
+                            data-ar="قصص وتجارب وأفكار من العمل التطوعي والطريق الذي تسلكه ميدلايف لصناعة أثر مستدام."
+                            data-en="Stories, experiences, and ideas from volunteering and the MedLife journey toward sustainable impact.">
+                            قصص وتجارب وأفكار من العمل التطوعي والطريق الذي تسلكه ميدلايف لصناعة أثر مستدام.
+                        </p>
+
+                        <a href="#contact"
+                           class="article-link"
+                           data-ar="قريباً ←"
+                           data-en="Coming Soon →">
+                            قريباً ←
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SOCIAL MEDIA
+    ====================================================== -->
+
+    <section class="section social-section">
+
+        <div class="container">
+
+            <div class="section-header reveal">
+
+                <div class="eyebrow"
+                     data-ar="ابقَ على تواصل"
+                     data-en="Stay Connected">
+                    ابقَ على تواصل
+                </div>
+
+                <h2
+                    data-ar="تابع ميدلايف"
+                    data-en="Follow MedLife">
+                    تابع ميدلايف
+                </h2>
+
+                <p
+                    data-ar="تابع أخبارنا ومبادراتنا ومحتوانا من خلال منصاتنا الرسمية."
+                    data-en="Follow our news, initiatives, and content through our official platforms.">
+                    تابع أخبارنا ومبادراتنا ومحتوانا من خلال منصاتنا الرسمية.
+                </p>
+
+            </div>
+
+
+            <div class="social-grid">
+
+
+                <a href="https://www.facebook.com/Medlifesy/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="social-card reveal">
+
+                    <i class="fa-brands fa-facebook-f"></i>
+
+                    <h3>Facebook</h3>
+
+                    <span>Med-life</span>
+
+                </a>
+
+
+                <a href="https://www.linkedin.com/company/med-life-syria/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="social-card reveal">
+
+                    <i class="fa-brands fa-linkedin-in"></i>
+
+                    <h3>LinkedIn</h3>
+
+                    <span>Med Life Syria</span>
+
+                </a>
+
+
+                <a href="https://www.youtube.com/@medlifesy"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="social-card reveal">
+
+                    <i class="fa-brands fa-youtube"></i>
+
+                    <h3>YouTube</h3>
+
+                    <span>MedLife Syria</span>
+
+                </a>
+
+
+                <a href="https://t.me/Medlife2024bot"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="social-card reveal">
+
+                    <i class="fa-brands fa-telegram"></i>
+
+                    <h3>Telegram</h3>
+
+                    <span>Medical Consultation Bot</span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         VOLUNTEER CTA
+    ====================================================== -->
+
+    <section class="section volunteer-section">
+
+        <div class="container">
+
+            <div class="cta-box reveal"
+                 id="volunteer">
+
+                <h2
+                    data-ar="مكانك يمكن أن يكون معنا"
+                    data-en="There Is a Place for You at MedLife">
+                    مكانك يمكن أن يكون معنا
+                </h2>
+
+                <p
+                    data-ar="في ميدلايف، لا نبحث فقط عن الأشخاص الذين يمتلكون الخبرة. نبحث أيضاً عن الأشخاص الذين يمتلكون الشغف والرغبة بالتعلم وصناعة الأثر. حالياً لا توجد فرص تطوع مفتوحة، لكننا سنعلن عن فرص الانضمام فور توفرها."
+                    data-en="At MedLife, we look not only for people with experience, but also for people with passion, curiosity, and a desire to create impact. There are currently no open volunteer opportunities, but we will announce new opportunities when available.">
+                    في ميدلايف، لا نبحث فقط عن الأشخاص الذين يمتلكون الخبرة.
+                    نبحث أيضاً عن الأشخاص الذين يمتلكون الشغف والرغبة بالتعلم وصناعة الأثر.
+
+                    حالياً لا توجد فرص تطوع مفتوحة،
+                    لكننا سنعلن عن فرص الانضمام فور توفرها.
+                </p>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="volunteerBtn">
+
+                    <i class="fa-solid fa-bell"></i>
+
+                    <span
+                        data-ar="ابقَ متابعاً"
+                        data-en="Stay Updated">
+                        ابقَ متابعاً
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CONTACT
+    ====================================================== -->
+
+    <section class="section contact"
+             id="contact">
+
+        <div class="container contact-grid">
+
+
+            <div class="reveal">
+
+                <div class="eyebrow"
+                     data-ar="تواصل مع ميدلايف"
+                     data-en="Contact MedLife">
+                    تواصل مع ميدلايف
+                </div>
+
+                <h2
+                    data-ar="نحن هنا للتعاون"
+                    data-en="Let's Work Together">
+                    نحن هنا للتعاون
+                </h2>
+
+                <p class="contact-intro"
+                   data-ar="للاستفسارات العامة، الشراكات، المبادرات والتعاون."
+                   data-en="For general inquiries, partnerships, initiatives, and collaboration.">
+                    للاستفسارات العامة، الشراكات، المبادرات والتعاون.
+                </p>
+
+
+                <div class="contact-list">
+
+
+                    <div class="contact-item">
+
+                        <div class="contact-icon">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+
+                        <div>
+
+                            <small
+                                data-ar="الموقع الإلكتروني"
+                                data-en="Website">
+                                الموقع الإلكتروني
+                            </small>
+
+                            <a href="https://medlifesy.org"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                medlifesy.org
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="contact-item">
+
+                        <div class="contact-icon">
+                            <i class="fa-brands fa-telegram"></i>
+                        </div>
+
+                        <div>
+
+                            <small
+                                data-ar="الاستشارات الطبية"
+                                data-en="Medical Consultation">
+                                الاستشارات الطبية
+                            </small>
+
+                            <a href="https://t.me/Medlife2024bot"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                @Medlife2024bot
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="contact-item">
+
+                        <div class="contact-icon">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+
+                        <div>
+
+                            <small
+                                data-ar="المقر الرئيسي"
+                                data-en="Headquarters">
+                                المقر الرئيسي
+                            </small>
+
+                            <span
+                                data-ar="طرطوس — سوريا"
+                                data-en="Tartous — Syria">
+                                طرطوس — سوريا
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="contact-logo reveal">
+
+                <img src="logo.PNG"
+                     alt="MedLife Syria">
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================================================
+     LOGIN MODAL
+========================================================= -->
+
+<div class="modal"
+     id="loginModal"
+     role="dialog"
+     aria-modal="true"
+     aria-hidden="true">
+
+    <div class="modal-box">
+
+        <button
+            type="button"
+            class="modal-close"
+            id="closeLogin"
+            aria-label="Close">
+            ×
+        </button>
+
+        <div class="modal-icon">
+            <i class="fa-solid fa-code"></i>
+        </div>
+
+        <h3
+            data-ar="دخول الأعضاء"
+            data-en="Members Login">
+            دخول الأعضاء
+        </h3>
+
+        <p
+            data-ar="هذه الخدمة قيد التطوير حالياً. سيتم إطلاق نظام دخول الأعضاء والكوادر في مرحلة لاحقة."
+            data-en="This service is currently under development. The members and team login system will be launched in a later phase.">
+            هذه الخدمة قيد التطوير حالياً.
+            سيتم إطلاق نظام دخول الأعضاء والكوادر في مرحلة لاحقة.
+        </p>
+
+        <button
+            type="button"
+            class="btn btn-primary"
+            id="closeLogin2">
+
+            <span
+                data-ar="حسناً"
+                data-en="OK">
+                حسناً
+            </span>
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     VOLUNTEER MODAL
+========================================================= -->
+
+<div class="modal"
+     id="volunteerModal"
+     role="dialog"
+     aria-modal="true"
+     aria-hidden="true">
+
+    <div class="modal-box">
+
+        <button
+            type="button"
+            class="modal-close"
+            id="closeVolunteer"
+            aria-label="Close">
+            ×
+        </button>
+
+        <div class="modal-icon">
+            <i class="fa-solid fa-hand-holding-heart"></i>
+        </div>
+
+        <h3
+            data-ar="التطوع في ميدلايف"
+            data-en="Volunteering at MedLife">
+            التطوع في ميدلايف
+        </h3>
+
+        <p
+            data-ar="لا توجد حالياً فرص تطوع مفتوحة. ابقَ متابعاً لمنصات ميدلايف الرسمية، وسنعلن عن فتح باب الانضمام عند توفر فرص جديدة."
+            data-en="There are currently no open volunteer opportunities. Follow MedLife's official platforms and we will announce new opportunities when available.">
+            لا توجد حالياً فرص تطوع مفتوحة.
+            ابقَ متابعاً لمنصات ميدلايف الرسمية،
+            وسنعلن عن فتح باب الانضمام عند توفر فرص جديدة.
+        </p>
+
+        <a href="https://www.facebook.com/Medlifesy/"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn btn-primary">
+
+            <i class="fa-brands fa-facebook-f"></i>
+
+            <span
+                data-ar="تابع ميدلايف"
+                data-en="Follow MedLife">
+                تابع ميدلايف
+            </span>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MEDLIFE AI FLOATING BUTTON
+========================================================= -->
+
+<button
+    type="button"
+    class="ai-floating-btn"
+    id="aiOpenBtn"
+    aria-label="Open MedLife AI">
+
+    <span class="ai-pulse"></span>
+
+    <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+    <span class="ai-floating-label">
+        MedLife AI
+    </span>
+
+</button>
+
+
+<!-- =========================================================
+     MEDLIFE AI PANEL
+========================================================= -->
+
+<div class="ai-overlay"
+     id="aiOverlay"
+     aria-hidden="true">
+
+    <div class="ai-panel"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="aiTitle">
+
+
+        <!-- AI HEADER -->
+
+        <div class="ai-header">
+
+            <div class="ai-brand">
+
+                <div class="ai-logo-wrap">
+
+                    <img src="logo.PNG"
+                         alt="MedLife"
+                         class="ai-logo">
+
+                </div>
+
+                <div>
+
+                    <strong id="aiTitle">
+                        MedLife AI
+                    </strong>
+
+                    <span
+                        data-ar="مساعد ميدلايف الذكي"
+                        data-en="MedLife Smart Assistant">
+                        مساعد ميدلايف الذكي
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="ai-close"
+                id="aiCloseBtn"
+                aria-label="Close MedLife AI">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- AI MESSAGES -->
+
+        <div class="ai-messages"
+             id="aiMessages">
+
+
+            <div class="ai-message ai-bot">
+
+                <div class="ai-message-avatar">
+
+                    <img src="logo.PNG"
+                         alt="MedLife">
+
+                </div>
+
+                <div class="ai-message-content">
+
+                    <p
+                        data-ar="مرحباً 👋 أنا MedLife AI. كيف يمكنني مساعدتك؟ يمكنك أن تسألني عن ميدلايف، برامجنا، مبادراتنا، التطوع أو المقالات."
+                        data-en="Hello 👋 I’m MedLife AI. How can I help you? You can ask me about MedLife, our programs, initiatives, volunteering, or articles.">
+                        مرحباً 👋
+                        أنا MedLife AI.
+                        كيف يمكنني مساعدتك؟
+                        يمكنك أن تسألني عن ميدلايف،
+                        برامجنا، مبادراتنا، التطوع أو المقالات.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- AI SUGGESTIONS -->
+
+            <div class="ai-suggestions">
+
+
+                <button
+                    type="button"
+                    data-question-ar="ما هي مؤسسة ميدلايف؟"
+                    data-question-en="What is MedLife?">
+
+                    <i class="fa-solid fa-heart-pulse"></i>
+
+                    <span
+                        data-ar="ما هي ميدلايف؟"
+                        data-en="What is MedLife?">
+                        ما هي ميدلايف؟
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    data-question-ar="كيف يمكنني التطوع مع ميدلايف؟"
+                    data-question-en="How can I volunteer with MedLife?">
+
+                    <i class="fa-solid fa-hand-holding-heart"></i>
+
+                    <span
+                        data-ar="كيف يمكنني التطوع؟"
+                        data-en="How can I volunteer?">
+                        كيف يمكنني التطوع؟
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    data-question-ar="ما هي مجالات عمل ميدلايف؟"
+                    data-question-en="What are MedLife's areas of work?">
+
+                    <i class="fa-solid fa-layer-group"></i>
+
+                    <span
+                        data-ar="مجالات عمل ميدلايف"
+                        data-en="MedLife areas of work">
+                        مجالات عمل ميدلايف
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- AI INPUT -->
+
+        <form class="ai-input-area"
+              id="aiForm">
+
+            <textarea
+                id="aiInput"
+                rows="1"
+                maxlength="1200"
+                autocomplete="off"
+                data-placeholder-ar="اكتب سؤالك هنا..."
+                data-placeholder-en="Type your question here..."
+                placeholder="اكتب سؤالك هنا..."></textarea>
+
+            <button
+                type="submit"
+                class="ai-send"
+                id="aiSendBtn"
+                aria-label="Send message">
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+            </button>
+
+        </form>
+
+
+        <!-- AI DISCLAIMER -->
+
+        <div class="ai-disclaimer">
+
+            <i class="fa-solid fa-shield-heart"></i>
+
+            <span
+                data-ar="MedLife AI مساعد معلوماتي، ولا يحل محل الطبيب أو الاستشارة الطبية المتخصصة."
+                data-en="MedLife AI provides informational assistance and does not replace a doctor or professional medical advice.">
+                MedLife AI مساعد معلوماتي،
+                ولا يحل محل الطبيب أو الاستشارة الطبية المتخصصة.
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="site-footer">
+
+    <div class="container footer-grid">
+
+
+        <!-- FOOTER BRAND -->
+
+        <div class="footer-brand">
+
+            <div class="footer-logo">
+
+                <img src="logo.PNG"
+                     alt="MedLife Syria">
+
+            </div>
+
+            <p class="footer-description"
+               data-ar="مؤسسة ميدلايف الطبية الخيرية التطوعية. بالعمل التطوعي نصنع الأثر، ونؤمن بأن لكل شخص مساحة يستطيع من خلالها أن يتعلم ويبدع ويخدم مجتمعه."
+               data-en="MedLife is a voluntary medical charity organization. Through volunteerism we create impact, and we believe everyone can find a space to learn, create, and serve their community.">
+                مؤسسة ميدلايف الطبية الخيرية التطوعية.
+                بالعمل التطوعي نصنع الأثر،
+                ونؤمن بأن لكل شخص مساحة يستطيع من خلالها أن يتعلم ويبدع ويخدم مجتمعه.
+            </p>
+
+
+            <div class="footer-socials">
+
+                <a href="https://www.facebook.com/Medlifesy/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="footer-social"
+                   aria-label="Facebook">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+
+                <a href="https://www.linkedin.com/company/med-life-syria/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="footer-social"
+                   aria-label="LinkedIn">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                </a>
+
+                <a href="https://www.youtube.com/@medlifesy"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="footer-social"
+                   aria-label="YouTube">
+                    <i class="fa-brands fa-youtube"></i>
+                </a>
+
+                <a href="https://t.me/Medlife2024bot"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="footer-social"
+                   aria-label="Telegram">
+                    <i class="fa-brands fa-telegram"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- QUICK LINKS -->
+
+        <div class="footer-column">
+
+            <h4
+                data-ar="روابط سريعة"
+                data-en="Quick Links">
+                روابط سريعة
+            </h4>
+
+            <a href="#home"
+               data-ar="الرئيسية"
+               data-en="Home">
+                الرئيسية
+            </a>
+
+            <a href="#about"
+               data-ar="من نحن"
+               data-en="About Us">
+                من نحن
+            </a>
+
+            <a href="#journey"
+               data-ar="رحلتنا"
+               data-en="Our Journey">
+                رحلتنا
+            </a>
+
+            <a href="#programs"
+               data-ar="مجالات العمل"
+               data-en="Our Work">
+                مجالات العمل
+            </a>
+
+            <a href="#articles"
+               data-ar="المقالات"
+               data-en="Articles">
+                المقالات
+            </a>
+
+            <a href="#consultation"
+               data-ar="الاستشارات"
+               data-en="Consultation">
+                الاستشارات
+            </a>
+
+        </div>
+
+
+        <!-- PLATFORMS -->
+
+        <div class="footer-column">
+
+            <h4
+                data-ar="منصات ميدلايف"
+                data-en="MedLife Platforms">
+                منصات ميدلايف
+            </h4>
+
+            <a href="https://www.facebook.com/Medlifesy/"
+               target="_blank"
+               rel="noopener noreferrer">
+                Facebook
+            </a>
+
+            <a href="https://www.linkedin.com/company/med-life-syria/"
+               target="_blank"
+               rel="noopener noreferrer">
+                LinkedIn
+            </a>
+
+            <a href="https://www.youtube.com/@medlifesy"
+               target="_blank"
+               rel="noopener noreferrer">
+                YouTube
+            </a>
+
+            <a href="https://t.me/Medlife2024bot"
+               target="_blank"
+               rel="noopener noreferrer">
+                Telegram — Medical Consultation
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+
+    <div class="container">
+
+        <div class="copyright">
+
+            © 2026 MedLife Syria —
+
+            <span
+                data-ar="مؤسسة ميدلايف الطبية الخيرية التطوعية"
+                data-en="MedLife Voluntary Medical Charity Organization">
+                مؤسسة ميدلايف الطبية الخيرية التطوعية
+            </span>
+
+            <br>
+
+            We save life, we are med.life
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- =========================================================
+     MAIN JAVASCRIPT
+========================================================= -->
+
+<script src="js/main.js"></script>
+
 
 </body>
+
 </html>
-```
