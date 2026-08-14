@@ -13,6 +13,21 @@ export async function onRequest(context) {
     }
 
     return new HTMLRewriter()
+        .on('a[href="#volunteer"]', {
+            element(element) {
+                element.setAttribute("href", "join-us.html");
+            }
+        })
+        .on('a[href="index.html#volunteer"]', {
+            element(element) {
+                element.setAttribute("href", "join-us.html");
+            }
+        })
+        .on('a[href="/#volunteer"]', {
+            element(element) {
+                element.setAttribute("href", "join-us.html");
+            }
+        })
         .on("body", {
             element(element) {
                 element.append(
