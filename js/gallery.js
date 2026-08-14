@@ -1,12 +1,7 @@
-/**
- * MedLife Dynamic Gallery
- *
- * Loads all images from:
- * /api/gallery
- *
- * and displays them inside:
- * #photoTrack
- */
+/* =========================================================
+   MEDLIFE DYNAMIC GALLERY
+   Loads images from /api/gallery
+========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -18,14 +13,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    const currentLanguage =
-        localStorage.getItem("medlifeLanguage") || "ar";
+    let galleryImages = [];
 
+
+    /* =====================================================
+       LOAD GALLERY
+    ===================================================== */
 
     loadGallery();
 
 
     async function loadGallery() {
+
+        showLoading();
+
 
         try {
 
@@ -54,89 +55,95 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 throw new Error(
                     data.error ||
-                    "Gallery request failed."
+                    "Unable to load gallery."
                 );
             }
 
 
-            const images =
+            galleryImages =
                 Array.isArray(data.images)
                     ? data.images
                     : [];
 
 
-            photoTrack.innerHTML = "";
+            if (
+                galleryImages.length === 0
+            ) {
 
-
-            if (images.length === 0) {
-
-                showEmptyGallery();
+                showEmpty();
 
                 return;
             }
 
 
-            /*
-             * Create the first image set.
-             */
-            images.forEach(
-                image => {
-
-                    createPhotoCard(
-                        image,
-                        photoTrack
-                    );
-
-                }
-            );
-
-
-            /*
-             * Duplicate the images.
-             *
-             * This is what allows the CSS animation
-             * to create a continuous scrolling effect.
-             */
-            images.forEach(
-                image => {
-
-                    createPhotoCard(
-                        image,
-                        photoTrack,
-                        true
-                    );
-
-                }
-            );
-
-
-            /*
-             * Re-apply the current language
-             * to dynamically generated elements.
-             */
-            updateGalleryLanguage();
+            renderGallery();
 
 
         } catch (error) {
 
             console.error(
-                "MedLife Gallery Error:",
+                "MedLife Gallery:",
                 error
             );
 
 
-            showGalleryError();
-
+            showError();
         }
     }
 
 
-    /**
-     * Create one photo card.
-     */
+    /* =====================================================
+       RENDER GALLERY
+    ===================================================== */
+
+    function renderGallery() {
+
+        photoTrack.innerHTML = "";
+
+
+        /*
+         * First set of images
+         */
+        galleryImages.forEach(
+            image => {
+
+                photoTrack.appendChild(
+                    createPhotoCard(
+                        image
+                    )
+                );
+
+            }
+        );
+
+
+        /*
+         * Duplicate the complete set.
+         *
+         * This is required for the CSS marquee animation
+         * to loop smoothly.
+         */
+        galleryImages.forEach(
+            image => {
+
+                photoTrack.appendChild(
+                    createPhotoCard(
+                        image,
+                        true
+                    )
+                );
+
+            }
+        );
+    }
+
+
+    /* =====================================================
+       CREATE PHOTO CARD
+    ===================================================== */
+
     function createPhotoCard(
         image,
-        container,
         duplicate = false
     ) {
 
@@ -150,6 +157,68 @@ document.addEventListener("DOMContentLoaded", () => {
             "photo-card";
 
 
+        const img =
+            document.createElement(
+                "img"
+            );
+
+
+        img.src =
+            image.url;
+
+
+        img.alt =
+            "MedLife";
+
+
+        img.decoding =
+            "async";
+
+
+        /*
+         * First set loads immediately.
+         * Duplicate set can load lazily.
+         */
+        img.loading =
+            duplicate
+                ? "lazy"
+                : "eager";
+
+
+        /*
+         * If an image fails, hide its card.
+         */
+        img.onerror = () => {
+
+            card.remove();
+
+        };
+
+
+        card.appendChild(
+            img
+        );
+
+
+        /*
+         * Open image on click.
+         */
+        card.addEventListener(
+            "click",
+            () => {
+
+                openLightbox(
+                    image.url,
+                    image.name
+                );
+
+            }
+        );
+
+
+        /*
+         * Keyboard accessibility.
+         */
         card.setAttribute(
             "tabindex",
             "0"
@@ -164,76 +233,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         card.setAttribute(
             "aria-label",
-            currentLanguage === "en"
-                ? "Open MedLife photo"
-                : "فتح صورة من ميدلايف"
+            "فتح صورة ميدلايف"
         );
 
 
-        const img =
-            document.createElement(
-                "img"
-            );
-
-
-        img.src =
-            image.url;
-
-
-        img.alt =
-            currentLanguage === "en"
-                ? "MedLife activity"
-                : "نشاط من ميدلايف";
-
-
-        /*
-         * Don't lazy-load the duplicated
-         * first visible images too aggressively.
-         */
-        img.loading =
-            duplicate
-                ? "lazy"
-                : "eager";
-
-
-        img.decoding =
-            "async";
-
-
-        /*
-         * Accessibility / fallback.
-         */
-        img.onerror =
-            () => {
-
-                card.remove();
-
-            };
-
-
-        card.appendChild(
-            img
-        );
-
-
-        /*
-         * Open image when clicked.
-         */
-        card.addEventListener(
-            "click",
-            () => {
-
-                openGalleryPreview(
-                    image.url
-                );
-
-            }
-        );
-
-
-        /*
-         * Keyboard support.
-         */
         card.addEventListener(
             "keydown",
             event => {
@@ -245,30 +248,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     event.preventDefault();
 
-                    openGalleryPreview(
-                        image.url
-                    );
 
+                    openLightbox(
+                        image.url,
+                        image.name
+                    );
                 }
 
             }
         );
 
 
-        container.appendChild(
-            card
-        );
+        return card;
     }
 
 
-    /**
-     * Open image preview.
-     *
-     * Creates the Lightbox dynamically,
-     * so no extra HTML is required.
-     */
-    function openGalleryPreview(
-        imageUrl
+    /* =====================================================
+       LIGHTBOX
+    ===================================================== */
+
+    function openLightbox(
+        imageUrl,
+        imageName
     ) {
 
         let lightbox =
@@ -278,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         /*
-         * Create Lightbox if it doesn't exist.
+         * Create Lightbox only once.
          */
         if (!lightbox) {
 
@@ -304,16 +305,22 @@ document.addEventListener("DOMContentLoaded", () => {
                         class="gallery-close"
                         id="galleryClose"
                         type="button"
-                        aria-label="Close image">
+                        aria-label="Close">
 
                         ×
 
                     </button>
 
+
                     <img
                         id="galleryPreview"
                         src=""
                         alt="MedLife">
+
+                    <div
+                        id="galleryCaption"
+                        class="gallery-caption">
+                    </div>
 
                 </div>
 
@@ -333,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             closeButton.addEventListener(
                 "click",
-                closeGallery
+                closeLightbox
             );
 
 
@@ -346,8 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         lightbox
                     ) {
 
-                        closeGallery();
-
+                        closeLightbox();
                     }
 
                 }
@@ -361,14 +367,29 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
+        const caption =
+            document.getElementById(
+                "galleryCaption"
+            );
+
+
         preview.src =
             imageUrl;
 
 
         preview.alt =
-            currentLanguage === "en"
-                ? "MedLife Photo"
-                : "صورة من ميدلايف";
+            imageName ||
+            "MedLife Photo";
+
+
+        if (
+            caption &&
+            imageName
+        ) {
+
+            caption.textContent =
+                imageName;
+        }
 
 
         lightbox.classList.add(
@@ -382,10 +403,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /**
-     * Close Lightbox.
-     */
-    function closeGallery() {
+    /* =====================================================
+       CLOSE LIGHTBOX
+    ===================================================== */
+
+    function closeLightbox() {
 
         const lightbox =
             document.getElementById(
@@ -396,6 +418,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const preview =
             document.getElementById(
                 "galleryPreview"
+            );
+
+
+        const caption =
+            document.getElementById(
+                "galleryCaption"
             );
 
 
@@ -413,7 +441,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             preview.src =
                 "";
+        }
 
+
+        if (caption) {
+
+            caption.textContent =
+                "";
         }
 
 
@@ -423,10 +457,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /**
-     * Empty state.
-     */
-    function showEmptyGallery() {
+    /* =====================================================
+       LOADING STATE
+    ===================================================== */
+
+    function showLoading() {
+
+        photoTrack.innerHTML = `
+
+            <div class="gallery-loading">
+
+                <i
+                    class="fa-solid fa-spinner fa-spin">
+                </i>
+
+                <span>
+                    جاري تحميل صور ميدلايف...
+                </span>
+
+            </div>
+
+        `;
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ===================================================== */
+
+    function showEmpty() {
 
         photoTrack.innerHTML = `
 
@@ -435,13 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <i class="fa-regular fa-images"></i>
 
                 <span>
-
-                    ${
-                        currentLanguage === "en"
-                            ? "No photos available yet."
-                            : "لا توجد صور منشورة حالياً."
-                    }
-
+                    لا توجد صور منشورة حالياً.
                 </span>
 
             </div>
@@ -450,25 +503,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /**
-     * Error state.
-     */
-    function showGalleryError() {
+    /* =====================================================
+       ERROR STATE
+    ===================================================== */
+
+    function showError() {
 
         photoTrack.innerHTML = `
 
             <div class="gallery-empty">
 
-                <i class="fa-solid fa-circle-exclamation"></i>
+                <i
+                    class="fa-solid fa-circle-exclamation">
+                </i>
 
                 <span>
-
-                    ${
-                        currentLanguage === "en"
-                            ? "Unable to load MedLife photos."
-                            : "تعذر تحميل صور ميدلايف حالياً."
-                    }
-
+                    تعذر تحميل صور ميدلايف حالياً.
                 </span>
 
             </div>
@@ -477,67 +527,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /**
-     * Update dynamically created gallery text.
-     */
-    function updateGalleryLanguage() {
+    /* =====================================================
+       ESCAPE KEY
+    ===================================================== */
 
-        document.querySelectorAll(
-            ".photo-card"
-        ).forEach(
-            card => {
-
-                card.setAttribute(
-                    "aria-label",
-                    currentLanguage === "en"
-                        ? "Open MedLife photo"
-                        : "فتح صورة من ميدلايف"
-                );
-
-
-                const img =
-                    card.querySelector(
-                        "img"
-                    );
-
-
-                if (img) {
-
-                    img.alt =
-                        currentLanguage === "en"
-                            ? "MedLife activity"
-                            : "نشاط من ميدلايف";
-
-                }
-
-            }
-        );
-    }
-
-
-    /**
-     * Listen for language changes.
-     */
-    window.addEventListener(
-        "medlifeLanguageChanged",
-        event => {
-
-            if (
-                event.detail &&
-                event.detail.language
-            ) {
-
-                updateGalleryLanguage();
-
-            }
-
-        }
-    );
-
-
-    /**
-     * Escape closes the image preview.
-     */
     document.addEventListener(
         "keydown",
         event => {
@@ -546,8 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 event.key === "Escape"
             ) {
 
-                closeGallery();
-
+                closeLightbox();
             }
 
         }
