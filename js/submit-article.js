@@ -134,3 +134,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+<script src="js/submit-article.js" defer></script>
