@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <!-- =====================================================
+         BASIC META
+    ====================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="MedLife Syria — لوحة التحكم والإدارة">
+
+    <meta name="author"
+          content="MedLife Syria">
+
+    <meta name="theme-color"
+          content="#0b3b60">
+
+
+    <!-- =====================================================
+         TITLE
+    ====================================================== -->
+
+    <title>MedLife Syria | Admin Dashboard</title>
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <!-- =====================================================
+         FONTS
+    ====================================================== -->
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+
+    <!-- =====================================================
+         ADMIN CSS
+    ====================================================== -->
+
+    <link rel="stylesheet"
+          href="css/admin.css">
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     ADMIN APP
+========================================================= -->
+
+<div class="admin-app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="admin-sidebar"
+           id="adminSidebar">
+
+
+        <!-- BRAND -->
+
+        <div class="admin-brand">
+
+            <a href="index.html"
+               class="admin-brand-link">
+
+                <div class="admin-brand-logo">
+
+                    <img src="logo.PNG"
+                         alt="MedLife Syria">
+
+                </div>
+
+                <div class="admin-brand-text">
+
+                    <strong>MedLife</strong>
+
+                    <span>Administration</span>
+
+                </div>
+
+            </a>
+
+        </div>
+
+
+        <!-- SIDEBAR NAVIGATION -->
+
+        <nav class="admin-navigation"
+             aria-label="Admin Navigation">
+
+
+            <div class="nav-section-title">
+                لوحة التحكم
+            </div>
+
+
+            <a href="#dashboard"
+               class="admin-nav-link active"
+               data-section="dashboard">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                <span>نظرة عامة</span>
+
+            </a>
+
+
+            <a href="#articles"
+               class="admin-nav-link"
+               data-section="articles">
+
+                <i class="fa-solid fa-newspaper"></i>
+
+                <span>المقالات</span>
+
+                <span class="nav-badge"
+                      id="pendingBadge">
+                    0
+                </span>
+
+            </a>
+
+
+            <a href="#pending"
+               class="admin-nav-link"
+               data-section="pending">
+
+                <i class="fa-solid fa-clock"></i>
+
+                <span>بانتظار المراجعة</span>
+
+            </a>
+
+
+            <a href="#approved"
+               class="admin-nav-link"
+               data-section="approved">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                <span>المقالات المنشورة</span>
+
+            </a>
+
+
+            <a href="#rejected"
+               class="admin-nav-link"
+               data-section="rejected">
+
+                <i class="fa-solid fa-circle-xmark"></i>
+
+                <span>المقالات المرفوضة</span>
+
+            </a>
+
+
+            <div class="nav-section-title">
+                الإدارة
+            </div>
+
+
+            <a href="#authors"
+               class="admin-nav-link"
+               data-section="authors">
+
+                <i class="fa-solid fa-users"></i>
+
+                <span>الكتّاب والمتطوعون</span>
+
+            </a>
+
+
+            <a href="#settings"
+               class="admin-nav-link"
+               data-section="settings">
+
+                <i class="fa-solid fa-gear"></i>
+
+                <span>الإعدادات</span>
+
+            </a>
+
+
+            <div class="nav-section-title">
+                الموقع
+            </div>
+
+
+            <a href="index.html"
+               class="admin-nav-link">
+
+                <i class="fa-solid fa-globe"></i>
+
+                <span>زيارة الموقع</span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- SIDEBAR FOOTER -->
+
+        <div class="sidebar-footer">
+
+            <div class="admin-user-mini">
+
+                <div class="admin-user-avatar">
+
+                    <i class="fa-solid fa-user-shield"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>Administrator</strong>
+
+                    <span>MedLife Admin</span>
+
+                </div>
+
+            </div>
+
+
+            <button type="button"
+                    class="logout-btn"
+                    id="logoutBtn">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>تسجيل الخروج</span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN AREA
+    ====================================================== -->
+
+    <div class="admin-main">
+
+
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
+
+        <header class="admin-topbar">
+
+
+            <div class="topbar-left">
+
+                <button type="button"
+                        class="sidebar-toggle"
+                        id="sidebarToggle"
+                        aria-label="Toggle sidebar">
+
+                    <i class="fa-solid fa-bars"></i>
+
+                </button>
+
+
+                <div class="page-heading">
+
+                    <span>
+                        MedLife Syria
+                    </span>
+
+                    <h1 id="pageTitle">
+                        لوحة التحكم
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+
+                <div class="admin-status">
+
+                    <span class="status-dot"></span>
+
+                    <span>
+                        النظام يعمل
+                    </span>
+
+                </div>
+
+
+                <button type="button"
+                        class="notification-btn"
+                        id="notificationBtn"
+                        aria-label="Notifications">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span class="notification-count"
+                          id="notificationCount">
+                        0
+                    </span>
+
+                </button>
+
+
+                <div class="topbar-user">
+
+                    <div class="topbar-avatar">
+
+                        <i class="fa-solid fa-user-shield"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>Administrator</strong>
+
+                        <span>Admin</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <main class="admin-content">
+
+
+            <!-- =================================================
+                 DASHBOARD
+            ================================================== -->
+
+            <section class="admin-section active"
+                     id="dashboard">
+
+
+                <div class="section-intro">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            MEDLIFE ADMINISTRATION
+                        </span>
+
+                        <h2>
+                            مرحباً بك في لوحة التحكم
+                        </h2>
+
+                        <p>
+                            من هنا يمكنك إدارة المقالات ومراجعة المحتوى
+                            المرسل من أعضاء ومتطوعي ميدلايف.
+                        </p>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="primary-admin-btn"
+                            id="refreshDashboardBtn">
+
+                        <i class="fa-solid fa-arrows-rotate"></i>
+
+                        تحديث البيانات
+
+                    </button>
+
+                </div>
+
+
+                <!-- STAT CARDS -->
+
+                <div class="dashboard-stats">
+
+
+                    <div class="dashboard-stat">
+
+                        <div class="stat-icon blue">
+
+                            <i class="fa-solid fa-newspaper"></i>
+
+                        </div>
+
+                        <div class="stat-info">
+
+                            <span>
+                                إجمالي المقالات
+                            </span>
+
+                            <strong id="totalArticles">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-stat">
+
+                        <div class="stat-icon orange">
+
+                            <i class="fa-solid fa-clock"></i>
+
+                        </div>
+
+                        <div class="stat-info">
+
+                            <span>
+                                بانتظار المراجعة
+                            </span>
+
+                            <strong id="pendingArticles">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-stat">
+
+                        <div class="stat-icon green">
+
+                            <i class="fa-solid fa-circle-check"></i>
+
+                        </div>
+
+                        <div class="stat-info">
+
+                            <span>
+                                منشورة
+                            </span>
+
+                            <strong id="approvedArticles">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-stat">
+
+                        <div class="stat-icon red">
+
+                            <i class="fa-solid fa-circle-xmark"></i>
+
+                        </div>
+
+                        <div class="stat-info">
+
+                            <span>
+                                مرفوضة
+                            </span>
+
+                            <strong id="rejectedArticles">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- RECENT ARTICLES -->
+
+                <div class="admin-card">
+
+                    <div class="admin-card-header">
+
+                        <div>
+
+                            <span class="card-eyebrow">
+                                RECENT ACTIVITY
+                            </span>
+
+                            <h3>
+                                آخر المقالات
+                            </h3>
+
+                        </div>
+
+
+                        <button type="button"
+                                class="text-btn"
+                                data-section-target="articles">
+
+                            عرض الكل
+
+                            <i class="fa-solid fa-arrow-left"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+                        <table class="admin-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        المقال
+                                    </th>
+
+                                    <th>
+                                        الكاتب
+                                    </th>
+
+                                    <th>
+                                        التصنيف
+                                    </th>
+
+                                    <th>
+                                        الحالة
+                                    </th>
+
+                                    <th>
+                                        التاريخ
+                                    </th>
+
+                                    <th>
+                                        الإجراء
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="recentArticlesTable">
+
+                                <tr class="empty-row">
+
+                                    <td colspan="6">
+
+                                        <div class="empty-state">
+
+                                            <i class="fa-solid fa-inbox"></i>
+
+                                            <strong>
+                                                لا توجد مقالات حالياً
+                                            </strong>
+
+                                            <span>
+                                                ستظهر المقالات الجديدة هنا.
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 ARTICLES
+            ================================================== -->
+
+            <section class="admin-section"
+                     id="articles">
+
+
+                <div class="section-intro">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            CONTENT MANAGEMENT
+                        </span>
+
+                        <h2>
+                            إدارة المقالات
+                        </h2>
+
+                        <p>
+                            مراجعة وإدارة جميع المقالات المرسلة إلى MedLife.
+                        </p>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="primary-admin-btn"
+                            id="refreshArticlesBtn">
+
+                        <i class="fa-solid fa-arrows-rotate"></i>
+
+                        تحديث
+
+                    </button>
+
+                </div>
+
+
+                <!-- FILTERS -->
+
+                <div class="filter-card">
+
+                    <div class="filter-group">
+
+                        <label for="articleSearch">
+                            البحث
+                        </label>
+
+                        <div class="search-input">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <input type="search"
+                                   id="articleSearch"
+                                   placeholder="ابحث عن مقال أو كاتب...">
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="statusFilter">
+                            الحالة
+                        </label>
+
+                        <select id="statusFilter">
+
+                            <option value="all">
+                                جميع الحالات
+                            </option>
+
+                            <option value="pending">
+                                بانتظار المراجعة
+                            </option>
+
+                            <option value="approved">
+                                منشور
+                            </option>
+
+                            <option value="rejected">
+                                مرفوض
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="categoryFilter">
+                            التصنيف
+                        </label>
+
+                        <select id="categoryFilter">
+
+                            <option value="all">
+                                جميع التصنيفات
+                            </option>
+
+                            <option value="medical">
+                                طبي
+                            </option>
+
+                            <option value="awareness">
+                                توعية صحية
+                            </option>
+
+                            <option value="education">
+                                تعليم طبي
+                            </option>
+
+                            <option value="volunteering">
+                                تطوع
+                            </option>
+
+                            <option value="community">
+                                مجتمع
+                            </option>
+
+                            <option value="other">
+                                أخرى
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ARTICLES TABLE -->
+
+                <div class="admin-card">
+
+                    <div class="table-wrapper">
+
+                        <table class="admin-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        العنوان
+                                    </th>
+
+                                    <th>
+                                        الكاتب
+                                    </th>
+
+                                    <th>
+                                        التصنيف
+                                    </th>
+
+                                    <th>
+                                        الحالة
+                                    </th>
+
+                                    <th>
+                                        تاريخ الإرسال
+                                    </th>
+
+                                    <th>
+                                        الإجراءات
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="articlesTable">
+
+                                <tr class="empty-row">
+
+                                    <td colspan="6">
+
+                                        <div class="empty-state">
+
+                                            <i class="fa-solid fa-newspaper"></i>
+
+                                            <strong>
+                                                لا توجد مقالات
+                                            </strong>
+
+                                            <span>
+                                                لم يتم إرسال أي مقالات بعد.
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 PENDING
+            ================================================== -->
+
+            <section class="admin-section"
+                     id="pending">
+
+
+                <div class="section-intro">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            REVIEW CENTER
+                        </span>
+
+                        <h2>
+                            المقالات بانتظار المراجعة
+                        </h2>
+
+                        <p>
+                            راجع المحتوى قبل نشره على موقع MedLife.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="review-layout">
+
+                    <div class="review-list"
+                         id="pendingArticlesList">
+
+                        <div class="empty-state large">
+
+                            <i class="fa-solid fa-clock"></i>
+
+                            <strong>
+                                لا توجد مقالات بانتظار المراجعة
+                            </strong>
+
+                            <span>
+                                ستظهر هنا المقالات الجديدة التي يرسلها الفريق.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="article-preview"
+                         id="articlePreview">
+
+                        <div class="preview-empty">
+
+                            <i class="fa-solid fa-file-lines"></i>
+
+                            <strong>
+                                اختر مقالاً للمراجعة
+                            </strong>
+
+                            <span>
+                                ستظهر تفاصيل المقال هنا.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 APPROVED
+            ================================================== -->
+
+            <section class="admin-section"
+                     id="approved">
+
+
+                <div class="section-intro">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            PUBLISHED CONTENT
+                        </span>
+
+                        <h2>
+                            المقالات المنشورة
+                        </h2>
+
+                        <p>
+                            جميع المقالات التي تمت الموافقة عليها ونشرها.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="admin-card">
+
+                    <div class="table-wrapper">
+
+                        <table class="admin-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        العنوان
+                                    </th>
+
+                                    <th>
+                                        الكاتب
+                                    </th>
+
+                                    <th>
+                                        التصنيف
+                                    </th>
+
+                                    <th>
+                                        تاريخ النشر
+                                    </th>
+
+                                    <th>
+                                        الإجراءات
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="approvedArticlesTable">
+
+                                <tr class="empty-row">
+
+                                    <td colspan="5">
+
+                                        <div class="empty-state">
+
+                                            <i class="fa-solid fa-circle-check"></i>
+
+                                            <strong>
+                                                لا توجد مقالات منشورة
+                                            </strong>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 REJECTED
+            ================================================== -->
+
+            <section class="admin-section"
+                     id="rejected">
+
+
+                <div class="section-intro">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            REJECTED CONTENT
+                        </span>
+
+                        <h2>
+                            المقالات المرفوضة
+                        </h2>
+
+                        <p>
+                            المقالات التي لم تتم الموافقة عليها للنشر.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="admin-card">
+
+                    <div class="table-wrapper">
+
+                        <table class="admin-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        العنوان
+                                    </th>
+
+                                    <th>
+                                        الكاتب
+                                    </th>
+
+                                    <th>
+                                        سبب الرفض
+                                    </th>
+
+                                    <th>
+                                        التاريخ
+                                    </th>
+
+                                    <th>
+                                        الإجراءات
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="rejectedArticlesTable">
+
+                                <tr class="empty-row">
+
+                                    <td colspan="5">
+
+                                        <div class="empty-state">
+
+                                            <i class="fa-solid fa-circle-xmark"></i>
+
+                                            <strong>
+                                                لا توجد مقالات مرفوضة
+                                            </strong>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 AUTHORS
+            ================================================== -->
+
+            <section class="admin-section"
+                     id="authors">
+
+
+                <div class="section-intro">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            CONTRIBUTORS
+                        </span>
+
+                        <h2>
+                            الكتّاب والمتطوعون
+                        </h2>
+
+                        <p>
+                            إدارة أعضاء الفريق الذين يساهمون في المحتوى.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="admin-card">
+
+                    <div class="empty-state large">
+
+                        <i class="fa-solid fa-users"></i>
+
+                        <strong>
+                            إدارة الفريق قيد التطوير
+                        </strong>
+
+                        <span>
+                            سيتم ربط هذه الصفحة لاحقاً بقاعدة بيانات أعضاء MedLife.
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 SETTINGS
+            ================================================== -->
+
+            <section class="admin-section"
+                     id="settings">
+
+
+                <div class="section-intro">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            SYSTEM SETTINGS
+                        </span>
+
+                        <h2>
+                            إعدادات النظام
+                        </h2>
+
+                        <p>
+                            إعدادات لوحة التحكم والمحتوى.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-grid">
+
+
+                    <div class="settings-card">
+
+                        <div class="settings-icon">
+
+                            <i class="fa-solid fa-language"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                لغة لوحة التحكم
+                            </h3>
+
+                            <p>
+                                العربية هي اللغة الافتراضية حالياً.
+                            </p>
+
+                        </div>
+
+                        <span class="settings-status">
+                            العربية
+                        </span>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="settings-icon">
+
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                صلاحيات الإدارة
+                            </h3>
+
+                            <p>
+                                نظام الصلاحيات سيتم ربطه بالمصادقة لاحقاً.
+                            </p>
+
+                        </div>
+
+                        <span class="settings-status">
+                            قيد التطوير
+                        </span>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="settings-icon">
+
+                            <i class="fa-solid fa-database"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                قاعدة البيانات
+                            </h3>
+
+                            <p>
+                                سيتم ربط المقالات بقاعدة البيانات في المرحلة التالية.
+                            </p>
+
+                        </div>
+
+                        <span class="settings-status">
+                            قيد الإعداد
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+        </main>
+
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="admin-footer">
+
+            <span>
+                © 2026 MedLife Syria
+            </span>
+
+            <span>
+                MedLife Administration System
+            </span>
+
+        </footer>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     ARTICLE REVIEW MODAL
+========================================================= -->
+
+<div class="admin-modal"
+     id="articleModal"
+     aria-hidden="true">
+
+    <div class="admin-modal-box">
+
+
+        <div class="admin-modal-header">
+
+            <div>
+
+                <span>
+                    ARTICLE REVIEW
+                </span>
+
+                <h3 id="modalArticleTitle">
+                    مراجعة المقال
+                </h3>
+
+            </div>
+
+
+            <button type="button"
+                    class="modal-close"
+                    id="closeArticleModal"
+                    aria-label="Close">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <div class="admin-modal-body">
+
+
+            <div class="article-meta-grid">
+
+
+                <div>
+
+                    <span>
+                        الكاتب
+                    </span>
+
+                    <strong id="modalArticleAuthor">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        التصنيف
+                    </span>
+
+                    <strong id="modalArticleCategory">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        تاريخ الإرسال
+                    </span>
+
+                    <strong id="modalArticleDate">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        الحالة
+                    </span>
+
+                    <strong id="modalArticleStatus">
+                        —
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="article-preview-content">
+
+                <h4>
+                    محتوى المقال
+                </h4>
+
+                <div id="modalArticleContent">
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="rejection-box"
+                 id="rejectionBox">
+
+                <label for="rejectionReason">
+                    سبب الرفض
+                </label>
+
+                <textarea id="rejectionReason"
+                          rows="4"
+                          placeholder="اكتب سبب رفض المقال ليتم إرساله إلى الكاتب..."></textarea>
+
+            </div>
+
+        </div>
+
+
+        <div class="admin-modal-footer">
+
+
+            <button type="button"
+                    class="modal-btn secondary"
+                    id="modalCloseBtn">
+
+                إغلاق
+
+            </button>
+
+
+            <button type="button"
+                    class="modal-btn danger"
+                    id="rejectArticleBtn">
+
+                <i class="fa-solid fa-xmark"></i>
+
+                رفض المقال
+
+            </button>
+
+
+            <button type="button"
+                    class="modal-btn success"
+                    id="approveArticleBtn">
+
+                <i class="fa-solid fa-check"></i>
+
+                الموافقة والنشر
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     CONFIRMATION MODAL
+========================================================= -->
+
+<div class="admin-confirm-modal"
+     id="confirmModal"
+     aria-hidden="true">
+
+    <div class="confirm-box">
+
+        <div class="confirm-icon">
+
+            <i class="fa-solid fa-circle-question"></i>
+
+        </div>
+
+        <h3 id="confirmTitle">
+            تأكيد العملية
+        </h3>
+
+        <p id="confirmMessage">
+            هل أنت متأكد من تنفيذ هذه العملية؟
+        </p>
+
+
+        <div class="confirm-actions">
+
+            <button type="button"
+                    class="modal-btn secondary"
+                    id="cancelConfirm">
+
+                إلغاء
+
+            </button>
+
+            <button type="button"
+                    class="modal-btn success"
+                    id="confirmAction">
+
+                تأكيد
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     TOAST NOTIFICATION
+========================================================= -->
+
+<div class="admin-toast"
+     id="adminToast"
+     role="status"
+     aria-live="polite">
+
+    <div class="toast-icon">
+
+        <i class="fa-solid fa-check"></i>
+
+    </div>
+
+    <div class="toast-content">
+
+        <strong id="toastTitle">
+            تم بنجاح
+        </strong>
+
+        <span id="toastMessage">
+            تمت العملية بنجاح.
+        </span>
+
+    </div>
+
+    <button type="button"
+            id="closeToast"
+            aria-label="Close notification">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </button>
+
+</div>
+
+
+
+<!-- =========================================================
+     ADMIN JAVASCRIPT
+========================================================= -->
+
+<script src="js/admin.js"></script>
+
+
+</body>
+
+</html>
