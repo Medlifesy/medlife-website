@@ -287,6 +287,58 @@
             background: #e0efed;
         }
 
+        .review-button {
+            background: #eef3f7;
+            color: var(--secondary);
+        }
+
+        .approve-button {
+            background: var(--success);
+            color: white;
+        }
+
+        .approve-button:hover {
+            background: #157347;
+        }
+
+        .reject-button {
+            background: #fdecec;
+            color: var(--danger);
+        }
+
+        .reject-button:hover {
+            background: #f9d8d8;
+        }
+
+        .article-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .article-actions button {
+            padding: 9px 14px;
+            font-size: 13px;
+        }
+
+        .article-content-preview {
+            display: none;
+            margin-top: 16px;
+            padding: 18px;
+            border-radius: 10px;
+            background: #f7fbfa;
+            border: 1px solid var(--border);
+            line-height: 1.9;
+            white-space: pre-wrap;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .article-content-preview.open {
+            display: block;
+        }
+
         /* =========================
            MESSAGE
         ========================= */
@@ -1088,6 +1140,30 @@ async function loadArticles() {
 
                             </div>
 
+                            <div class="article-actions">
+
+                                <button type="button" class="review-button" onclick="toggleArticle(${article.id})">
+                                    👁️ مراجعة المقال
+                                </button>
+
+                                ${status === "pending" ? `
+                                    <button type="button" class="approve-button" onclick="approveArticle(${article.id})">
+                                        ✅ موافقة ونشر
+                                    </button>
+
+                                    <button type="button" class="reject-button" onclick="rejectArticle(${article.id})">
+                                        ❌ رفض
+                                    </button>
+                                ` : ""}
+
+                            </div>
+
+                            <div id="article-content-${article.id}" class="article-content-preview">
+                                <strong>محتوى المقال:</strong>
+                                <br><br>
+                                ${escapeHtml(article.content_ar || "لا يوجد محتوى.")}
+                            </div>
+
                         </div>
 
                         <span class="status ${status}">
@@ -1130,6 +1206,111 @@ async function loadArticles() {
 // =====================================================
 // STATUS TEXT
 // =====================================================
+
+function toggleArticle(id) {
+
+    const content =
+        document.getElementById(`article-content-${id}`);
+
+    if (!content) return;
+
+    content.classList.toggle("open");
+}
+
+
+async function approveArticle(id) {
+
+    const confirmed =
+        confirm("هل أنت متأكد من الموافقة على هذا المقال ونشره؟");
+
+    if (!confirmed) return;
+
+    try {
+
+        const response = await fetch("/api/articles", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: id,
+                status: "published"
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.error || "تعذر نشر المقال."
+            );
+        }
+
+        message.className = "message success";
+        message.textContent = "تمت الموافقة على المقال ونشره بنجاح.";
+
+        loadArticles();
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.className = "message error";
+        message.textContent =
+            error.message || "حدث خطأ أثناء نشر المقال.";
+    }
+}
+
+
+async function rejectArticle(id) {
+
+    const reason = prompt(
+        "اكتب سبب رفض المقال:"
+    );
+
+    if (reason === null) return;
+
+    if (!reason.trim()) {
+        alert("يرجى كتابة سبب الرفض.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch("/api/articles", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: id,
+                status: "rejected",
+                rejection_reason: reason.trim()
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.error || "تعذر رفض المقال."
+            );
+        }
+
+        message.className = "message success";
+        message.textContent = "تم رفض المقال وحفظ سبب الرفض.";
+
+        loadArticles();
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.className = "message error";
+        message.textContent =
+            error.message || "حدث خطأ أثناء رفض المقال.";
+    }
+}
 
 function statusText(status) {
 
