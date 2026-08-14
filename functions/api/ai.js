@@ -4,12 +4,19 @@
  * Endpoint:
  * POST /api/ai
  *
- * The OpenAI API key is stored securely in Cloudflare
- * as the secret:
+ * Supported actions:
+ *
+ * 1. chat
+ *    General MedLife AI assistant.
+ *
+ * 2. format_article
+ *    Format and improve a submitted medical article.
+ *
+ * Required Cloudflare Secret:
  *
  * OPENAI_API_KEY
  *
- * Optional variable:
+ * Optional Cloudflare variable:
  *
  * OPENAI_MODEL
  */
@@ -26,37 +33,15 @@ export async function onRequestPost(context) {
 
         const body = await request.json();
 
-        const message =
-            typeof body.message === "string"
-                ? body.message.trim()
-                : "";
+        const action =
+            typeof body.action === "string"
+                ? body.action.trim().toLowerCase()
+                : "chat";
 
         const language =
             body.language === "en"
                 ? "en"
                 : "ar";
-
-        const history =
-            Array.isArray(body.history)
-                ? body.history
-                : [];
-
-
-        /* =====================================================
-           VALIDATION
-        ===================================================== */
-
-        if (!message) {
-
-            return jsonResponse(
-                {
-                    success: false,
-                    error: "Message is required."
-                },
-                400
-            );
-        }
-
 
         if (!env.OPENAI_API_KEY) {
 
@@ -85,10 +70,458 @@ export async function onRequestPost(context) {
 
 
         /* =====================================================
-           MEDLIFE SYSTEM PROMPT
+           FORMAT ARTICLE
         ===================================================== */
 
-        const systemPrompt = `
+        if (action === "format_article") {
+
+            return await formatArticle(
+                body,
+                env,
+                model,
+                language
+            );
+        }
+
+
+        /* =====================================================
+           GENERAL CHAT
+        ===================================================== */
+
+        return await chatWithAI(
+            body,
+            env,
+            model,
+            language
+        );
+
+    } catch (error) {
+
+        console.error(
+            "MedLife AI error:",
+            error
+        );
+
+        return jsonResponse(
+            {
+                success: false,
+                error:
+                    "Internal server error."
+            },
+            500
+        );
+    }
+}
+
+
+/* =========================================================
+   FORMAT ARTICLE
+========================================================= */
+
+async function formatArticle(
+    body,
+    env,
+    model,
+    language
+) {
+
+    /*
+     * The article can be sent in:
+     *
+     * body.article
+     *
+     * or:
+     *
+     * body.message
+     */
+
+    const article =
+        typeof body.article === "string"
+            ? body.article.trim()
+            : typeof body.message === "string"
+                ? body.message.trim()
+                : "";
+
+
+    if (!article) {
+
+        return jsonResponse(
+            {
+                success: false,
+                error:
+                    "Article content is required."
+            },
+            400
+        );
+    }
+
+
+    /*
+     * Allow considerably longer medical articles
+     * than the normal chat message.
+     *
+     * Keep this limit reasonable to control cost.
+     */
+
+    const articleText =
+        article.slice(0, 50000);
+
+
+    /* =====================================================
+       ARTICLE EDITOR PROMPT
+    ===================================================== */
+
+    const systemPrompt = `
+
+You are MedLife Medical Content Editor.
+
+You are helping MedLife Syria prepare medical and
+health-awareness articles for publication on the official
+MedLife website.
+
+Your task is EDITORIAL, not authorship.
+
+You must preserve the author's meaning and factual claims.
+
+=========================================================
+CORE RULES
+=========================================================
+
+1. Do not invent medical facts.
+
+2. Do not invent statistics.
+
+3. Do not invent references.
+
+4. Do not invent drug doses.
+
+5. Do not invent diagnoses.
+
+6. Do not add medical claims that are not supported
+   by the submitted article.
+
+7. Do not remove important safety warnings.
+
+8. Preserve scientific terminology where appropriate.
+
+9. Improve grammar, spelling, punctuation and readability.
+
+10. Make the article easier for the general public to read.
+
+11. Keep the author's professional tone.
+
+12. Do not make the article sound like advertising.
+
+13. Keep medical uncertainty when the source text
+    expresses uncertainty.
+
+14. Do not fabricate evidence if a statement looks doubtful.
+
+15. If a statement appears potentially inaccurate,
+    keep it only when necessary for faithful editing,
+    but add it to "editor_notes" so a human reviewer
+    can verify it.
+
+16. Preserve the references provided by the author.
+
+17. Never invent a DOI, URL, journal, guideline,
+    author or publication.
+
+18. Do not write personalized medical advice.
+
+19. Add a brief general medical disclaimer only when
+    appropriate for a public-facing health article.
+
+=========================================================
+ARTICLE STRUCTURE
+=========================================================
+
+Create:
+
+- title
+- excerpt
+- introduction
+- sections
+- conclusion
+- references
+- editor_notes
+- image_prompts
+
+The sections should be logical and easy to scan.
+
+Use clear Arabic headings when the article is Arabic.
+
+Do not over-fragment the article.
+
+=========================================================
+IMAGE PROMPTS
+=========================================================
+
+Suggest up to 5 useful images.
+
+Each image prompt must:
+
+- be medically appropriate
+- be visually clear
+- not contain patient-identifiable information
+- not portray a real identifiable person
+- be suitable for a professional medical website
+- avoid sensational or frightening imagery
+
+For each image provide:
+
+- placement
+- purpose
+- prompt
+
+Suggested placement values:
+
+cover
+section
+warning
+treatment
+prevention
+
+=========================================================
+LANGUAGE
+=========================================================
+
+Preferred language:
+
+${language === "en" ? "English" : "Arabic"}
+
+=========================================================
+OUTPUT FORMAT
+=========================================================
+
+Return ONLY valid JSON.
+
+Do not use markdown fences.
+
+Use exactly this structure:
+
+{
+  "title": "",
+  "excerpt": "",
+  "introduction": "",
+  "sections": [
+    {
+      "heading": "",
+      "content": ""
+    }
+  ],
+  "conclusion": "",
+  "references": [
+    ""
+  ],
+  "editor_notes": [
+    ""
+  ],
+  "image_prompts": [
+    {
+      "placement": "cover",
+      "purpose": "",
+      "prompt": ""
+    }
+  ]
+}
+
+=========================================================
+IMPORTANT
+=========================================================
+
+The human MedLife editorial reviewer makes the final
+decision about publication.
+
+Never change the article status yourself.
+
+`;
+
+
+    const messages = [
+
+        {
+            role: "developer",
+            content:
+                systemPrompt
+        },
+
+        {
+            role: "user",
+            content:
+                articleText
+        }
+
+    ];
+
+
+    /* =====================================================
+       OPENAI REQUEST
+    ===================================================== */
+
+    const openAIResponse =
+        await fetch(
+            "https://api.openai.com/v1/responses",
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "Authorization":
+                        `Bearer ${env.OPENAI_API_KEY}`
+
+                },
+
+                body: JSON.stringify({
+
+                    model: model,
+
+                    input: messages,
+
+                    max_output_tokens:
+                        12000
+
+                })
+
+            }
+        );
+
+
+    const result =
+        await openAIResponse.json();
+
+
+    if (!openAIResponse.ok) {
+
+        console.error(
+            "OpenAI article formatting error:",
+            result
+        );
+
+        return jsonResponse(
+            {
+                success: false,
+                error:
+                    "The AI service returned an error."
+            },
+            502
+        );
+    }
+
+
+    const rawAnswer =
+        extractOutputText(
+            result
+        );
+
+
+    if (!rawAnswer) {
+
+        console.error(
+            "OpenAI returned no article formatting result:",
+            result
+        );
+
+        return jsonResponse(
+            {
+                success: false,
+                error:
+                    "No AI response was returned."
+            },
+            502
+        );
+    }
+
+
+    /* =====================================================
+       PARSE JSON
+    ===================================================== */
+
+    const formattedArticle =
+        parseJSONResponse(
+            rawAnswer
+        );
+
+
+    if (!formattedArticle) {
+
+        console.error(
+            "Could not parse AI article JSON:",
+            rawAnswer
+        );
+
+        return jsonResponse(
+            {
+                success: false,
+                error:
+                    "The AI returned an invalid article format."
+            },
+            502
+        );
+    }
+
+
+    return jsonResponse({
+
+        success: true,
+
+        action:
+            "format_article",
+
+        article:
+            sanitizeFormattedArticle(
+                formattedArticle
+            )
+
+    });
+
+}
+
+
+/* =========================================================
+   GENERAL CHAT
+========================================================= */
+
+async function chatWithAI(
+    body,
+    env,
+    model,
+    language
+) {
+
+    const message =
+        typeof body.message === "string"
+            ? body.message.trim()
+            : "";
+
+    const history =
+        Array.isArray(body.history)
+            ? body.history
+            : [];
+
+
+    if (!message) {
+
+        return jsonResponse(
+            {
+                success: false,
+                error:
+                    "Message is required."
+            },
+            400
+        );
+    }
+
+
+    /* =====================================================
+       MEDLIFE SYSTEM PROMPT
+    ===================================================== */
+
+    const systemPrompt = `
 
 You are MedLife AI, the official AI assistant for MedLife Syria.
 
@@ -206,203 +639,403 @@ IMPORTANT RULES
 `;
 
 
-        /* =====================================================
-           BUILD CONVERSATION
-        ===================================================== */
+    /* =====================================================
+       BUILD CONVERSATION
+    ===================================================== */
 
-        const messages = [
+    const messages = [
 
-            {
-                role: "developer",
-                content: systemPrompt
-            }
+        {
+            role: "developer",
+            content:
+                systemPrompt
+        }
 
-        ];
+    ];
 
 
-        /*
-         * Keep only recent messages.
-         * This keeps requests smaller and controls costs.
-         */
+    for (
+        const item of history.slice(-10)
+    ) {
 
-        for (
-            const item of history.slice(-10)
+        if (
+            !item ||
+            typeof item.content !== "string"
         ) {
-
-            if (
-                !item ||
-                typeof item.content !== "string"
-            ) {
-                continue;
-            }
-
-
-            const role =
-                item.role === "assistant"
-                    ? "assistant"
-                    : "user";
-
-
-            messages.push({
-
-                role: role,
-
-                content:
-                    item.content.slice(0, 5000)
-
-            });
+            continue;
         }
 
 
-        /*
-         * Add current user message.
-         */
+        const role =
+            item.role === "assistant"
+                ? "assistant"
+                : "user";
+
 
         messages.push({
 
-            role: "user",
+            role:
+                role,
 
             content:
-                message.slice(0, 5000)
+                item.content.slice(0, 5000)
 
         });
 
+    }
 
-        /* =====================================================
-           OPENAI REQUEST
-        ===================================================== */
 
-        const openAIResponse =
-            await fetch(
-                "https://api.openai.com/v1/responses",
-                {
+    messages.push({
 
-                    method: "POST",
+        role:
+            "user",
 
-                    headers: {
+        content:
+            message.slice(0, 5000)
 
-                        "Content-Type":
-                            "application/json",
+    });
 
-                        "Authorization":
-                            `Bearer ${env.OPENAI_API_KEY}`
 
-                    },
+    /* =====================================================
+       OPENAI REQUEST
+    ===================================================== */
 
-                    body: JSON.stringify({
+    const openAIResponse =
+        await fetch(
+            "https://api.openai.com/v1/responses",
+            {
 
-                        model: model,
+                method:
+                    "POST",
 
-                        input: messages,
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "Authorization":
+                        `Bearer ${env.OPENAI_API_KEY}`
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        model:
+                            model,
+
+                        input:
+                            messages,
 
                         max_output_tokens:
                             700
 
                     })
 
-                }
-            );
+            }
+        );
 
 
-        /* =====================================================
-           OPENAI RESPONSE
-        ===================================================== */
-
-        const result =
-            await openAIResponse.json();
+    const result =
+        await openAIResponse.json();
 
 
-        if (!openAIResponse.ok) {
-
-            console.error(
-                "OpenAI API error:",
-                result
-            );
-
-
-            return jsonResponse(
-
-                {
-                    success: false,
-
-                    error:
-                        "The AI service returned an error."
-                },
-
-                502
-
-            );
-        }
-
-
-        /* =====================================================
-           EXTRACT TEXT
-        ===================================================== */
-
-        const answer =
-            extractOutputText(
-                result
-            );
-
-
-        if (!answer) {
-
-            console.error(
-                "OpenAI returned no text:",
-                result
-            );
-
-
-            return jsonResponse(
-
-                {
-                    success: false,
-
-                    error:
-                        "No AI response was returned."
-                },
-
-                502
-
-            );
-        }
-
-
-        /* =====================================================
-           SUCCESS
-        ===================================================== */
-
-        return jsonResponse({
-
-            success: true,
-
-            answer:
-                answer
-
-        });
-
-
-    } catch (error) {
+    if (!openAIResponse.ok) {
 
         console.error(
-            "MedLife AI error:",
-            error
+            "OpenAI API error:",
+            result
         );
 
 
         return jsonResponse(
-
             {
                 success: false,
-
                 error:
-                    "Internal server error."
+                    "The AI service returned an error."
             },
-
-            500
-
+            502
         );
     }
+
+
+    const answer =
+        extractOutputText(
+            result
+        );
+
+
+    if (!answer) {
+
+        console.error(
+            "OpenAI returned no text:",
+            result
+        );
+
+
+        return jsonResponse(
+            {
+                success: false,
+                error:
+                    "No AI response was returned."
+            },
+            502
+        );
+    }
+
+
+    return jsonResponse({
+
+        success:
+            true,
+
+        answer:
+            answer
+
+    });
+
+}
+
+
+/* =========================================================
+   PARSE JSON RESPONSE
+========================================================= */
+
+function parseJSONResponse(
+    text
+) {
+
+    let cleaned =
+        String(
+            text || ""
+        ).trim();
+
+
+    /*
+     * Remove accidental markdown fences.
+     */
+
+    cleaned =
+        cleaned.replace(
+            /^```json\s*/i,
+            ""
+        );
+
+    cleaned =
+        cleaned.replace(
+            /^```\s*/i,
+            ""
+        );
+
+    cleaned =
+        cleaned.replace(
+            /\s*```$/i,
+            ""
+        );
+
+
+    /*
+     * Find the outer JSON object if the model
+     * accidentally added a small amount of text.
+     */
+
+    const firstBrace =
+        cleaned.indexOf("{");
+
+    const lastBrace =
+        cleaned.lastIndexOf("}");
+
+
+    if (
+        firstBrace !== -1 &&
+        lastBrace !== -1 &&
+        lastBrace > firstBrace
+    ) {
+
+        cleaned =
+            cleaned.slice(
+                firstBrace,
+                lastBrace + 1
+            );
+    }
+
+
+    try {
+
+        const parsed =
+            JSON.parse(
+                cleaned
+            );
+
+
+        if (
+            !parsed ||
+            typeof parsed !== "object"
+        ) {
+
+            return null;
+        }
+
+
+        return parsed;
+
+    } catch (error) {
+
+        return null;
+    }
+
+}
+
+
+/* =========================================================
+   SANITIZE FORMATTED ARTICLE
+========================================================= */
+
+function sanitizeFormattedArticle(
+    article
+) {
+
+    const safeArticle =
+        article &&
+        typeof article === "object"
+            ? article
+            : {};
+
+
+    const sections =
+        Array.isArray(
+            safeArticle.sections
+        )
+            ? safeArticle.sections
+            : [];
+
+
+    const references =
+        Array.isArray(
+            safeArticle.references
+        )
+            ? safeArticle.references
+            : [];
+
+
+    const editorNotes =
+        Array.isArray(
+            safeArticle.editor_notes
+        )
+            ? safeArticle.editor_notes
+            : [];
+
+
+    const imagePrompts =
+        Array.isArray(
+            safeArticle.image_prompts
+        )
+            ? safeArticle.image_prompts
+            : [];
+
+
+    return {
+
+        title:
+            cleanOutput(
+                safeArticle.title
+            ),
+
+        excerpt:
+            cleanOutput(
+                safeArticle.excerpt
+            ),
+
+        introduction:
+            cleanOutput(
+                safeArticle.introduction
+            ),
+
+        sections:
+            sections
+                .slice(0, 30)
+                .map(section => ({
+                    heading:
+                        cleanOutput(
+                            section?.heading
+                        ),
+
+                    content:
+                        cleanOutput(
+                            section?.content
+                        )
+                }))
+                .filter(
+                    section =>
+                        section.heading ||
+                        section.content
+                ),
+
+        conclusion:
+            cleanOutput(
+                safeArticle.conclusion
+            ),
+
+        references:
+            references
+                .slice(0, 100)
+                .map(
+                    item =>
+                        cleanOutput(item)
+                )
+                .filter(Boolean),
+
+        editor_notes:
+            editorNotes
+                .slice(0, 30)
+                .map(
+                    item =>
+                        cleanOutput(item)
+                )
+                .filter(Boolean),
+
+        image_prompts:
+            imagePrompts
+                .slice(0, 5)
+                .map(image => ({
+                    placement:
+                        cleanOutput(
+                            image?.placement
+                        ),
+
+                    purpose:
+                        cleanOutput(
+                            image?.purpose
+                        ),
+
+                    prompt:
+                        cleanOutput(
+                            image?.prompt
+                        )
+                }))
+                .filter(
+                    image =>
+                        image.prompt
+                )
+
+    };
+
+}
+
+
+/* =========================================================
+   CLEAN OUTPUT
+========================================================= */
+
+function cleanOutput(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+    .trim();
+
 }
 
 
@@ -410,7 +1043,9 @@ IMPORTANT RULES
    EXTRACT OUTPUT TEXT
 ========================================================= */
 
-function extractOutputText(data) {
+function extractOutputText(
+    data
+) {
 
     /*
      * First try output_text.
@@ -431,7 +1066,9 @@ function extractOutputText(data) {
      */
 
     if (
-        Array.isArray(data.output)
+        Array.isArray(
+            data.output
+        )
     ) {
 
         const parts = [];
@@ -469,6 +1106,7 @@ function extractOutputText(data) {
                     parts.push(
                         part.text
                     );
+
                 }
 
             }
@@ -479,10 +1117,12 @@ function extractOutputText(data) {
         return parts
             .join("\n")
             .trim();
+
     }
 
 
     return "";
+
 }
 
 
@@ -498,12 +1138,15 @@ function jsonResponse(
     return new Response(
 
         JSON.stringify(
-            data
+            data,
+            null,
+            2
         ),
 
         {
 
-            status: status,
+            status:
+                status,
 
             headers: {
 
@@ -518,4 +1161,5 @@ function jsonResponse(
         }
 
     );
+
 }
