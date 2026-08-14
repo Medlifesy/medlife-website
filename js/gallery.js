@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showLoading();
 
-
         try {
 
             const response =
@@ -51,10 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 );
 
-
             const data =
                 await response.json();
-
 
             if (
                 !response.ok ||
@@ -67,25 +64,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-
             galleryImages =
                 Array.isArray(data.images)
                     ? data.images
                     : [];
-
 
             if (
                 galleryImages.length === 0
             ) {
 
                 showEmpty();
-
                 return;
             }
 
-
             renderGallery();
-
 
         } catch (error) {
 
@@ -93,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 "MedLife Gallery:",
                 error
             );
-
 
             showError();
         }
@@ -108,28 +99,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         photoTrack.innerHTML = "";
 
-
         galleryImages.forEach(
             image => {
 
                 photoTrack.appendChild(
-                    createPhotoCard(
-                        image
-                    )
+                    createPhotoCard(image)
                 );
 
             }
         );
 
-
         galleryImages.forEach(
             image => {
 
                 photoTrack.appendChild(
-                    createPhotoCard(
-                        image,
-                        true
-                    )
+                    createPhotoCard(image, true)
                 );
 
             }
@@ -147,81 +131,37 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
 
         const card =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
-
-        card.className =
-            "photo-card";
-
+        card.className = "photo-card";
 
         const img =
-            document.createElement(
-                "img"
-            );
+            document.createElement("img");
 
-
-        img.src =
-            image.url;
-
-
-        img.alt =
-            "MedLife";
-
-
-        img.decoding =
-            "async";
-
-
-        img.loading =
-            duplicate
-                ? "lazy"
-                : "eager";
-
+        img.src = image.url;
+        img.alt = "MedLife";
+        img.decoding = "async";
+        img.loading = duplicate ? "lazy" : "eager";
 
         img.onerror = () => {
-
             card.remove();
-
         };
 
-
-        card.appendChild(
-            img
-        );
-
+        card.appendChild(img);
 
         card.addEventListener(
             "click",
             () => {
-
-                openLightbox(
-                    image.url,
-                    image.name
-                );
-
+                openLightbox(image.url, image.name);
             }
         );
 
-
-        card.setAttribute(
-            "tabindex",
-            "0"
-        );
-
-
-        card.setAttribute(
-            "role",
-            "button"
-        );
-
-
+        card.setAttribute("tabindex", "0");
+        card.setAttribute("role", "button");
         card.setAttribute(
             "aria-label",
             "فتح صورة ميدلايف"
         );
-
 
         card.addEventListener(
             "keydown",
@@ -233,16 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 ) {
 
                     event.preventDefault();
-
-                    openLightbox(
-                        image.url,
-                        image.name
-                    );
+                    openLightbox(image.url, image.name);
                 }
 
             }
         );
-
 
         return card;
     }
@@ -258,26 +193,15 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
 
         let lightbox =
-            document.getElementById(
-                "galleryLightbox"
-            );
-
+            document.getElementById("galleryLightbox");
 
         if (!lightbox) {
 
             lightbox =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
-
-            lightbox.id =
-                "galleryLightbox";
-
-
-            lightbox.className =
-                "gallery-lightbox";
-
+            lightbox.id = "galleryLightbox";
+            lightbox.className = "gallery-lightbox";
 
             lightbox.innerHTML = `
 
@@ -288,11 +212,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         id="galleryClose"
                         type="button"
                         aria-label="Close">
-
                         ×
-
                     </button>
-
 
                     <img
                         id="galleryPreview"
@@ -308,33 +229,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             `;
 
-
-            document.body.appendChild(
-                lightbox
-            );
-
+            document.body.appendChild(lightbox);
 
             const closeButton =
-                document.getElementById(
-                    "galleryClose"
-                );
-
+                document.getElementById("galleryClose");
 
             closeButton.addEventListener(
                 "click",
                 closeLightbox
             );
 
-
             lightbox.addEventListener(
                 "click",
                 event => {
 
-                    if (
-                        event.target ===
-                        lightbox
-                    ) {
-
+                    if (event.target === lightbox) {
                         closeLightbox();
                     }
 
@@ -342,46 +251,21 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
-
         const preview =
-            document.getElementById(
-                "galleryPreview"
-            );
-
+            document.getElementById("galleryPreview");
 
         const caption =
-            document.getElementById(
-                "galleryCaption"
-            );
+            document.getElementById("galleryCaption");
 
+        preview.src = imageUrl;
+        preview.alt = imageName || "MedLife Photo";
 
-        preview.src =
-            imageUrl;
-
-
-        preview.alt =
-            imageName ||
-            "MedLife Photo";
-
-
-        if (
-            caption &&
-            imageName
-        ) {
-
-            caption.textContent =
-                imageName;
+        if (caption && imageName) {
+            caption.textContent = imageName;
         }
 
-
-        lightbox.classList.add(
-            "active"
-        );
-
-
-        document.body.classList.add(
-            "ai-open"
-        );
+        lightbox.classList.add("active");
+        document.body.classList.add("ai-open");
     }
 
 
@@ -392,50 +276,29 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeLightbox() {
 
         const lightbox =
-            document.getElementById(
-                "galleryLightbox"
-            );
-
+            document.getElementById("galleryLightbox");
 
         const preview =
-            document.getElementById(
-                "galleryPreview"
-            );
-
+            document.getElementById("galleryPreview");
 
         const caption =
-            document.getElementById(
-                "galleryCaption"
-            );
-
+            document.getElementById("galleryCaption");
 
         if (!lightbox) {
             return;
         }
 
-
-        lightbox.classList.remove(
-            "active"
-        );
-
+        lightbox.classList.remove("active");
 
         if (preview) {
-
-            preview.src =
-                "";
+            preview.src = "";
         }
-
 
         if (caption) {
-
-            caption.textContent =
-                "";
+            caption.textContent = "";
         }
 
-
-        document.body.classList.remove(
-            "ai-open"
-        );
+        document.body.classList.remove("ai-open");
     }
 
 
@@ -449,9 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <div class="gallery-loading">
 
-                <i
-                    class="fa-solid fa-spinner fa-spin">
-                </i>
+                <i class="fa-solid fa-spinner fa-spin"></i>
 
                 <span>
                     جاري تحميل صور ميدلايف...
@@ -495,9 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <div class="gallery-empty">
 
-                <i
-                    class="fa-solid fa-circle-exclamation">
-                </i>
+                <i class="fa-solid fa-circle-exclamation"></i>
 
                 <span>
                     تعذر تحميل صور ميدلايف حالياً.
@@ -566,7 +425,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </p>
 
                 <a
-                    href="article.html"
+                    href="article.html?slug=tension-headache"
                     class="article-link"
                 >
                     اقرأ المقال ←
@@ -591,10 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "keydown",
         event => {
 
-            if (
-                event.key === "Escape"
-            ) {
-
+            if (event.key === "Escape") {
                 closeLightbox();
             }
 
