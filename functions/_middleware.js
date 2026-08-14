@@ -2,7 +2,11 @@ export async function onRequest(context) {
     const response = await context.next();
     const url = new URL(context.request.url);
 
-    if (url.pathname !== "/" && url.pathname !== "/index.html") {
+    if (![
+        "/",
+        "/index.html",
+        "/articles.html"
+    ].includes(url.pathname)) {
         return response;
     }
 
@@ -30,18 +34,23 @@ export async function onRequest(context) {
         })
         .on("body", {
             element(element) {
-                element.append(
-                    '<script src="/js/members.js" defer></script>',
-                    { html: true }
-                );
-                element.append(
-                    '<script src="/js/home-enhancements.js" defer></script>',
-                    { html: true }
-                );
-                element.append(
-                    '<script src="/js/home-articles-cleanup.js" defer></script>',
-                    { html: true }
-                );
+                if (url.pathname === "/" || url.pathname === "/index.html") {
+                    element.append(
+                        '<script src="/js/members.js" defer></script>',
+                        { html: true }
+                    );
+                    element.append(
+                        '<script src="/js/home-enhancements.js" defer></script>',
+                        { html: true }
+                    );
+                }
+
+                if (url.pathname === "/articles.html") {
+                    element.append(
+                        '<script src="/js/articles.js?v=20260814" defer></script>',
+                        { html: true }
+                    );
+                }
             }
         })
         .transform(response);
