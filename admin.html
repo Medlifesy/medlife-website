@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MedLife Admin - إدارة المقالات</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7f9;
+            color: #1f2937;
+        }
+
+        header {
+            background: #0f766e;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #0f766e;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 8px;
+            background: #0f766e;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #115e59;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .article {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 18px;
+            margin-top: 15px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>MedLife</h1>
+    <p>لوحة إدارة المقالات</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>إضافة مقال جديد</h2>
+
+        <form id="articleForm">
+
+            <label>عنوان المقال بالعربية</label>
+            <input
+                type="text"
+                id="title_ar"
+                required
+            >
+
+            <label>عنوان المقال بالإنجليزية</label>
+            <input
+                type="text"
+                id="title_en"
+            >
+
+            <label>اسم الكاتب</label>
+            <input
+                type="text"
+                id="author_name"
+                required
+            >
+
+            <label>البريد الإلكتروني للكاتب</label>
+            <input
+                type="email"
+                id="author_email"
+            >
+
+            <label>التصنيف</label>
+            <select id="category">
+                <option value="">اختر التصنيف</option>
+                <option value="Medical Education">Medical Education</option>
+                <option value="Obstetrics and Gynecology">Obstetrics and Gynecology</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="Public Health">Public Health</option>
+                <option value="Research">Research</option>
+                <option value="General Medicine">General Medicine</option>
+            </select>
+
+            <label>صورة المقال</label>
+            <input
+                type="text"
+                id="image_url"
+                placeholder="رابط الصورة"
+            >
+
+            <label>الملخص بالعربية</label>
+            <textarea
+                id="excerpt_ar"
+                placeholder="اكتب ملخصاً قصيراً للمقال..."
+            ></textarea>
+
+            <label>الملخص بالإنجليزية</label>
+            <textarea
+                id="excerpt_en"
+            ></textarea>
+
+            <label>محتوى المقال بالعربية</label>
+            <textarea
+                id="content_ar"
+                required
+                placeholder="اكتب محتوى المقال هنا..."
+            ></textarea>
+
+            <label>محتوى المقال بالإنجليزية</label>
+            <textarea
+                id="content_en"
+            ></textarea>
+
+            <button type="submit">
+                إرسال المقال للمراجعة
+            </button>
+
+            <div id="message" class="message"></div>
+
+        </form>
+    </div>
+
+    <div class="card">
+
+        <h2>المقالات الحالية</h2>
+
+        <div id="articles">
+            جاري تحميل المقالات...
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const form = document.getElementById("articleForm");
+const message = document.getElementById("message");
+const articlesContainer = document.getElementById("articles");
+
+
+// =====================================================
+// إرسال مقال
+// =====================================================
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    message.className = "message";
+    message.textContent = "جاري إرسال المقال...";
+
+    try {
+
+        const article = {
+
+            title_ar: document.getElementById("title_ar").value,
+            title_en: document.getElementById("title_en").value,
+
+            content_ar: document.getElementById("content_ar").value,
+            content_en: document.getElementById("content_en").value,
+
+            excerpt_ar: document.getElementById("excerpt_ar").value,
+            excerpt_en: document.getElementById("excerpt_en").value,
+
+            author_name: document.getElementById("author_name").value,
+            author_email: document.getElementById("author_email").value,
+
+            category: document.getElementById("category").value,
+            image_url: document.getElementById("image_url").value
+
+        };
+
+
+        const response = await fetch("/api/articles", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(article)
+
+        });
+
+
+        const data = await response.json();
+
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.error || "حدث خطأ أثناء إرسال المقال."
+            );
+
+        }
+
+
+        message.className = "message success";
+
+        message.textContent =
+            "تم إرسال المقال بنجاح للمراجعة!";
+
+
+        form.reset();
+
+        loadArticles();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        message.className = "message error";
+
+        message.textContent =
+            error.message;
+
+    }
+
+});
+
+
+// =====================================================
+// تحميل المقالات
+// =====================================================
+
+async function loadArticles() {
+
+    try {
+
+        const response =
+            await fetch("/api/articles?admin=1");
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            throw new Error(
+                data.error || "تعذر تحميل المقالات."
+            );
+
+        }
+
+
+        if (!data.articles || data.articles.length === 0) {
+
+            articlesContainer.innerHTML =
+                "<p>لا توجد مقالات حالياً.</p>";
+
+            return;
+
+        }
+
+
+        articlesContainer.innerHTML = "";
+
+
+        data.articles.forEach(article => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "article";
+
+
+            div.innerHTML = `
+
+                <h3>
+                    ${escapeHtml(article.title_ar || "")}
+                </h3>
+
+                <p>
+                    <strong>الكاتب:</strong>
+                    ${escapeHtml(article.author_name || "")}
+                </p>
+
+                <p>
+                    <strong>التصنيف:</strong>
+                    ${escapeHtml(article.category || "-")}
+                </p>
+
+                <span class="status">
+                    ${escapeHtml(article.status || "")}
+                </span>
+
+            `;
+
+
+            articlesContainer.appendChild(div);
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        articlesContainer.innerHTML =
+            "<p>تعذر تحميل المقالات.</p>";
+
+    }
+
+}
+
+
+// =====================================================
+// حماية بسيطة من HTML
+// =====================================================
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// تشغيل تحميل المقالات
+
+loadArticles();
+
+</script>
+
+</body>
+</html>
