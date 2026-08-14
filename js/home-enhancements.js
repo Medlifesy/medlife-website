@@ -1,13 +1,11 @@
 /* =========================================================
    MEDLIFE HOMEPAGE ENHANCEMENTS
-   Independent layer for gallery + feedback + support
+   Single support + feedback section only
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
     ensureStyles();
     ensureSupportAndFeedback();
-    ensureVolunteerShortcut();
-    ensureGalleryFallback();
 });
 
 function ensureStyles() {
@@ -35,8 +33,6 @@ function ensureStyles() {
         .ml-feedback-button{border:0;border-radius:13px;padding:13px 18px;background:#FF2A54;color:#fff;font-family:inherit;font-weight:900;cursor:pointer}
         .ml-feedback-button:disabled{opacity:.65;cursor:wait}
         .ml-feedback-status{display:none;padding:11px 13px;border-radius:12px;font-size:13px}.ml-feedback-status.show{display:block}.ml-feedback-status.success{background:#ECFDF5;color:#047857}.ml-feedback-status.error{background:#FFF1F2;color:#B42318}
-        .ml-gallery-empty-fallback{padding:40px 20px;text-align:center;color:#64748B;width:100%}
-        .ml-volunteer-note{margin-top:15px;font-size:11px;color:#94A3B8}
         @media(max-width:850px){.ml-home-grid{grid-template-columns:1fr}}
         @media(max-width:550px){.ml-feedback-row,.ml-support-methods{grid-template-columns:1fr}.ml-home-enhancements{padding:55px 14px}.ml-home-card{padding:22px}}
     `;
@@ -103,16 +99,6 @@ function ensureSupportAndFeedback() {
                     </form>
                 </div>
             </div>
-
-            <div class="ml-home-card" style="margin-top:22px;text-align:center;">
-                <span class="ml-home-badge"><i class="fa-solid fa-hand-holding-heart"></i> كن جزءاً من الأثر</span>
-                <h2>تطوع معنا</h2>
-                <p>إذا كنت ترغب بالانضمام إلى فريق MedLife، اختر المجال المناسب لك وقدّم طلب الانضمام.</p>
-                <a href="join-us.html" class="ml-feedback-button" style="display:inline-flex;text-decoration:none;align-items:center;justify-content:center;gap:8px;">
-                    <i class="fa-solid fa-people-group"></i> تقديم طلب الانضمام
-                </a>
-                <div class="ml-volunteer-note">كتابة محتوى طبي · تصميم · مونتاج · إعلام مرئي · ميداني · سوشيل ميديا · إعلامي جامعات</div>
-            </div>
         </div>
     `;
 
@@ -162,47 +148,5 @@ async function submitHomepageFeedback(event) {
     } finally {
         submit.disabled = false;
         submit.textContent = "إرسال الرسالة";
-    }
-}
-
-function ensureVolunteerShortcut() {
-    document.querySelectorAll('a[href="#volunteer"], a[href="index.html#volunteer"], a[href="/#volunteer"]').forEach(link => {
-        link.setAttribute("href", "join-us.html");
-    });
-}
-
-async function ensureGalleryFallback() {
-    const track = document.getElementById("photoTrack");
-    if (!track) return;
-
-    const hasImage = track.querySelector("img");
-    if (hasImage) return;
-
-    try {
-        const response = await fetch("/api/gallery", { cache: "no-store" });
-        const data = await response.json();
-        const images = Array.isArray(data.images) ? data.images : [];
-
-        if (!response.ok || !data.success || !images.length) {
-            return;
-        }
-
-        track.innerHTML = "";
-        [...images, ...images].forEach(image => {
-            const card = document.createElement("div");
-            card.className = "photo-card";
-
-            const img = document.createElement("img");
-            img.src = image.url;
-            img.alt = image.name || "MedLife";
-            img.loading = "lazy";
-            img.decoding = "async";
-            img.onerror = () => card.remove();
-
-            card.appendChild(img);
-            track.appendChild(card);
-        });
-    } catch (error) {
-        console.error("Gallery fallback error:", error);
     }
 }
