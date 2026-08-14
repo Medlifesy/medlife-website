@@ -1,0 +1,154 @@
+<form id="articleSubmitForm">
+
+    <div class="form-group">
+        <label for="authorName">
+            اسم الكاتب
+        </label>
+
+        <input
+            type="text"
+            id="authorName"
+            name="author_name"
+            required>
+    </div>
+
+
+    <div class="form-group">
+        <label for="authorEmail">
+            البريد الإلكتروني
+        </label>
+
+        <input
+            type="email"
+            id="authorEmail"
+            name="author_email">
+    </div>
+
+
+    <div class="form-group">
+        <label for="titleAr">
+            عنوان المقال
+        </label>
+
+        <input
+            type="text"
+            id="titleAr"
+            name="title_ar"
+            required>
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="titleEn">
+            English Title
+        </label>
+
+        <input
+            type="text"
+            id="titleEn"
+            name="title_en">
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="category">
+            تصنيف المقال
+        </label>
+
+        <select
+            id="category"
+            name="category"
+            required>
+
+            <option value="health-awareness">
+                توعية صحية
+            </option>
+
+            <option value="medical-education">
+                تعليم طبي
+            </option>
+
+            <option value="research">
+                أبحاث
+            </option>
+
+            <option value="volunteering">
+                تطوع
+            </option>
+
+            <option value="humanitarian">
+                إنساني
+            </option>
+
+            <option value="other">
+                أخرى
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="excerptAr">
+            ملخص المقال
+        </label>
+
+        <textarea
+            id="excerptAr"
+            name="excerpt_ar"
+            rows="4"></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="contentAr">
+            محتوى المقال
+        </label>
+
+        <textarea
+            id="contentAr"
+            name="content_ar"
+            rows="15"
+            required></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="contentEn">
+            English Content
+        </label>
+
+        <textarea
+            id="contentEn"
+            name="content_en"
+            rows="15"></textarea>
+
+    </div>
+
+
+    <button
+        type="submit"
+        class="btn btn-primary">
+
+        <i class="fa-solid fa-paper-plane"></i>
+
+        إرسال المقال للمراجعة
+
+    </button>
+
+
+    <div
+        id="submitMessage"
+        class="submit-message">
+    </div>
+
+</form>
