@@ -6,264 +6,222 @@
  * Endpoint:
  * GET /api/gallery
  *
- * Source:
- * GitHub repository -> images/
- *
- * The API automatically finds image files inside:
+ * Searches recursively inside:
  *
  * /images/
  *
- * No image filenames need to be written in index.html.
+ * It automatically finds images inside:
+ *
+ * images/
+ * images/articles/
+ * images/campaigns/
+ * images/projects/
+ * images/team/
+ * etc.
+ *
+ * No image filenames need to be added to index.html.
  * =========================================================
  */
 
-
 export async function onRequestGet(context) {
 
-    /*
-     * =======================================================
-     * GITHUB REPOSITORY SETTINGS
-     * =======================================================
-     */
-
-    const OWNER =
-        "Medlifesy";
-
-    const REPOSITORY =
-        "medlife-website";
-
-    const BRANCH =
-        "main";
-
-    const IMAGE_FOLDER =
-        "images";
+    const OWNER = "Medlifesy";
+    const REPOSITORY = "medlife-website";
+    const BRANCH = "main";
+    const IMAGE_FOLDER = "images";
 
 
     /*
-     * GitHub Contents API URL
+     * GitHub Git Trees API
+     *
+     * recursive=1 means:
+     * search inside all subfolders.
      */
 
     const githubUrl =
-        `https://api.github.com/repos/${OWNER}/${REPOSITORY}/contents/${IMAGE_FOLDER}?ref=${BRANCH}`;
+        `https://api.github.com/repos/${OWNER}/${REPOSITORY}/git/trees/${BRANCH}?recursive=1`;
 
 
     try {
 
-        /*
-         * ===================================================
-         * REQUEST GITHUB
-         * ===================================================
-         */
+        /* =====================================================
+           REQUEST GITHUB
+        ===================================================== */
 
-        const response =
-            await fetch(
-                githubUrl,
-                {
-                    method: "GET",
+        const response = await fetch(
+            githubUrl,
+            {
+                method: "GET",
 
-                    headers: {
+                headers: {
+                    "Accept":
+                        "application/vnd.github+json",
 
-                        "Accept":
-                            "application/vnd.github+json",
+                    "User-Agent":
+                        "MedLife-Website",
 
-                        "User-Agent":
-                            "MedLife-Website",
-
-                        /*
-                         * Ask GitHub for the latest
-                         * API version.
-                         */
-                        "X-GitHub-Api-Version":
-                            "2022-11-28"
-                    }
+                    "X-GitHub-Api-Version":
+                        "2022-11-28"
                 }
-            );
+            }
+        );
 
-
-        /*
-         * ===================================================
-         * CHECK RESPONSE
-         * ===================================================
-         */
 
         if (!response.ok) {
 
             console.error(
-                "GitHub Gallery API Error:",
+                "GitHub Tree API error:",
                 response.status,
                 response.statusText
             );
 
-
             return jsonResponse(
                 {
                     success: false,
-
                     error:
-                        "Unable to load gallery images."
+                        "Unable to read MedLife gallery."
                 },
-
                 500
             );
         }
 
 
-        /*
-         * ===================================================
-         * PARSE FILE LIST
-         * ===================================================
-         */
-
-        const files =
+        const data =
             await response.json();
 
 
         if (
-            !Array.isArray(files)
+            !Array.isArray(data.tree)
         ) {
 
             return jsonResponse(
                 {
                     success: false,
-
                     error:
-                        "Invalid gallery data."
+                        "Invalid GitHub tree response."
                 },
-
                 500
             );
         }
 
 
-        /*
-         * ===================================================
-         * ALLOWED IMAGE FORMATS
-         * ===================================================
-         */
+        /* =====================================================
+           ALLOWED IMAGE FORMATS
+        ===================================================== */
 
         const allowedExtensions = [
-
             ".jpg",
-
             ".jpeg",
-
             ".png",
-
             ".webp",
-
             ".gif",
-
             ".avif"
-
         ];
 
 
-        /*
-         * ===================================================
-         * FILTER IMAGE FILES
-         * ===================================================
-         */
+        /* =====================================================
+           FIND ALL IMAGES INSIDE /images/
+        ===================================================== */
 
-        const imageFiles =
-            files
-                .filter(file => {
+        const images =
+            data.tree
+                .filter(item => {
 
                     /*
-                     * Only actual files.
+                     * Must be a file.
                      */
                     if (
-                        !file ||
-                        file.type !== "file"
+                        !item ||
+                        item.type !== "blob"
                     ) {
-
                         return false;
                     }
 
 
                     /*
-                     * Get lowercase filename.
+                     * Must be inside images/
                      */
-                    const name =
-                        String(
-                            file.name || ""
-                        ).toLowerCase();
+                    if (
+                        !item.path.startsWith(
+                            `${IMAGE_FOLDER}/`
+                        )
+                    ) {
+                        return false;
+                    }
 
 
                     /*
-                     * Check image extension.
+                     * Check extension.
                      */
+                    const fileName =
+                        item.path.toLowerCase();
+
+
                     return allowedExtensions.some(
                         extension =>
-                            name.endsWith(
+                            fileName.endsWith(
                                 extension
                             )
                     );
 
-                });
-
-
-        /*
-         * ===================================================
-         * BUILD IMAGE DATA
-         * ===================================================
-         */
-
-        const images =
-            imageFiles.map(
-                file => {
+                })
+                .map(item => {
 
                     /*
-                     * Raw GitHub URL.
+                     * Example:
                      *
-                     * encodeURIComponent() protects
-                     * filenames containing spaces or
-                     * special characters.
+                     * images/campaigns/photo.jpg
+                     *
+                     * becomes:
+                     *
+                     * https://raw.githubusercontent.com/
+                     * Medlifesy/medlife-website/main/
+                     * images/campaigns/photo.jpg
+                     *
                      */
 
-                    const encodedFileName =
-                        encodeURIComponent(
-                            file.name
-                        );
+                    const encodedPath =
+                        item.path
+                            .split("/")
+                            .map(
+                                part =>
+                                    encodeURIComponent(
+                                        part
+                                    )
+                            )
+                            .join("/");
 
 
                     const imageUrl =
-                        `https://raw.githubusercontent.com/${OWNER}/${REPOSITORY}/${BRANCH}/${IMAGE_FOLDER}/${encodedFileName}`;
+                        `https://raw.githubusercontent.com/${OWNER}/${REPOSITORY}/${BRANCH}/${encodedPath}`;
 
 
                     return {
 
                         name:
-                            file.name,
+                            item.path
+                                .split("/")
+                                .pop(),
 
                         path:
-                            file.path,
+                            item.path,
 
                         url:
                             imageUrl
 
                     };
 
-                }
-            );
+                });
 
 
-        /*
-         * ===================================================
-         * SORT IMAGES
-         * ===================================================
-         *
-         * Newest/latest-looking files first based on
-         * GitHub file name.
-         *
-         * This is only alphabetical ordering, because
-         * GitHub does not provide upload dates in the
-         * Contents API response.
-         */
+        /* =====================================================
+           SORT
+        ===================================================== */
 
         images.sort(
             (a, b) =>
-                a.name.localeCompare(
-                    b.name,
+                a.path.localeCompare(
+                    b.path,
                     undefined,
                     {
                         numeric: true,
@@ -273,11 +231,9 @@ export async function onRequestGet(context) {
         );
 
 
-        /*
-         * ===================================================
-         * RESPONSE
-         * ===================================================
-         */
+        /* =====================================================
+           RESPONSE
+        ===================================================== */
 
         return jsonResponse({
 
@@ -295,12 +251,6 @@ export async function onRequestGet(context) {
 
     } catch (error) {
 
-        /*
-         * ===================================================
-         * ERROR HANDLING
-         * ===================================================
-         */
-
         console.error(
             "MedLife Gallery Function Error:",
             error
@@ -308,27 +258,21 @@ export async function onRequestGet(context) {
 
 
         return jsonResponse(
-
             {
-                success:
-                    false,
+                success: false,
 
                 error:
                     "Gallery service is temporarily unavailable."
             },
-
             500
-
         );
     }
 }
 
 
-/**
- * =========================================================
- * JSON RESPONSE HELPER
- * =========================================================
- */
+/* =========================================================
+   JSON RESPONSE
+========================================================= */
 
 function jsonResponse(
     data,
@@ -336,15 +280,9 @@ function jsonResponse(
 ) {
 
     return new Response(
-
-        JSON.stringify(
-            data
-        ),
-
+        JSON.stringify(data),
         {
-
-            status:
-                status,
+            status: status,
 
             headers: {
 
@@ -352,16 +290,11 @@ function jsonResponse(
                     "application/json; charset=UTF-8",
 
                 /*
-                 * Cache response for 5 minutes.
-                 *
-                 * This reduces requests to GitHub.
+                 * Cache for 5 minutes.
                  */
                 "Cache-Control":
                     "public, max-age=300"
-
             }
-
         }
-
     );
 }
