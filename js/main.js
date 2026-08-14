@@ -1,13 +1,14 @@
 /* =========================================================
    MEDLIFE SYRIA
    Main JavaScript
-   Version 1.0
+   Version: 1.0
 ========================================================= */
 
 "use strict";
 
+
 /* =========================================================
-   1. DOM READY
+   DOM READY
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -43,32 +44,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const aiInput = document.getElementById("aiInput");
     const aiMessages = document.getElementById("aiMessages");
 
-    const aiSuggestions =
-        document.querySelectorAll(".ai-suggestions button");
-
     const mobileLinks =
         document.querySelectorAll("[data-mobile-link]");
 
     const volunteerTriggers =
         document.querySelectorAll("[data-volunteer-trigger]");
 
-    const revealElements =
-        document.querySelectorAll(".reveal");
+    const languageElements =
+        document.querySelectorAll("[data-ar][data-en]");
+
+    const aiSuggestionButtons =
+        document.querySelectorAll(".ai-suggestions button");
 
 
     /* =====================================================
-       2. LANGUAGE SYSTEM
+       LANGUAGE
     ====================================================== */
 
     let currentLanguage =
-        localStorage.getItem("medlife-language") || "ar";
+        localStorage.getItem("medlifeLanguage") || "ar";
 
 
     function updateLanguage() {
 
         const isArabic = currentLanguage === "ar";
-
-        /* HTML direction */
 
         document.documentElement.lang =
             isArabic ? "ar" : "en";
@@ -77,60 +76,31 @@ document.addEventListener("DOMContentLoaded", () => {
             isArabic ? "rtl" : "ltr";
 
 
-        /* Body language class */
+        /* ---------------------------------------------
+           TEXT CONTENT
+        --------------------------------------------- */
 
-        body.classList.toggle(
-            "language-ar",
-            isArabic
-        );
+        languageElements.forEach(element => {
 
-        body.classList.toggle(
-            "language-en",
-            !isArabic
-        );
+            const arabicText =
+                element.getAttribute("data-ar");
 
+            const englishText =
+                element.getAttribute("data-en");
 
-        /* Change all translated elements */
-
-        const translatedElements =
-            document.querySelectorAll("[data-ar][data-en]");
-
-
-        translatedElements.forEach(element => {
-
-            const translation =
-                isArabic
-                    ? element.dataset.ar
-                    : element.dataset.en;
-
-            if (translation !== undefined) {
-
-                element.textContent = translation;
-
+            if (!arabicText || !englishText) {
+                return;
             }
 
-        });
-
-
-        /* Update placeholders */
-
-        const placeholderElements =
-            document.querySelectorAll(
-                "[data-placeholder-ar][data-placeholder-en]"
-            );
-
-
-        placeholderElements.forEach(element => {
-
-            element.placeholder =
-                isArabic
-                    ? element.dataset.placeholderAr
-                    : element.dataset.placeholderEn;
+            element.textContent =
+                isArabic ? arabicText : englishText;
 
         });
 
 
-        /* Language button */
+        /* ---------------------------------------------
+           LANGUAGE BUTTON
+        --------------------------------------------- */
 
         if (languageBtn) {
 
@@ -147,49 +117,63 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        /* Document title */
+        /* ---------------------------------------------
+           AI INPUT PLACEHOLDER
+        --------------------------------------------- */
 
-        document.title = isArabic
-            ? "MedLife Syria | مؤسسة ميدلايف الطبية الخيرية التطوعية"
-            : "MedLife Syria | Voluntary Medical Charity Organization";
+        if (aiInput) {
 
-    }
+            const placeholderArabic =
+                aiInput.getAttribute("data-placeholder-ar");
+
+            const placeholderEnglish =
+                aiInput.getAttribute("data-placeholder-en");
+
+            aiInput.placeholder =
+                isArabic
+                    ? placeholderArabic
+                    : placeholderEnglish;
+
+        }
 
 
-    function toggleLanguage() {
-
-        currentLanguage =
-            currentLanguage === "ar"
-                ? "en"
-                : "ar";
+        /* ---------------------------------------------
+           SAVE LANGUAGE
+        --------------------------------------------- */
 
         localStorage.setItem(
-            "medlife-language",
+            "medlifeLanguage",
             currentLanguage
         );
-
-        updateLanguage();
 
     }
 
 
     if (languageBtn) {
 
-        languageBtn.addEventListener(
-            "click",
-            toggleLanguage
-        );
+        languageBtn.addEventListener("click", () => {
+
+            currentLanguage =
+                currentLanguage === "ar"
+                    ? "en"
+                    : "ar";
+
+            updateLanguage();
+
+        });
 
     }
 
 
     /* =====================================================
-       3. MOBILE MENU
+       MOBILE MENU
     ====================================================== */
 
     function openMobileMenu() {
 
-        if (!mobileMenu || !menuToggle) return;
+        if (!mobileMenu || !menuToggle) {
+            return;
+        }
 
         mobileMenu.classList.add("active");
 
@@ -200,21 +184,29 @@ document.addEventListener("DOMContentLoaded", () => {
             "true"
         );
 
-        menuToggle.setAttribute(
-            "aria-label",
-            currentLanguage === "ar"
-                ? "إغلاق القائمة"
-                : "Close menu"
-        );
+        const icon =
+            menuToggle.querySelector("i");
 
-        body.classList.add("menu-open");
+        if (icon) {
+
+            icon.classList.remove(
+                "fa-bars"
+            );
+
+            icon.classList.add(
+                "fa-xmark"
+            );
+
+        }
 
     }
 
 
     function closeMobileMenu() {
 
-        if (!mobileMenu || !menuToggle) return;
+        if (!mobileMenu || !menuToggle) {
+            return;
+        }
 
         mobileMenu.classList.remove("active");
 
@@ -225,21 +217,29 @@ document.addEventListener("DOMContentLoaded", () => {
             "false"
         );
 
-        menuToggle.setAttribute(
-            "aria-label",
-            currentLanguage === "ar"
-                ? "فتح القائمة"
-                : "Open menu"
-        );
+        const icon =
+            menuToggle.querySelector("i");
 
-        body.classList.remove("menu-open");
+        if (icon) {
+
+            icon.classList.remove(
+                "fa-xmark"
+            );
+
+            icon.classList.add(
+                "fa-bars"
+            );
+
+        }
 
     }
 
 
     function toggleMobileMenu() {
 
-        if (!mobileMenu) return;
+        if (!mobileMenu) {
+            return;
+        }
 
         if (mobileMenu.classList.contains("active")) {
 
@@ -264,8 +264,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* Close menu after clicking link */
-
     mobileLinks.forEach(link => {
 
         link.addEventListener(
@@ -277,12 +275,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       4. MODAL SYSTEM
+       MODAL SYSTEM
     ====================================================== */
 
     function openModal(modal) {
 
-        if (!modal) return;
+        if (!modal) {
+            return;
+        }
 
         modal.classList.add("active");
 
@@ -291,14 +291,18 @@ document.addEventListener("DOMContentLoaded", () => {
             "false"
         );
 
-        body.classList.add("modal-open");
+        body.classList.add(
+            "modal-open"
+        );
 
     }
 
 
     function closeModal(modal) {
 
-        if (!modal) return;
+        if (!modal) {
+            return;
+        }
 
         modal.classList.remove("active");
 
@@ -307,20 +311,36 @@ document.addEventListener("DOMContentLoaded", () => {
             "true"
         );
 
-        body.classList.remove("modal-open");
+        if (
+            !document.querySelector(
+                ".modal.active"
+            )
+        ) {
+
+            body.classList.remove(
+                "modal-open"
+            );
+
+        }
 
     }
 
 
     /* =====================================================
-       5. LOGIN MODAL
+       LOGIN MODAL
     ====================================================== */
 
     if (loginBtn) {
 
         loginBtn.addEventListener(
             "click",
-            () => openModal(loginModal)
+            () => {
+
+                closeMobileMenu();
+
+                openModal(loginModal);
+
+            }
         );
 
     }
@@ -363,7 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       6. VOLUNTEER MODAL
+       VOLUNTEER MODAL
     ====================================================== */
 
     volunteerTriggers.forEach(trigger => {
@@ -388,7 +408,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         volunteerBtn.addEventListener(
             "click",
-            () => closeModal(volunteerModal)
+            () => {
+
+                openModal(volunteerModal);
+
+            }
         );
 
     }
@@ -405,12 +429,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       7. CLOSE MODAL BY BACKDROP
+       CLOSE MODAL BY CLICKING OUTSIDE
     ====================================================== */
 
     [loginModal, volunteerModal].forEach(modal => {
 
-        if (!modal) return;
+        if (!modal) {
+            return;
+        }
 
         modal.addEventListener(
             "click",
@@ -429,12 +455,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       8. MEDLIFE AI
+       MEDLIFE AI
     ====================================================== */
 
     function openAI() {
 
-        if (!aiOverlay) return;
+        if (!aiOverlay) {
+            return;
+        }
 
         aiOverlay.classList.add("active");
 
@@ -443,14 +471,15 @@ document.addEventListener("DOMContentLoaded", () => {
             "false"
         );
 
-        body.classList.add("ai-open");
+        body.classList.add(
+            "ai-open"
+        );
+
 
         setTimeout(() => {
 
             if (aiInput) {
-
                 aiInput.focus();
-
             }
 
         }, 250);
@@ -460,16 +489,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeAI() {
 
-        if (!aiOverlay) return;
+        if (!aiOverlay) {
+            return;
+        }
 
-        aiOverlay.classList.remove("active");
+        aiOverlay.classList.remove(
+            "active"
+        );
 
         aiOverlay.setAttribute(
             "aria-hidden",
             "true"
         );
 
-        body.classList.remove("ai-open");
+        body.classList.remove(
+            "ai-open"
+        );
 
     }
 
@@ -494,7 +529,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* Close AI when clicking outside panel */
+    /* =====================================================
+       CLOSE AI WHEN CLICKING OVERLAY
+    ====================================================== */
 
     if (aiOverlay) {
 
@@ -502,7 +539,9 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             event => {
 
-                if (event.target === aiOverlay) {
+                if (
+                    event.target === aiOverlay
+                ) {
 
                     closeAI();
 
@@ -515,12 +554,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       9. AI MESSAGE SYSTEM
+       AI MESSAGE SYSTEM
     ====================================================== */
 
     function addUserMessage(text) {
 
-        if (!aiMessages || !text.trim()) return;
+        if (!aiMessages || !text) {
+            return;
+        }
 
         const message =
             document.createElement("div");
@@ -528,32 +569,29 @@ document.addEventListener("DOMContentLoaded", () => {
         message.className =
             "ai-message ai-user";
 
-
         message.innerHTML = `
-
             <div class="ai-message-content">
-
                 <p></p>
-
             </div>
-
         `;
 
+        const paragraph =
+            message.querySelector("p");
 
-        message.querySelector("p").textContent =
-            text;
-
+        paragraph.textContent = text;
 
         aiMessages.appendChild(message);
 
-        scrollAIToBottom();
+        scrollAIMessages();
 
     }
 
 
     function addBotMessage(text) {
 
-        if (!aiMessages) return;
+        if (!aiMessages || !text) {
+            return;
+        }
 
         const message =
             document.createElement("div");
@@ -561,40 +599,33 @@ document.addEventListener("DOMContentLoaded", () => {
         message.className =
             "ai-message ai-bot";
 
-
         message.innerHTML = `
-
             <div class="ai-message-avatar">
-
-                <img
-                    src="logo.PNG"
-                    alt="MedLife">
-
+                <img src="logo.PNG" alt="MedLife">
             </div>
 
             <div class="ai-message-content">
-
                 <p></p>
-
             </div>
-
         `;
 
+        const paragraph =
+            message.querySelector("p");
 
-        message.querySelector("p").textContent =
-            text;
-
+        paragraph.textContent = text;
 
         aiMessages.appendChild(message);
 
-        scrollAIToBottom();
+        scrollAIMessages();
 
     }
 
 
-    function addTypingMessage() {
+    function addTypingIndicator() {
 
-        if (!aiMessages) return null;
+        if (!aiMessages) {
+            return null;
+        }
 
         const typing =
             document.createElement("div");
@@ -602,219 +633,176 @@ document.addEventListener("DOMContentLoaded", () => {
         typing.className =
             "ai-message ai-bot ai-typing";
 
-
         typing.innerHTML = `
-
             <div class="ai-message-avatar">
-
-                <img
-                    src="logo.PNG"
-                    alt="MedLife">
-
+                <img src="logo.PNG" alt="MedLife">
             </div>
 
             <div class="ai-message-content">
-
                 <div class="typing-dots">
-
                     <span></span>
                     <span></span>
                     <span></span>
-
                 </div>
-
             </div>
-
         `;
-
 
         aiMessages.appendChild(typing);
 
-        scrollAIToBottom();
+        scrollAIMessages();
 
         return typing;
 
     }
 
 
-    function scrollAIToBottom() {
+    function scrollAIMessages() {
 
-        if (!aiMessages) return;
+        if (!aiMessages) {
+            return;
+        }
 
         aiMessages.scrollTo({
-
             top: aiMessages.scrollHeight,
-
             behavior: "smooth"
-
         });
 
     }
 
 
     /* =====================================================
-       10. BASIC MEDLIFE AI KNOWLEDGE
+       BASIC MEDLIFE AI KNOWLEDGE
     ====================================================== */
 
     function getAIResponse(question) {
 
-        const q =
+        const normalized =
             question
                 .toLowerCase()
                 .trim();
 
 
         if (
-            q.includes("من هي ميدلايف") ||
-            q.includes("ما هي ميدلايف") ||
-            q.includes("medlife")
+            normalized.includes("من هي ميدلايف") ||
+            normalized.includes("ما هي ميدلايف") ||
+            normalized.includes("what is medlife") ||
+            normalized.includes("medlife")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "ميدلايف هي مؤسسة طبية خيرية تطوعية تأسست عام 2019، وتعمل في مجالات الصحة، التوعية، التعليم والتدريب، المبادرات الإنسانية، التقنية والابتكار وتمكين الشباب."
+                ? "ميدلايف هي مؤسسة طبية خيرية تطوعية انطلقت عام 2019، وتعمل في مجالات الصحة والتوعية والتعليم والتدريب والمبادرات الإنسانية والتقنية وتمكين الشباب. حصلت المؤسسة على الترخيص الرسمي عام 2023."
 
-                : "MedLife is a voluntary medical charity organization founded in 2019. It works in health, awareness, education and training, humanitarian initiatives, technology, innovation, and youth empowerment.";
+                : "MedLife is a voluntary medical charity organization founded in 2019. It works across health, awareness, education, training, humanitarian initiatives, technology, and youth empowerment. The organization obtained official registration in 2023.";
 
         }
 
 
         if (
-            q.includes("تطوع") ||
-            q.includes("متطوع") ||
-            q.includes("volunteer")
+            normalized.includes("تطوع") ||
+            normalized.includes("متطوع") ||
+            normalized.includes("volunteer")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "حالياً لا توجد فرص تطوع مفتوحة. يمكنك متابعة منصات ميدلايف الرسمية لمعرفة الفرص الجديدة عند الإعلان عنها."
+                ? "حالياً لا توجد فرص تطوع مفتوحة في ميدلايف. عند توفر فرص جديدة سيتم الإعلان عنها عبر المنصات الرسمية للمؤسسة."
 
-                : "There are currently no open volunteer opportunities. Follow MedLife's official platforms for future announcements.";
+                : "There are currently no open volunteer opportunities at MedLife. New opportunities will be announced through MedLife's official platforms.";
 
         }
 
 
         if (
-            q.includes("مجالات") ||
-            q.includes("عمل ميدلايف") ||
-            q.includes("areas") ||
-            q.includes("programs")
+            normalized.includes("مجالات") ||
+            normalized.includes("ماذا تفعل") ||
+            normalized.includes("areas") ||
+            normalized.includes("programs") ||
+            normalized.includes("what do you do")
         ) {
 
             return currentLanguage === "ar"
 
                 ? "تشمل مجالات عمل ميدلايف الخدمات والاستشارات الطبية، التوعية الصحية، التعليم والتدريب، المبادرات الإنسانية، التقنية والابتكار، وتمكين الشباب."
 
-                : "MedLife works in medical services and consultation, health awareness, education and training, humanitarian initiatives, technology and innovation, and youth empowerment.";
+                : "MedLife works across medical services and consultation, health awareness, education and training, humanitarian initiatives, technology and innovation, and youth empowerment.";
 
         }
 
 
         if (
-            q.includes("مقال") ||
-            q.includes("articles")
+            normalized.includes("2019") ||
+            normalized.includes("تأسست") ||
+            normalized.includes("founded")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "يعمل فريق ميدلايف على تطوير مساحة للمقالات الطبية والتوعوية التي يشارك في إعدادها أعضاء ومتطوعو المؤسسة."
+                ? "انطلقت ميدلايف عام 2019 كمبادرة تطوعية طبية، ثم تطورت تدريجياً حتى حصلت على الترخيص الرسمي عام 2023."
 
-                : "MedLife is developing a knowledge space for medical and awareness articles created by members and volunteers.";
+                : "MedLife started in 2019 as a voluntary medical initiative and gradually developed into an officially registered organization in 2023.";
 
         }
 
 
         if (
-            q.includes("استشار") ||
-            q.includes("consult")
+            normalized.includes("استشارة") ||
+            normalized.includes("طبية") ||
+            normalized.includes("consultation") ||
+            normalized.includes("medical")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "يمكنك الوصول إلى خدمة الاستشارات الطبية عبر بوت ميدلايف على Telegram من خلال قسم الاستشارات في الموقع."
+                ? "للاستشارات الطبية يمكنك استخدام بوت ميدلايف على Telegram عبر @Medlife2024bot. تذكّر أن MedLife AI نفسه لا يحل محل الطبيب أو الاستشارة الطبية المتخصصة."
 
-                : "You can access MedLife's medical consultation service through the MedLife Telegram bot via the Consultation section.";
+                : "For medical consultation, you can use MedLife's Telegram bot at @Medlife2024bot. Please remember that MedLife AI itself does not replace a doctor or professional medical advice.";
 
         }
 
 
         if (
-            q.includes("2019") ||
-            q.includes("تأسست") ||
-            q.includes("founded")
+            normalized.includes("مقال") ||
+            normalized.includes("مقالات") ||
+            normalized.includes("article") ||
+            normalized.includes("articles")
         ) {
 
             return currentLanguage === "ar"
 
-                ? "بدأت ميدلايف عام 2019 كمبادرة تطوعية طبية، وحصلت على الترخيص الرسمي عام 2023."
+                ? "نعمل على تطوير مساحة للمقالات الطبية والتوعوية التي يكتبها أعضاء ومتطوعو ميدلايف."
 
-                : "MedLife started in 2019 as a voluntary medical initiative and received official registration in 2023.";
+                : "We are developing a space for medical and awareness articles written by MedLife members and volunteers.";
+
+        }
+
+
+        if (
+            normalized.includes("طرطوس") ||
+            normalized.includes("tartous") ||
+            normalized.includes("headquarters")
+        ) {
+
+            return currentLanguage === "ar"
+
+                ? "المقر الرئيسي لميدلايف موجود في طرطوس — سوريا."
+
+                : "MedLife's headquarters are in Tartous, Syria.";
 
         }
 
 
         return currentLanguage === "ar"
 
-            ? "شكراً لسؤالك 🌿 يمكنك أن تسألني عن ميدلايف، مجالات عملنا، التطوع، المبادرات، المقالات أو الاستشارات الطبية."
+            ? "شكراً لسؤالك ❤️ يمكنني مساعدتك بالمعلومات المتعلقة بميدلايف، مثل من نحن، مجالات العمل، التطوع، المبادرات، المقالات والاستشارات الطبية."
 
-            : "Thank you for your question 🌿 You can ask me about MedLife, our areas of work, volunteering, initiatives, articles, or medical consultation.";
-
-    }
-
-
-    /* =====================================================
-       11. AI SEND MESSAGE
-    ====================================================== */
-
-    async function sendAIMessage(text) {
-
-        if (!text || !text.trim()) return;
-
-        const cleanText =
-            text.trim();
-
-
-        addUserMessage(cleanText);
-
-        if (aiInput) {
-
-            aiInput.value = "";
-
-        }
-
-
-        const typing =
-            addTypingMessage();
-
-
-        await new Promise(resolve => {
-
-            setTimeout(
-                resolve,
-                700
-            );
-
-        });
-
-
-        if (typing) {
-
-            typing.remove();
-
-        }
-
-
-        const response =
-            getAIResponse(cleanText);
-
-
-        addBotMessage(response);
+            : "Thank you for your question ❤️ I can help with information about MedLife, including who we are, our areas of work, volunteering, initiatives, articles, and medical consultation.";
 
     }
 
 
     /* =====================================================
-       12. AI FORM
+       AI FORM
     ====================================================== */
 
     if (aiForm) {
@@ -825,11 +813,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 event.preventDefault();
 
-                if (!aiInput) return;
+                if (!aiInput) {
+                    return;
+                }
 
-                sendAIMessage(
-                    aiInput.value
-                );
+                const question =
+                    aiInput.value.trim();
+
+                if (!question) {
+                    return;
+                }
+
+
+                addUserMessage(question);
+
+                aiInput.value = "";
+
+                autoResizeTextarea();
+
+
+                const typing =
+                    addTypingIndicator();
+
+
+                setTimeout(() => {
+
+                    if (typing) {
+                        typing.remove();
+                    }
+
+                    const response =
+                        getAIResponse(question);
+
+                    addBotMessage(response);
+
+                }, 700);
 
             }
         );
@@ -838,10 +856,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       13. AI ENTER KEY
+       AI QUICK QUESTIONS
     ====================================================== */
 
+    aiSuggestionButtons.forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const question =
+                    currentLanguage === "ar"
+
+                        ? button.getAttribute(
+                            "data-question-ar"
+                        )
+
+                        : button.getAttribute(
+                            "data-question-en"
+                        );
+
+                if (!question) {
+                    return;
+                }
+
+                if (aiInput) {
+
+                    aiInput.value =
+                        question;
+
+                    autoResizeTextarea();
+
+                    aiInput.focus();
+
+                }
+
+            }
+        );
+
+    });
+
+
+    /* =====================================================
+       AI TEXTAREA AUTO RESIZE
+    ====================================================== */
+
+    function autoResizeTextarea() {
+
+        if (!aiInput) {
+            return;
+        }
+
+        aiInput.style.height = "auto";
+
+        aiInput.style.height =
+            Math.min(
+                aiInput.scrollHeight,
+                130
+            ) + "px";
+
+    }
+
+
     if (aiInput) {
+
+        aiInput.addEventListener(
+            "input",
+            autoResizeTextarea
+        );
+
 
         aiInput.addEventListener(
             "keydown",
@@ -855,9 +938,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     event.preventDefault();
 
                     if (aiForm) {
-
                         aiForm.requestSubmit();
-
                     }
 
                 }
@@ -869,63 +950,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       14. AI SUGGESTIONS
+       SCROLL REVEAL
     ====================================================== */
 
-    aiSuggestions.forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const question =
-                    currentLanguage === "ar"
-
-                        ? button.dataset.questionAr
-
-                        : button.dataset.questionEn;
-
-
-                sendAIMessage(question);
-
-            }
+    const revealElements =
+        document.querySelectorAll(
+            ".reveal"
         );
 
-    });
 
+    if (
+        "IntersectionObserver"
+        in window
+    ) {
 
-    /* =====================================================
-       15. AUTO RESIZE AI TEXTAREA
-    ====================================================== */
-
-    if (aiInput) {
-
-        aiInput.addEventListener(
-            "input",
-            () => {
-
-                aiInput.style.height =
-                    "auto";
-
-                aiInput.style.height =
-                    Math.min(
-                        aiInput.scrollHeight,
-                        130
-                    ) + "px";
-
-            }
-        );
-
-    }
-
-
-    /* =====================================================
-       16. SCROLL REVEAL
-    ====================================================== */
-
-    if ("IntersectionObserver" in window) {
-
-        const revealObserver =
+        const observer =
             new IntersectionObserver(
                 entries => {
 
@@ -939,7 +978,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 "visible"
                             );
 
-                            revealObserver.unobserve(
+                            observer.unobserve(
                                 entry.target
                             );
 
@@ -949,14 +988,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 },
                 {
-                    threshold: 0.12
+                    threshold: 0.12,
+                    rootMargin: "0px 0px -40px 0px"
                 }
             );
 
 
         revealElements.forEach(element => {
 
-            revealObserver.observe(element);
+            observer.observe(element);
 
         });
 
@@ -974,58 +1014,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       17. HEADER SCROLL EFFECT
+       SMOOTH SCROLL
     ====================================================== */
 
-    const header =
-        document.querySelector(
-            ".site-header"
-        );
+    document
+        .querySelectorAll('a[href^="#"]')
+        .forEach(anchor => {
 
+            anchor.addEventListener(
+                "click",
+                event => {
 
-    function updateHeader() {
+                    const targetId =
+                        anchor.getAttribute(
+                            "href"
+                        );
 
-        if (!header) return;
+                    if (
+                        !targetId ||
+                        targetId === "#"
+                    ) {
+                        return;
+                    }
 
-        if (window.scrollY > 30) {
+                    const target =
+                        document.querySelector(
+                            targetId
+                        );
 
-            header.classList.add(
-                "scrolled"
+                    if (!target) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    closeMobileMenu();
+
+                    target.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+
+                }
             );
 
-        } else {
-
-            header.classList.remove(
-                "scrolled"
-            );
-
-        }
-
-    }
-
-
-    window.addEventListener(
-        "scroll",
-        updateHeader,
-        {
-            passive: true
-        }
-    );
-
-
-    updateHeader();
+        });
 
 
     /* =====================================================
-       18. CLOSE EVERYTHING WITH ESCAPE
+       ESCAPE KEY
     ====================================================== */
 
     document.addEventListener(
         "keydown",
         event => {
 
-            if (event.key !== "Escape") return;
-
+            if (event.key !== "Escape") {
+                return;
+            }
 
             closeMobileMenu();
 
@@ -1040,26 +1086,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       19. PREVENT BODY SCROLL WHEN OVERLAYS ARE OPEN
+       BODY SCROLL CONTROL
     ====================================================== */
 
-    function updateBodyLock() {
+    function updateBodyScroll() {
 
         const modalOpen =
-            loginModal?.classList.contains("active") ||
-            volunteerModal?.classList.contains("active");
+            document.querySelector(
+                ".modal.active"
+            );
 
-        const aiOpen =
-            aiOverlay?.classList.contains("active");
-
-        const menuOpen =
-            mobileMenu?.classList.contains("active");
-
+        const aiIsOpen =
+            aiOverlay &&
+            aiOverlay.classList.contains(
+                "active"
+            );
 
         if (
             modalOpen ||
-            aiOpen ||
-            menuOpen
+            aiIsOpen
         ) {
 
             body.classList.add(
@@ -1078,108 +1123,171 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       20. OBSERVE OVERLAY STATES
+       HANDLE WINDOW RESIZE
     ====================================================== */
 
-    const stateObserver =
-        new MutationObserver(
-            updateBodyLock
-        );
+    window.addEventListener(
+        "resize",
+        () => {
 
-
-    [
-        loginModal,
-        volunteerModal,
-        aiOverlay,
-        mobileMenu
-    ].forEach(element => {
-
-        if (!element) return;
-
-        stateObserver.observe(
-            element,
-            {
-                attributes: true,
-                attributeFilter: ["class"]
-            }
-        );
-
-    });
-
-
-    /* =====================================================
-       21. SMOOTH ANCHOR SCROLL
-    ====================================================== */
-
-    document.querySelectorAll(
-        'a[href^="#"]'
-    ).forEach(link => {
-
-        link.addEventListener(
-            "click",
-            event => {
-
-                const targetId =
-                    link.getAttribute("href");
-
-
-                if (
-                    !targetId ||
-                    targetId === "#"
-                ) return;
-
-
-                const target =
-                    document.querySelector(
-                        targetId
-                    );
-
-
-                if (!target) return;
-
-
-                event.preventDefault();
-
-
-                target.scrollIntoView({
-
-                    behavior: "smooth",
-
-                    block: "start"
-
-                });
-
+            if (
+                window.innerWidth > 768
+            ) {
 
                 closeMobileMenu();
 
             }
-        );
 
-    });
+            updateBodyScroll();
+
+        }
+    );
 
 
     /* =====================================================
-       22. INITIALIZATION
+       ACTIVE NAVIGATION
+    ====================================================== */
+
+    const sections =
+        document.querySelectorAll(
+            "main section[id]"
+        );
+
+    const navLinks =
+        document.querySelectorAll(
+            ".nav-links a"
+        );
+
+
+    if (
+        "IntersectionObserver"
+        in window
+    ) {
+
+        const sectionObserver =
+            new IntersectionObserver(
+                entries => {
+
+                    entries.forEach(entry => {
+
+                        if (
+                            !entry.isIntersecting
+                        ) {
+                            return;
+                        }
+
+                        const id =
+                            entry.target.id;
+
+                        navLinks.forEach(link => {
+
+                            link.classList.remove(
+                                "active"
+                            );
+
+                            if (
+                                link.getAttribute(
+                                    "href"
+                                ) === `#${id}`
+                            ) {
+
+                                link.classList.add(
+                                    "active"
+                                );
+
+                            }
+
+                        });
+
+                    });
+
+                },
+                {
+                    threshold: 0.25,
+                    rootMargin: "-20% 0px -60% 0px"
+                }
+            );
+
+
+        sections.forEach(section => {
+
+            sectionObserver.observe(
+                section
+            );
+
+        });
+
+    }
+
+
+    /* =====================================================
+       HEADER SCROLL EFFECT
+    ====================================================== */
+
+    const header =
+        document.querySelector(
+            ".site-header"
+        );
+
+
+    if (header) {
+
+        const handleHeaderScroll = () => {
+
+            if (
+                window.scrollY > 30
+            ) {
+
+                header.classList.add(
+                    "scrolled"
+                );
+
+            } else {
+
+                header.classList.remove(
+                    "scrolled"
+                );
+
+            }
+
+        };
+
+
+        window.addEventListener(
+            "scroll",
+            handleHeaderScroll,
+            {
+                passive: true
+            }
+        );
+
+
+        handleHeaderScroll();
+
+    }
+
+
+    /* =====================================================
+       INITIALIZATION
     ====================================================== */
 
     updateLanguage();
 
-    updateHeader();
-
-    updateBodyLock();
+    updateBodyScroll();
 
 
     /* =====================================================
-       23. CONSOLE MESSAGE
+       CONSOLE
     ====================================================== */
 
     console.log(
         "%cMedLife Syria",
-        "font-size: 20px; font-weight: bold;"
+        "font-size:22px;font-weight:bold;"
     );
 
     console.log(
-        "MedLife website initialized successfully."
+        "%cWe save life, we are med.life",
+        "font-size:13px;"
     );
 
 });
