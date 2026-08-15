@@ -16,16 +16,30 @@ export async function onRequest(context) {
     }
 
     if (!env.MEMBERS_DB) {
-        return json({ success: false, error: "Database binding 'MEMBERS_DB' is not configured." }, 500);
+        return json({
+            success: false,
+            error: "Database binding 'MEMBERS_DB' is not configured."
+        }, 500);
     }
 
-    if (!env.ADMIN_KEY) {
-        return json({ success: false, error: "Admin secret 'ADMIN_KEY' is not configured." }, 500);
+    // Pages Functions expose project Secrets through context.env.
+    // Never return the secret value to the browser.
+    const adminKey = typeof env.ADMIN_KEY === "string" ? env.ADMIN_KEY.trim() : "";
+
+    if (!adminKey) {
+        return json({
+            success: false,
+            error: "Admin secret 'ADMIN_KEY' is not available to this Production Pages Function.",
+            code: "ADMIN_KEY_MISSING"
+        }, 500);
     }
 
-    const authorized = await isAuthorized(request, env.ADMIN_KEY);
+    const authorized = await isAuthorized(request, adminKey);
     if (!authorized) {
-        return json({ success: false, error: "غير مصرح بالدخول إلى لوحة الإدارة." }, 401);
+        return json({
+            success: false,
+            error: "غير مصرح بالدخول إلى لوحة الإدارة."
+        }, 401);
     }
 
     try {
@@ -40,7 +54,10 @@ export async function onRequest(context) {
         return json({ success: false, error: "Method not allowed." }, 405);
     } catch (error) {
         console.error("Members admin API error:", error);
-        return json({ success: false, error: "تعذر تنفيذ عملية الإدارة حالياً." }, 500);
+        return json({
+            success: false,
+            error: "تعذر تنفيذ عملية الإدارة حالياً."
+        }, 500);
     }
 }
 
@@ -230,6 +247,7 @@ function json(data, status = 200) {
         headers: {
             "Content-Type": "application/json; charset=UTF-8",
             "Cache-Control": "no-store",
+            "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "Authorization, Content-Type",
             "Access-Control-Allow-Methods": "GET, PATCH, OPTIONS"
         }
