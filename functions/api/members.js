@@ -1,9 +1,13 @@
+/* =========================================================
+   MEDLIFE MEMBERS API
+   POST /api/members
+
+   Public endpoint for submitting a new membership application.
+   Sensitive member data is never returned by this endpoint.
+========================================================= */
+
 export async function onRequest(context) {
     const { request, env } = context;
-
-    if (!env.DB) {
-        return jsonResponse({ success: false, error: "Database binding 'DB' is not configured." }, 500);
-    }
 
     if (request.method === "OPTIONS") {
         return jsonResponse({ success: true });
@@ -13,133 +17,198 @@ export async function onRequest(context) {
         return jsonResponse({ success: false, error: "Method not allowed." }, 405);
     }
 
+    if (!env.DB) {
+        return jsonResponse({
+            success: false,
+            error: "Database binding 'DB' is not configured."
+        }, 500);
+    }
+
     try {
         const body = await request.json();
 
         const fullName = clean(body.full_name, 150);
+        const motherName = clean(body.mother_name, 150);
+        const nationalId = clean(body.national_id, 40);
+        const email = clean(body.email, 200).toLowerCase();
         const phone = clean(body.phone, 40);
-        const email = clean(body.email, 150);
-        const profession = clean(body.profession, 150);
-        const university = clean(body.university, 200);
-        const fieldCity = clean(body.field_city, 60);
-        const experience = clean(body.experience, 5000);
-        const motivation = clean(body.motivation, 5000);
-        const availability = clean(body.availability, 100);
-        const socialLinks = clean(body.social_links, 1000);
-        const consent = body.consent === true;
-        const departments = Array.isArray(body.departments)
-            ? body.departments.map(item => clean(item, 80)).filter(Boolean)
-            : [];
+        const gender = clean(body.gender, 20);
+        const educationLevel = clean(body.education_level, 150);
+        const studyYear = clean(body.study_year, 80);
+        const residentSpecialty = clean(body.resident_specialty, 150);
+        const residencyYear = clean(body.residency_year, 80);
+        const residencyHospital = clean(body.residency_hospital, 200);
+        const university = clean(body.university, 250);
+        const address = clean(body.address, 500);
+        const governorate = clean(body.governorate, 100);
+        const medlifeRole = clean(body.medlife_role, 80);
+        const cell = clean(body.cell, 80);
+        const fieldLocation = clean(body.field_location, 100);
+        const joinDate = clean(body.join_date, 30) || new Date().toISOString().slice(0, 10);
+        const volunteerCertificate = clean(body.volunteer_certificate, 10) || "no";
 
-        const allowedDepartments = [
-            "كتابة محتوى طبي",
-            "تصميم",
-            "مونتاج",
-            "إعلام مرئي",
-            "ميداني",
-            "سوشيل ميديا",
-            "إعلامي جامعات"
+        const allowedGender = ["male", "female"];
+        const allowedRoles = [
+            "volunteer",
+            "supervisor",
+            "general_supervisor",
+            "assistant_supervisor"
         ];
-
-        const allowedCities = [
-            "طرطوس",
-            "اللاذقية",
-            "دمشق",
-            "حلب",
-            "الحسكة",
-            "حمص"
+        const allowedCells = [
+            "plasma_cell",
+            "neuron_cell",
+            "astrocyte_cell",
+            "leukocyte_cell",
+            "heart_cell",
+            "red_blood_cell",
+            "blog",
+            "design",
+            "video_editing",
+            "visual_media",
+            "instagram",
+            "telegram",
+            "administration",
+            "voice_over",
+            "coordination",
+            "university_media",
+            "field"
         ];
+        const allowedFieldLocations = [
+            "damascus",
+            "aleppo",
+            "tartous",
+            "latakia",
+            "homs",
+            "hasakah"
+        ];
+        const allowedCertificates = ["yes", "no"];
 
-        const invalidDepartments = departments.filter(item => !allowedDepartments.includes(item));
-
-        if (invalidDepartments.length) {
-            return jsonResponse({ success: false, error: "يوجد اختصاص غير صالح." }, 400);
-        }
-
-        if (!fullName || !phone || !departments.length || !consent) {
+        if (!fullName || !motherName || !nationalId || !phone || !gender ||
+            !educationLevel || !governorate || !medlifeRole || !cell) {
             return jsonResponse({
                 success: false,
-                error: "يرجى تعبئة الاسم والهاتف واختيار مجال واحد على الأقل والموافقة على معالجة البيانات."
+                error: "يرجى تعبئة جميع الحقول الأساسية المطلوبة."
             }, 400);
         }
 
-        if (departments.includes("ميداني") && !allowedCities.includes(fieldCity)) {
+        if (!allowedGender.includes(gender)) {
+            return jsonResponse({ success: false, error: "الجنس المحدد غير صالح." }, 400);
+        }
+
+        if (!allowedRoles.includes(medlifeRole)) {
+            return jsonResponse({ success: false, error: "الصفة داخل MedLife غير صالحة." }, 400);
+        }
+
+        if (!allowedCells.includes(cell)) {
+            return jsonResponse({ success: false, error: "الخلية المحددة غير صالحة." }, 400);
+        }
+
+        if (!allowedCertificates.includes(volunteerCertificate)) {
+            return jsonResponse({ success: false, error: "قيمة شهادة التطوع غير صالحة." }, 400);
+        }
+
+        if (cell === "field" && !allowedFieldLocations.includes(fieldLocation)) {
             return jsonResponse({
                 success: false,
-                error: "يرجى اختيار محافظة للعمل الميداني."
+                error: "يرجى اختيار المحافظة للعمل الميداني."
             }, 400);
         }
 
-        await ensureMembersTable(env.DB);
+        if (cell !== "field" && fieldLocation) {
+            return jsonResponse({
+                success: false,
+                error: "لا يمكن تحديد محافظة ميدانية إلا عند اختيار المجال الميداني."
+            }, 400);
+        }
+
+        if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+            return jsonResponse({ success: false, error: "البريد الإلكتروني غير صالح." }, 400);
+        }
+
+        const duplicate = await env.DB.prepare(`
+            SELECT id
+            FROM members
+            WHERE national_id = ?
+            LIMIT 1
+        `).bind(nationalId).first();
+
+        if (duplicate) {
+            return jsonResponse({
+                success: false,
+                error: "يوجد طلب أو سجل سابق مرتبط بهذا الرقم الوطني."
+            }, 409);
+        }
 
         const result = await env.DB.prepare(`
             INSERT INTO members (
                 full_name,
-                phone,
+                mother_name,
+                national_id,
                 email,
-                profession,
+                phone,
+                gender,
+                education_level,
+                study_year,
+                resident_specialty,
+                residency_year,
+                residency_hospital,
                 university,
-                departments,
-                field_city,
-                experience,
-                motivation,
-                availability,
-                social_links,
-                consent,
+                address,
+                governorate,
+                medlife_role,
+                cell,
+                field_location,
+                join_date,
+                volunteer_certificate,
                 status,
                 created_at,
                 updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         `).bind(
             fullName,
-            phone,
+            motherName,
+            nationalId,
             email,
-            profession,
+            phone,
+            gender,
+            educationLevel,
+            studyYear,
+            residentSpecialty,
+            residencyYear,
+            residencyHospital,
             university,
-            JSON.stringify(departments),
-            fieldCity,
-            experience,
-            motivation,
-            availability,
-            socialLinks,
-            1
+            address,
+            governorate,
+            medlifeRole,
+            cell,
+            cell === "field" ? fieldLocation : null,
+            joinDate,
+            volunteerCertificate
         ).run();
 
         return jsonResponse({
             success: true,
-            message: "تم استلام طلب الانضمام بنجاح. ستتم مراجعته من فريق MedLife.",
-            id: result.meta?.last_row_id ?? null
+            message: "تم استلام طلب الانضمام بنجاح، وسيتم مراجعته من فريق MedLife.",
+            id: result.meta?.last_row_id ?? null,
+            status: "pending"
         }, 201);
 
     } catch (error) {
         console.error("Members API error:", error);
-        return jsonResponse({ success: false, error: "تعذر إرسال طلب الانضمام حالياً." }, 500);
-    }
-}
 
-async function ensureMembersTable(db) {
-    await db.prepare(`
-        CREATE TABLE IF NOT EXISTS members (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT NOT NULL,
-            phone TEXT NOT NULL,
-            email TEXT,
-            profession TEXT,
-            university TEXT,
-            departments TEXT NOT NULL,
-            field_city TEXT,
-            experience TEXT,
-            motivation TEXT,
-            availability TEXT,
-            social_links TEXT,
-            consent INTEGER NOT NULL DEFAULT 1,
-            status TEXT NOT NULL DEFAULT 'pending',
-            rejection_reason TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    `).run();
+        if (String(error?.message || "").toLowerCase().includes("unique")) {
+            return jsonResponse({
+                success: false,
+                error: "يوجد سجل سابق مرتبط بهذا الرقم الوطني أو البريد الإلكتروني."
+            }, 409);
+        }
+
+        return jsonResponse({
+            success: false,
+            error: "تعذر إرسال طلب الانضمام حالياً."
+        }, 500);
+    }
 }
 
 function clean(value, maxLength = 5000) {
