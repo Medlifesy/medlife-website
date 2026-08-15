@@ -3,7 +3,7 @@
    POST /api/members
 
    Public endpoint for submitting a new membership application.
-   Sensitive member data is never returned by this endpoint.
+   Member data is stored exclusively in the MEMBERS_DB binding.
 ========================================================= */
 
 export async function onRequest(context) {
@@ -17,10 +17,10 @@ export async function onRequest(context) {
         return jsonResponse({ success: false, error: "Method not allowed." }, 405);
     }
 
-    if (!env.DB) {
+    if (!env.MEMBERS_DB) {
         return jsonResponse({
             success: false,
-            error: "Database binding 'DB' is not configured."
+            error: "Database binding 'MEMBERS_DB' is not configured."
         }, 500);
     }
 
@@ -125,7 +125,7 @@ export async function onRequest(context) {
             return jsonResponse({ success: false, error: "البريد الإلكتروني غير صالح." }, 400);
         }
 
-        const duplicate = await env.DB.prepare(`
+        const duplicate = await env.MEMBERS_DB.prepare(`
             SELECT id
             FROM members
             WHERE national_id = ?
@@ -139,7 +139,7 @@ export async function onRequest(context) {
             }, 409);
         }
 
-        const result = await env.DB.prepare(`
+        const result = await env.MEMBERS_DB.prepare(`
             INSERT INTO members (
                 full_name,
                 mother_name,
