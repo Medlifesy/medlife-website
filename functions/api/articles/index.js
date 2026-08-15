@@ -5,7 +5,7 @@
    GET  /api/articles
    POST /api/articles
 
-   Articles admin (requires ARTICLES_ADMIN_KEY):
+   Articles admin (requires ARTICLES_ADMIN_KEY or ADMIN_PASSWORD):
    GET    /api/articles?admin=1
    PUT    /api/articles
    DELETE /api/articles?id=123
@@ -27,7 +27,8 @@ export async function onRequest(context) {
             const url = new URL(request.url);
             const isAdmin = url.searchParams.get("admin") === "1";
             if (isAdmin) {
-                if (!await isAdminAuthorized(request, env)) return json({ success: false, error: "غير مصرح بالدخول إلى إدارة المقالات." }, 401);
+                const auth = await isAdminAuthorized(request, env);
+                if (!auth.ok) return json({ success: false, error: auth.error }, auth.status);
                 return await listAllArticles(env.DB);
             }
             return await listPublishedArticles(env.DB);
@@ -39,7 +40,8 @@ export async function onRequest(context) {
         }
 
         if (method === "PUT" || method === "DELETE") {
-            if (!await isAdminAuthorized(request, env)) return json({ success: false, error: "غير مصرح بالدخول إلى إدارة المقالات." }, 401);
+            const auth = await isAdminAuthorized(request, env);
+            if (!auth.ok) return json({ success: false, error: auth.error }, auth.status);
             return method === "PUT"
                 ? await updateArticle(request, env.DB)
                 : await deleteArticle(request, env.DB);
@@ -147,13 +149,13 @@ async function deleteArticle(request,db){
 }
 
 async function isAdminAuthorized(request,env){
-    const expected=env.ARTICLES_ADMIN_KEY;
-    if(!expected)return false;
+    const expected=env.ARTICLES_ADMIN_KEY || env.ADMIN_PASSWORD;
+    if(!expected) return { ok:false, status:500, error:"إعدادات المشرف غير مكتملة على Cloudflare (ARTICLES_ADMIN_KEY)." };
     const header=request.headers.get('Authorization')||'';
     const match=header.match(/^Bearer\s+(.+)$/i);
-    if(!match)return false;
+    if(!match) return { ok:false, status:401, error:"غير مصرح بالدخول إلى إدارة المقالات." };
     const supplied=match[1].trim();
-    if(!supplied||supplied.length>500||expected.length>500)return false;
+    if(!supplied||supplied.length>500||expected.length>500) return { ok:false, status:401, error:"غير مصرح بالدخول إلى إدارة المقالات." };
     const encoder=new TextEncoder();
     const [a,b]=await Promise.all([
         crypto.subtle.digest('SHA-256',encoder.encode(supplied)),
@@ -161,7 +163,9 @@ async function isAdminAuthorized(request,env){
     ]);
     const left=new Uint8Array(a),right=new Uint8Array(b);let diff=left.length^right.length;
     for(let i=0;i<Math.min(left.length,right.length);i++)diff|=left[i]^right[i];
-    return diff===0;
+    return diff===0
+        ? { ok:true, status:200 }
+        : { ok:false, status:401, error:"غير مصرح بالدخول إلى إدارة المقالات." };
 }
 
 function clean(value,maxLength=5000){return String(value??'').trim().slice(0,maxLength)}
