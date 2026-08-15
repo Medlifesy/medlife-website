@@ -2,7 +2,7 @@ export async function onRequest(context) {
     const response = await context.next();
     const url = new URL(context.request.url);
 
-    if (!["/","/index.html","/articles.html"].includes(url.pathname)) return response;
+    if (!["/", "/index.html", "/articles.html", "/admin.html"].includes(url.pathname)) return response;
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.includes("text/html")) return response;
 
@@ -10,6 +10,13 @@ export async function onRequest(context) {
         .on('a[href="#volunteer"]', { element(element) { element.setAttribute("href", "join-options.html"); } })
         .on('a[href="index.html#volunteer"]', { element(element) { element.setAttribute("href", "join-options.html"); } })
         .on('a[href="/#volunteer"]', { element(element) { element.setAttribute("href", "join-options.html"); } })
+        .on("head", {
+            element(element) {
+                if (url.pathname === "/admin.html") {
+                    element.append('<script src="/js/admin-auth.js"></script>', { html: true });
+                }
+            }
+        })
         .on("body", {
             element(element) {
                 if (url.pathname === "/" || url.pathname === "/index.html") {
