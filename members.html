@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مجتمع متطوعي MedLife</title>
+<link rel="icon" type="image/png" href="logo.PNG">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--red:#ff2a54;--navy:#151d36;--blue:#2f6bff;--bg:#f5f7fb;--white:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--green:#059669;--shadow:0 12px 35px rgba(21,29,54,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:Cairo,sans-serif;background:var(--bg);color:var(--text)}button,input,textarea{font-family:inherit}button{cursor:pointer;border:0}.container{width:min(1180px,calc(100% - 28px));margin:auto}header{position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:20}.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:15px}.logo{height:50px}.nav-actions{display:flex;gap:8px}.btn{padding:10px 15px;border-radius:12px;font-weight:800}.btn-main{background:var(--red);color:#fff}.btn-light{background:#fff;border:1px solid var(--border);color:var(--navy)}.hero{padding:55px 0 35px;text-align:center;background:linear-gradient(135deg,#fff,#f7f9fc)}.hero h1{margin:0;color:var(--navy);font-size:clamp(30px,5vw,48px)}.hero p{max-width:720px;margin:12px auto;color:var(--muted)}.layout{display:grid;grid-template-columns:310px minmax(0,1fr);gap:24px;align-items:start;padding:30px 0 70px}.panel,.card{background:#fff;border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow)}.panel{padding:22px;position:sticky;top:95px}.profile-head{display:flex;align-items:center;gap:12px}.avatar{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--navy),#36456e);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.profile-name{font-weight:900;color:var(--navy)}.profile-sub{font-size:12px;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:20px 0}.stat{padding:12px;border:1px solid var(--border);border-radius:12px;text-align:center}.stat b{display:block;font-size:20px;color:var(--blue)}.muted{color:var(--muted);font-size:13px}.compose{padding:18px;margin-bottom:18px}.compose textarea{width:100%;min-height:110px;resize:vertical;padding:13px;border:1px solid var(--border);border-radius:14px;outline:none}.row{display:flex;gap:8px;justify-content:flex-start;flex-wrap:wrap;margin-top:10px}.post{padding:18px;margin-bottom:15px}.post-top{display:flex;align-items:center;gap:10px}.post-author{font-weight:900;color:var(--navy)}.post-time{font-size:11px;color:var(--muted)}.post-content{white-space:pre-wrap;line-height:1.9;margin:15px 0}.post-actions{display:flex;gap:10px;border-top:1px solid var(--border);padding-top:12px}.action{background:#f7f9fc;color:var(--navy);padding:8px 12px;border-radius:10px}.action.liked{color:var(--red);background:#fff0f3}.comment{display:flex;gap:8px;padding:10px 0;border-top:1px solid #f0f2f5}.comment-body{background:#f7f9fc;padding:9px 12px;border-radius:12px;flex:1}.comment-name{font-weight:800;font-size:12px}.comment-text{font-size:13px;white-space:pre-wrap}.comment-form{display:flex;gap:8px;margin-top:10px}.comment-form input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px}.empty{text-align:center;padding:50px 20px;color:var(--muted)}.auth{max-width:520px;margin:50px auto;padding:25px}.tabs{display:flex;gap:8px;margin-bottom:20px}.tab{flex:1;padding:11px;border-radius:10px;background:#f3f5f8;font-weight:800}.tab.active{background:var(--navy);color:#fff}.field{margin-bottom:13px}.field label{display:block;font-size:13px;font-weight:800;margin-bottom:6px}.field input,.field textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:11px}.message{margin-top:12px;padding:11px 12px;border-radius:10px;font-size:13px;display:none}.message.show{display:block}.message.error{background:#fff1f2;color:#b91c1c}.message.ok{background:#ecfdf5;color:#047857}.section-title{font-size:20px;font-weight:900;color:var(--navy);margin:0 0 15px}.achievement{padding:13px;border:1px solid var(--border);border-radius:12px;margin-top:8px}.logout{width:100%;margin-top:10px}.hidden{display:none!important}@media(max-width:900px){.layout{grid-template-columns:1fr}.panel{position:static}}
+</style>
+</head>
+<body>
+<header><div class="container nav"><a href="index.html"><img class="logo" src="logo.PNG" alt="MedLife"></a><div class="nav-actions"><a class="btn btn-light" href="index.html">الرئيسية</a><button id="logoutBtn" class="btn btn-light hidden">تسجيل الخروج</button></div></div></header>
+<section class="hero"><div class="container"><h1>مجتمع متطوعي MedLife</h1><p>مساحة داخلية تجمع متطوعي ميدلايف لعرض الإنجازات، مشاركة الخبرات، ونشر الأفكار وصناعة الأثر معاً.</p></div></section>
+<div class="container">
+<div id="authPanel" class="card auth">
+<div class="tabs"><button id="loginTab" class="tab active">تسجيل الدخول</button><button id="registerTab" class="tab">إنشاء الحساب</button></div>
+<form id="loginForm"><div class="field"><label>اسم المستخدم</label><input id="loginUsername" required></div><div class="field"><label>كلمة المرور</label><input id="loginPassword" type="password" required></div><button class="btn btn-main" style="width:100%">دخول</button></form>
+<form id="registerForm" class="hidden"><div class="field"><label>رمز الدعوة</label><input id="inviteCode" required placeholder="يحصل عليه المتطوع بعد اعتماد طلبه"></div><div class="field"><label>اسم المستخدم</label><input id="registerUsername" required></div><div class="field"><label>كلمة المرور</label><input id="registerPassword" type="password" minlength="10" required></div><button class="btn btn-main" style="width:100%">إنشاء الحساب</button></form>
+<div id="authMessage" class="message"></div>
+</div>
+<div id="app" class="layout hidden">
+<aside class="panel">
+<div class="profile-head"><div id="avatar" class="avatar">ML</div><div><div id="profileName" class="profile-name">متطوع MedLife</div><div id="profileSub" class="profile-sub">عضو في المجتمع</div></div></div>
+<div class="stats"><div class="stat"><b id="postsCount">0</b><span class="muted">منشورات</span></div><div class="stat"><b id="achievementCount">0</b><span class="muted">إنجازات</span></div></div>
+<h3 class="section-title">ملفي</h3><div class="field"><label>الاسم الظاهر</label><input id="displayName"></div><div class="field"><label>نبذة</label><textarea id="bio" rows="4"></textarea></div><div class="field"><label>المهارات</label><input id="skills" placeholder="مثال: تصميم, إسعاف أولي, كتابة"></div><div class="field"><label>رابط الصورة</label><input id="avatarUrl" placeholder="https://..."></div><button id="saveProfile" class="btn btn-main" style="width:100%">حفظ الملف</button>
+<h3 class="section-title" style="margin-top:25px">إضافة إنجاز</h3><div class="field"><label>عنوان الإنجاز</label><input id="achievementTitle"></div><div class="field"><label>الوصف</label><textarea id="achievementDescription" rows="3"></textarea></div><button id="addAchievement" class="btn btn-light" style="width:100%">إضافة الإنجاز</button>
+</aside>
+<main>
+<div class="card compose"><h2 class="section-title">ماذا تريد أن تشارك؟</h2><textarea id="postContent" placeholder="شارك إنجازاً، تجربة، فكرة، فرصة تطوع، أو فائدة علمية..."></textarea><div class="row"><button id="publishPost" class="btn btn-main">نشر المشاركة</button></div></div>
+<div id="feed"><div class="empty">جاري تحميل مجتمع MedLife...</div></div>
+</main>
+</div>
+</div>
+<script src="js/members-platform.js?v=20260815"></script>
+</body></html>
