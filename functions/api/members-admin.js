@@ -2,59 +2,88 @@
    MEDLIFE MEMBERS ADMIN API
    GET    /api/members-admin
    PATCH  /api/members-admin
-   DELETE /api/members-admin?id=...
 
-   Protected with MEMBERS_ADMIN_KEY.
-   All member records are stored in MEMBERS_DB.
+   Protected by the ADMIN_KEY secret and backed by MEMBERS_DB.
 ========================================================= */
+
+const ALLOWED_STATUSES = ["active", "suspended", "inactive"];
 
 export async function onRequest(context) {
     const { request, env } = context;
-    const method = request.method.toUpperCase();
 
-    if (method === "OPTIONS") {
-        return jsonResponse({ success: true });
-    }
-
-    const adminKey = env.MEMBERS_ADMIN_KEY;
-
-    if (!adminKey) {
-        return jsonResponse({ success: false, error: "Members admin key is not configured." }, 500);
-    }
-
-    const suppliedKey = getAdminKey(request);
-
-    if (!suppliedKey || !safeEqual(suppliedKey, adminKey)) {
-        return jsonResponse({ success: false, error: "Unauthorized." }, 401);
+    if (request.method === "OPTIONS") {
+        return json({ success: true });
     }
 
     if (!env.MEMBERS_DB) {
-        return jsonResponse({ success: false, error: "Database binding 'MEMBERS_DB' is not configured." }, 500);
+        return json({ success: false, error: "Database binding 'MEMBERS_DB' is not configured." }, 500);
+    }
+
+    if (!env.ADMIN_KEY) {
+        return json({ success: false, error: "Admin secret 'ADMIN_KEY' is not configured." }, 500);
+    }
+
+    const authorized = await isAuthorized(request, env.ADMIN_KEY);
+    if (!authorized) {
+        return json({ success: false, error: "غير مصرح بالدخول إلى لوحة الإدارة." }, 401);
     }
 
     try {
-        if (method === "GET") return await listMembers(request, env.MEMBERS_DB);
-        if (method === "PATCH") return await updateMember(request, env.MEMBERS_DB);
-        if (method === "DELETE") return await deleteMember(request, env.MEMBERS_DB);
+        if (request.method === "GET") {
+            return await listMembers(request, env);
+        }
 
-        return jsonResponse({ success: false, error: "Method not allowed." }, 405);
+        if (request.method === "PATCH") {
+            return await updateMember(request, env);
+        }
+
+        return json({ success: false, error: "Method not allowed." }, 405);
     } catch (error) {
         console.error("Members admin API error:", error);
-        return jsonResponse({
-            success: false,
-            error: error?.message || "Internal server error."
-        }, 500);
+        return json({ success: false, error: "تعذر تنفيذ عملية الإدارة حالياً." }, 500);
     }
 }
 
-async function listMembers(request, db) {
+async function listMembers(request, env) {
     const url = new URL(request.url);
-    const status = clean(url.searchParams.get("status"), 30) || "all";
-    const cell = clean(url.searchParams.get("cell"), 80) || "all";
-    const governorate = clean(url.searchParams.get("governorate"), 100) || "all";
-    const fieldLocation = clean(url.searchParams.get("field_location"), 100) || "all";
+    const status = cleanFilter(url.searchParams.get("status"));
+    const role = cleanFilter(url.searchParams.get("role"));
+    const cell = cleanFilter(url.searchParams.get("cell"));
+    const governorate = cleanFilter(url.searchParams.get("governorate"));
+    const search = cleanFilter(url.searchParams.get("search"));
 
-    let query = `
+    const conditions = [];
+    const binds = [];
+
+    if (status && status !== "all") {
+        conditions.push("status = ?");
+        binds.push(status);
+    }
+
+    if (role && role !== "all") {
+        conditions.push("medlife_role = ?");
+        binds.push(role);
+    }
+
+    if (cell && cell !== "all") {
+        conditions.push("cell = ?");
+        binds.push(cell);
+    }
+
+    if (governorate && governorate !== "all") {
+        conditions.push("governorate = ?");
+        binds.push(governorate);
+    }
+
+    if (search) {
+        conditions.push("(full_name LIKE ? OR phone LIKE ? OR email LIKE ? OR national_id LIKE ?)");
+        const pattern = `%${search}%`;
+        binds.push(pattern, pattern, pattern, pattern);
+    }
+
+    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const result = await env.MEMBERS_DB.prepare(`
         SELECT
             id,
             membership_number,
@@ -66,10 +95,10 @@ async function listMembers(request, db) {
             gender,
             education_level,
             study_year,
+            university,
             resident_specialty,
             residency_year,
             residency_hospital,
-            university,
             address,
             governorate,
             medlife_role,
@@ -81,41 +110,24 @@ async function listMembers(request, db) {
             created_at,
             updated_at
         FROM members
-    `;
+        ${where}
+        ORDER BY
+            CASE status WHEN 'pending' THEN 0 WHEN 'active' THEN 1 WHEN 'suspended' THEN 2 ELSE 3 END,
+            datetime(created_at) DESC
+        LIMIT 200
+    `).bind(...binds).all();
 
-    const conditions = [];
-    const values = [];
+    const summary = await getSummary(env.MEMBERS_DB);
 
-    if (status !== "all") {
-        conditions.push("status = ?");
-        values.push(status);
-    }
+    return json({
+        success: true,
+        members: result.results || [],
+        summary
+    });
+}
 
-    if (cell !== "all") {
-        conditions.push("cell = ?");
-        values.push(cell);
-    }
-
-    if (governorate !== "all") {
-        conditions.push("governorate = ?");
-        values.push(governorate);
-    }
-
-    if (fieldLocation !== "all") {
-        conditions.push("field_location = ?");
-        values.push(fieldLocation);
-    }
-
-    if (conditions.length) {
-        query += ` WHERE ${conditions.join(" AND ")}`;
-    }
-
-    query += " ORDER BY created_at DESC";
-
-    const result = await db.prepare(query).bind(...values).all();
-    const members = result.results || [];
-
-    const summary = await db.prepare(`
+async function getSummary(db) {
+    const result = await db.prepare(`
         SELECT
             COUNT(*) AS total,
             SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending_count,
@@ -125,139 +137,101 @@ async function listMembers(request, db) {
         FROM members
     `).first();
 
-    return jsonResponse({
-        success: true,
-        members,
-        summary: summary || {
-            total: 0,
-            pending_count: 0,
-            active_count: 0,
-            suspended_count: 0,
-            inactive_count: 0
-        }
-    });
+    return {
+        total: Number(result?.total || 0),
+        pending_count: Number(result?.pending_count || 0),
+        active_count: Number(result?.active_count || 0),
+        suspended_count: Number(result?.suspended_count || 0),
+        inactive_count: Number(result?.inactive_count || 0)
+    };
 }
 
-async function updateMember(request, db) {
+async function updateMember(request, env) {
     const body = await request.json();
     const id = Number(body.id);
-    const status = clean(body.status, 30);
+    const status = cleanFilter(body.status);
 
     if (!Number.isInteger(id) || id <= 0) {
-        return jsonResponse({ success: false, error: "Valid member ID is required." }, 400);
+        return json({ success: false, error: "معرّف العضو غير صالح." }, 400);
     }
 
-    const allowed = ["pending", "active", "suspended", "inactive"];
-
-    if (!allowed.includes(status)) {
-        return jsonResponse({ success: false, error: "Invalid member status." }, 400);
+    if (!ALLOWED_STATUSES.includes(status)) {
+        return json({ success: false, error: "حالة العضوية غير صالحة." }, 400);
     }
 
-    const rejectionReason = clean(body.rejection_reason, 3000);
-    let membershipNumber = null;
+    const member = await env.MEMBERS_DB.prepare(`
+        SELECT id, membership_number, full_name
+        FROM members
+        WHERE id = ?
+        LIMIT 1
+    `).bind(id).first();
 
-    if (status === "active") {
-        const current = await db.prepare(`
-            SELECT id, membership_number
-            FROM members
-            WHERE id = ?
-            LIMIT 1
-        `).bind(id).first();
-
-        if (!current) {
-            return jsonResponse({ success: false, error: "Member not found." }, 404);
-        }
-
-        membershipNumber = current.membership_number;
-
-        if (!membershipNumber) {
-            membershipNumber = await nextMembershipNumber(db);
-        }
+    if (!member) {
+        return json({ success: false, error: "العضو غير موجود." }, 404);
     }
 
-    const result = await db.prepare(`
+    let membershipNumber = member.membership_number || null;
+
+    if (status === "active" && !membershipNumber) {
+        membershipNumber = `ML-${new Date().getFullYear()}-${String(id).padStart(6, "0")}`;
+    }
+
+    await env.MEMBERS_DB.prepare(`
         UPDATE members
-        SET
-            status = ?,
-            membership_number = COALESCE(?, membership_number),
+        SET status = ?,
+            membership_number = ?,
             updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-    `).bind(
-        status,
-        membershipNumber,
-        id
-    ).run();
+    `).bind(status, membershipNumber, id).run();
 
-    if (!result.meta?.changes) {
-        return jsonResponse({ success: false, error: "Member not found." }, 404);
-    }
-
-    return jsonResponse({
+    return json({
         success: true,
-        message: "تم تحديث حالة العضو بنجاح.",
-        membership_number: membershipNumber,
-        rejection_reason: rejectionReason || null
+        message: status === "active"
+            ? "تم قبول العضو وتفعيل عضويته بنجاح."
+            : status === "suspended"
+                ? "تم تعليق العضوية بنجاح."
+                : "تم إلغاء تفعيل العضوية بنجاح.",
+        id,
+        status,
+        membership_number: membershipNumber
     });
 }
 
-async function deleteMember(request, db) {
-    const url = new URL(request.url);
-    const id = Number(url.searchParams.get("id"));
+async function isAuthorized(request, expectedKey) {
+    const header = request.headers.get("Authorization") || "";
+    const match = header.match(/^Bearer\s+(.+)$/i);
+    if (!match) return false;
 
-    if (!Number.isInteger(id) || id <= 0) {
-        return jsonResponse({ success: false, error: "Valid member ID is required." }, 400);
+    const supplied = match[1].trim();
+    if (!supplied || supplied.length > 500 || expectedKey.length > 500) return false;
+
+    const encoder = new TextEncoder();
+    const [a, b] = await Promise.all([
+        crypto.subtle.digest("SHA-256", encoder.encode(supplied)),
+        crypto.subtle.digest("SHA-256", encoder.encode(expectedKey))
+    ]);
+
+    const left = new Uint8Array(a);
+    const right = new Uint8Array(b);
+    let diff = left.length ^ right.length;
+    for (let i = 0; i < Math.min(left.length, right.length); i++) {
+        diff |= left[i] ^ right[i];
     }
-
-    const result = await db.prepare(`DELETE FROM members WHERE id = ?`).bind(id).run();
-
-    if (!result.meta?.changes) {
-        return jsonResponse({ success: false, error: "Member not found." }, 404);
-    }
-
-    return jsonResponse({ success: true, message: "تم حذف سجل العضو." });
+    return diff === 0;
 }
 
-async function nextMembershipNumber(db) {
-    const row = await db.prepare(`
-        SELECT membership_number
-        FROM members
-        WHERE membership_number LIKE 'ML-%'
-        ORDER BY id DESC
-        LIMIT 1
-    `).first();
-
-    const match = String(row?.membership_number || "").match(/^ML-(\d+)$/);
-    const next = match ? Number(match[1]) + 1 : 1;
-
-    return `ML-${String(next).padStart(6, "0")}`;
+function cleanFilter(value) {
+    return String(value ?? "").trim().slice(0, 200);
 }
 
-function getAdminKey(request) {
-    const auth = request.headers.get("Authorization") || "";
-    if (auth.startsWith("Bearer ")) return auth.slice(7).trim();
-    return request.headers.get("X-Admin-Key")?.trim() || "";
-}
-
-function safeEqual(a, b) {
-    if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
-    let result = 0;
-    for (let i = 0; i < a.length; i++) result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-    return result === 0;
-}
-
-function clean(value, maxLength = 5000) {
-    return String(value ?? "").trim().slice(0, maxLength);
-}
-
-function jsonResponse(data, status = 200) {
+function json(data, status = 200) {
     return new Response(JSON.stringify(data, null, 2), {
         status,
         headers: {
             "Content-Type": "application/json; charset=UTF-8",
             "Cache-Control": "no-store",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Admin-Key",
-            "Access-Control-Allow-Methods": "GET, PATCH, DELETE, OPTIONS"
+            "Access-Control-Allow-Headers": "Authorization, Content-Type",
+            "Access-Control-Allow-Methods": "GET, PATCH, OPTIONS"
         }
     });
 }
