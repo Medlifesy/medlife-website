@@ -5,6 +5,7 @@
    DELETE /api/members-admin?id=...
 
    Protected with MEMBERS_ADMIN_KEY.
+   All member records are stored in MEMBERS_DB.
 ========================================================= */
 
 export async function onRequest(context) {
@@ -27,14 +28,14 @@ export async function onRequest(context) {
         return jsonResponse({ success: false, error: "Unauthorized." }, 401);
     }
 
-    if (!env.DB) {
-        return jsonResponse({ success: false, error: "Database binding 'DB' is not configured." }, 500);
+    if (!env.MEMBERS_DB) {
+        return jsonResponse({ success: false, error: "Database binding 'MEMBERS_DB' is not configured." }, 500);
     }
 
     try {
-        if (method === "GET") return await listMembers(request, env.DB);
-        if (method === "PATCH") return await updateMember(request, env.DB);
-        if (method === "DELETE") return await deleteMember(request, env.DB);
+        if (method === "GET") return await listMembers(request, env.MEMBERS_DB);
+        if (method === "PATCH") return await updateMember(request, env.MEMBERS_DB);
+        if (method === "DELETE") return await deleteMember(request, env.MEMBERS_DB);
 
         return jsonResponse({ success: false, error: "Method not allowed." }, 405);
     } catch (error) {
@@ -77,7 +78,6 @@ async function listMembers(request, db) {
             join_date,
             volunteer_certificate,
             status,
-            rejection_reason,
             created_at,
             updated_at
         FROM members
@@ -142,7 +142,6 @@ async function updateMember(request, db) {
     const body = await request.json();
     const id = Number(body.id);
     const status = clean(body.status, 30);
-    const rejectionReason = clean(body.rejection_reason, 3000);
 
     if (!Number.isInteger(id) || id <= 0) {
         return jsonResponse({ success: false, error: "Valid member ID is required." }, 400);
@@ -154,6 +153,7 @@ async function updateMember(request, db) {
         return jsonResponse({ success: false, error: "Invalid member status." }, 400);
     }
 
+    const rejectionReason = clean(body.rejection_reason, 3000);
     let membershipNumber = null;
 
     if (status === "active") {
@@ -179,13 +179,11 @@ async function updateMember(request, db) {
         UPDATE members
         SET
             status = ?,
-            rejection_reason = ?,
             membership_number = COALESCE(?, membership_number),
             updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     `).bind(
         status,
-        rejectionReason || null,
         membershipNumber,
         id
     ).run();
@@ -197,7 +195,8 @@ async function updateMember(request, db) {
     return jsonResponse({
         success: true,
         message: "تم تحديث حالة العضو بنجاح.",
-        membership_number: membershipNumber
+        membership_number: membershipNumber,
+        rejection_reason: rejectionReason || null
     });
 }
 
