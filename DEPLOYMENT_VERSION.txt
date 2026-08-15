@@ -1,3 +1,4 @@
 MedLife production deployment trigger
 Commit: 2026-08-16
-Purpose: force Cloudflare Pages to rebuild the main branch so the current member/new member platform files are published.
+Release: article-dedup-and-members-platform
+Purpose: force Cloudflare Pages to rebuild the main branch with the latest production fixes, responsive homepage, member/new-member flows, login, APIs, and article duplicate protection.
