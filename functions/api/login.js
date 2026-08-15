@@ -18,6 +18,6 @@ export async function onRequest({request,env}){
     const expires=new Date(Date.now()+1000*60*60*24*30).toISOString();
     await env.MEMBERS_DB.prepare('DELETE FROM member_sessions WHERE member_id=? OR expires_at<=CURRENT_TIMESTAMP').bind(member.id).run();
     await env.MEMBERS_DB.prepare('INSERT INTO member_sessions(member_id,token_hash,expires_at) VALUES(?,?,?)').bind(member.id,tokenHash,expires).run();
-    return json({success:true,user:{id:member.id,member_code:member.member_code,full_name:member.full_name,email:member.account_email||member.email,role:member.medlife_role,cell:member.cell}},{status:200,headers:{'Set-Cookie':cookie('medlife_session',rawToken,60*60*24*30)}});
+    return json({success:true,user:{id:member.id,member_code:member.member_code,full_name:member.full_name,email:member.account_email||member.email,role:member.medlife_role,cell:member.cell}},200,{'Set-Cookie':cookie('medlife_session',rawToken,60*60*24*30)});
   }catch(e){console.error(e);return json({success:false,error:'تعذر تسجيل الدخول حالياً.'},500)}
 }
