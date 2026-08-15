@@ -1,17 +1,17 @@
 /* =========================================================
    MEDLIFE HOMEPAGE
-   Featured Articles + Gallery + Volunteer Registration
+   Featured Articles + Gallery + Membership Navigation
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
     addHomepageArticles();
     initGallery();
     initVolunteerRegistrationLinks();
+    initMemberLoginLink();
 });
 
 /* =========================================================
-   VOLUNTEER REGISTRATION
-   Connect all existing homepage volunteer CTAs to join-us.html
+   NEW MEMBER REGISTRATION
 ========================================================= */
 function initVolunteerRegistrationLinks() {
     const registrationUrl = "join-us.html";
@@ -20,20 +20,20 @@ function initVolunteerRegistrationLinks() {
         trigger.setAttribute("href", registrationUrl);
         trigger.addEventListener("click", event => {
             event.preventDefault();
+            event.stopImmediatePropagation();
             window.location.href = registrationUrl;
-        });
+        }, true);
     });
 
-    // Also cover any volunteer CTA that does not yet have data-volunteer-trigger.
     document.querySelectorAll(".volunteer-btn, a[href='#volunteer']").forEach(trigger => {
         trigger.setAttribute("href", registrationUrl);
         trigger.addEventListener("click", event => {
             event.preventDefault();
+            event.stopImmediatePropagation();
             window.location.href = registrationUrl;
-        });
+        }, true);
     });
 
-    // Make the homepage volunteer section use the registration page.
     const volunteerSection = document.getElementById("volunteer");
     if (volunteerSection) {
         const buttons = volunteerSection.querySelectorAll("a, button");
@@ -45,29 +45,71 @@ function initVolunteerRegistrationLinks() {
                 }
                 button.addEventListener("click", event => {
                     event.preventDefault();
+                    event.stopImmediatePropagation();
                     window.location.href = registrationUrl;
-                });
+                }, true);
             }
         });
     }
 
     const volunteerText = document.querySelector("#volunteer p[data-ar]");
-
     if (volunteerText) {
         volunteerText.dataset.ar = "في ميدلايف، لا نبحث فقط عن الأشخاص الذين يمتلكون الخبرة. نبحث أيضاً عن الأشخاص الذين يمتلكون الشغف والرغبة بالتعلم وصناعة الأثر. يمكنك الآن تقديم طلب الانضمام إلى فريق ميدلايف عبر نموذج التسجيل، وسيتم مراجعة طلبك من قبل فريق الإدارة.";
         volunteerText.dataset.en = "At MedLife, we look not only for people with experience, but also for people with passion, curiosity, and a desire to create impact. You can now submit your application to join the MedLife team through our registration form, and your application will be reviewed by the administration team.";
         volunteerText.textContent = volunteerText.dataset.ar;
     }
 
-    const volunteerButton = document.querySelector("#volunteer [data-volunteer-trigger]");
+    document.querySelectorAll("[data-volunteer-trigger] span").forEach(label => {
+        label.dataset.ar = "انضم إلى فريق ميدلايف";
+        label.dataset.en = "Join the MedLife Team";
+        label.textContent = "انضم إلى فريق ميدلايف";
+    });
 
-    if (volunteerButton) {
-        const label = volunteerButton.querySelector("span");
-        if (label) {
-            label.dataset.ar = "قدّم طلب الانضمام";
-            label.dataset.en = "Apply to Join MedLife";
-            label.textContent = "قدّم طلب الانضمام";
+    const heroJoin = document.querySelector('a[href="join-us.html"]');
+    if (heroJoin) {
+        heroJoin.className = "btn btn-primary";
+        heroJoin.setAttribute("aria-label", "الانضمام إلى فريق MedLife");
+    }
+}
+
+/* =========================================================
+   EXISTING MEMBER ACCESS
+   The homepage member-login buttons now open the member platform.
+========================================================= */
+function initMemberLoginLink() {
+    const memberUrl = "members.html";
+
+    [
+        document.getElementById("loginBtn"),
+        document.getElementById("mobileLoginBtn")
+    ].filter(Boolean).forEach(button => {
+        button.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            window.location.href = memberUrl;
+        }, true);
+    });
+
+    const loginModal = document.getElementById("loginModal");
+    if (loginModal) {
+        const text = loginModal.querySelector("p");
+        if (text) {
+            text.dataset.ar = "إذا كنت عضواً في MedLife يمكنك الدخول إلى منصة الأعضاء. وإذا لم يكن لديك حساب بعد، استخدم خيار إنشاء الحساب بعد اعتماد طلبك.";
+            text.dataset.en = "If you are a MedLife member, you can access the members platform. If you do not have an account yet, use the account creation option after your application has been approved.";
+            text.textContent = text.dataset.ar;
         }
+
+        const actions = loginModal.querySelectorAll("button, a");
+        actions.forEach(action => {
+            const label = (action.textContent || "").trim();
+            if (/حسناً|OK|دخول|login/i.test(label)) {
+                action.addEventListener("click", event => {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    window.location.href = memberUrl;
+                }, true);
+            }
+        });
     }
 }
 
