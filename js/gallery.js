@@ -1,12 +1,54 @@
 /* =========================================================
    MEDLIFE HOMEPAGE
-   Featured Articles + Gallery only
+   Featured Articles + Gallery + Volunteer Registration
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
     addHomepageArticles();
     initGallery();
+    initVolunteerRegistrationLinks();
 });
+
+/* =========================================================
+   VOLUNTEER REGISTRATION
+   Connect all existing homepage volunteer CTAs to join-us.html
+========================================================= */
+function initVolunteerRegistrationLinks() {
+    const registrationUrl = "join-us.html";
+
+    document.querySelectorAll("[data-volunteer-trigger]").forEach(trigger => {
+        trigger.addEventListener("click", event => {
+            event.preventDefault();
+            window.location.href = registrationUrl;
+        });
+
+        if (trigger.tagName === "A") {
+            trigger.setAttribute("href", registrationUrl);
+        }
+    });
+
+    // The homepage previously said that volunteer opportunities were closed.
+    // Applications are now available through the new registration form.
+    const volunteerText = document.querySelector("#volunteer p[data-ar]");
+
+    if (volunteerText) {
+        volunteerText.dataset.ar = "في ميدلايف، لا نبحث فقط عن الأشخاص الذين يمتلكون الخبرة. نبحث أيضاً عن الأشخاص الذين يمتلكون الشغف والرغبة بالتعلم وصناعة الأثر. يمكنك الآن تقديم طلب الانضمام إلى فريق ميدلايف عبر نموذج التسجيل، وسيتم مراجعة طلبك من قبل فريق الإدارة.");
+        volunteerText.dataset.en = "At MedLife, we look not only for people with experience, but also for people with passion, curiosity, and a desire to create impact. You can now submit your application to join the MedLife team through our registration form, and your application will be reviewed by the administration team.");
+
+        volunteerText.textContent = volunteerText.dataset.ar;
+    }
+
+    const volunteerButton = document.querySelector("#volunteer [data-volunteer-trigger]");
+
+    if (volunteerButton) {
+        const label = volunteerButton.querySelector("span");
+        if (label) {
+            label.dataset.ar = "قدّم طلب الانضمام";
+            label.dataset.en = "Apply to Join MedLife";
+            label.textContent = "قدّم طلب الانضمام";
+        }
+    }
+}
 
 /* =========================================================
    FEATURED ARTICLES
