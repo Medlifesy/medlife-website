@@ -2,11 +2,14 @@
    MEDLIFE ARTICLES API
    /api/articles
 
-   GET  -> public published articles from DB
-   POST -> create article submission in DB
+   GET  /api/articles              -> published articles for the public site
+   GET  /api/articles?admin=1      -> all articles for the admin dashboard
+   POST /api/articles              -> create a pending article
+   PUT  /api/articles              -> publish/reject/draft an article
+   DELETE /api/articles?id=123     -> delete an article
 
-   Member validation uses MEMBERS_DB.
    Articles are stored exclusively in DB.
+   Optional author linking uses MEMBERS_DB.
 ========================================================= */
 
 export async function onRequest(context) {
@@ -26,7 +29,11 @@ export async function onRequest(context) {
 
     try {
         if (method === "GET") {
-            return await listPublishedArticles(env.DB);
+            const url = new URL(request.url);
+            const isAdmin = url.searchParams.get("admin") === "1";
+            return isAdmin
+                ? await listAllArticles(env.DB)
+                : await listPublishedArticles(env.DB);
         }
 
         if (method === "POST") {
@@ -36,8 +43,15 @@ export async function onRequest(context) {
                     error: "Database binding 'MEMBERS_DB' is not configured."
                 }, 500);
             }
-
             return await createArticle(request, env.DB, env.MEMBERS_DB);
+        }
+
+        if (method === "PUT") {
+            return await updateArticle(request, env.DB);
+        }
+
+        if (method === "DELETE") {
+            return await deleteArticle(request, env.DB);
         }
 
         return json({ success: false, error: "Method not allowed." }, 405);
@@ -53,27 +67,49 @@ export async function onRequest(context) {
 async function listPublishedArticles(db) {
     const result = await db.prepare(`
         SELECT
-            a.id,
-            a.title_ar,
-            a.title_en,
-            a.excerpt_ar,
-            a.excerpt_en,
-            a.author_member_id,
-            a.author_name,
-            a.category,
-            a.image_url,
-            a.status,
-            a.published_at,
-            a.created_at,
-            a.updated_at
-        FROM articles a
-        WHERE a.status = 'published'
-        ORDER BY COALESCE(a.published_at, a.created_at) DESC
+            id, title_ar, title_en, excerpt_ar, excerpt_en,
+            author_member_id, author_name, author_email, category,
+            image_url, status, rejection_reason, published_at,
+            created_at, updated_at
+        FROM articles
+        WHERE status = 'published'
+        ORDER BY COALESCE(published_at, created_at) DESC
     `).all();
 
+    return json({ success: true, articles: result.results || [] });
+}
+
+async function listAllArticles(db) {
+    const result = await db.prepare(`
+        SELECT
+            id, title_ar, title_en, excerpt_ar, excerpt_en,
+            content_ar, content_en,
+            author_member_id, author_name, author_email, category,
+            image_url, status, rejection_reason, published_at,
+            created_at, updated_at
+        FROM articles
+        ORDER BY
+            CASE status
+                WHEN 'pending' THEN 0
+                WHEN 'draft' THEN 1
+                WHEN 'published' THEN 2
+                WHEN 'rejected' THEN 3
+                ELSE 4
+            END,
+            datetime(created_at) DESC
+    `).all();
+
+    const articles = result.results || [];
     return json({
         success: true,
-        articles: result.results || []
+        articles,
+        summary: {
+            total: articles.length,
+            pending: articles.filter(a => a.status === "pending").length,
+            published: articles.filter(a => a.status === "published").length,
+            rejected: articles.filter(a => a.status === "rejected").length,
+            draft: articles.filter(a => a.status === "draft").length
+        }
     });
 }
 
@@ -118,34 +154,16 @@ async function createArticle(request, articlesDb, membersDb) {
 
     const result = await articlesDb.prepare(`
         INSERT INTO articles (
-            title_ar,
-            title_en,
-            content_ar,
-            content_en,
-            excerpt_ar,
-            excerpt_en,
-            author_member_id,
-            author_name,
-            author_email,
-            category,
-            image_url,
-            status,
-            created_at,
-            updated_at
+            title_ar, title_en, content_ar, content_en,
+            excerpt_ar, excerpt_en, author_member_id, author_name,
+            author_email, category, image_url, status,
+            created_at, updated_at
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     `).bind(
-        titleAr,
-        titleEn,
-        contentAr,
-        contentEn,
-        excerptAr,
-        excerptEn,
-        authorMemberId,
-        authorName,
-        authorEmail,
-        category,
-        imageUrl
+        titleAr, titleEn, contentAr, contentEn,
+        excerptAr, excerptEn, authorMemberId, authorName,
+        authorEmail, category, imageUrl
     ).run();
 
     return json({
@@ -154,6 +172,84 @@ async function createArticle(request, articlesDb, membersDb) {
         id: result.meta?.last_row_id ?? null,
         status: "pending"
     }, 201);
+}
+
+async function updateArticle(request, db) {
+    const body = await request.json();
+    const id = Number(body.id);
+    const status = clean(body.status, 30);
+    const rejectionReason = clean(body.rejection_reason, 2000);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        return json({ success: false, error: "معرّف المقال غير صالح." }, 400);
+    }
+
+    if (!["draft", "pending", "published", "rejected"].includes(status)) {
+        return json({ success: false, error: "حالة المقال غير صالحة." }, 400);
+    }
+
+    const article = await db.prepare(`
+        SELECT id, title_ar, status
+        FROM articles
+        WHERE id = ?
+        LIMIT 1
+    `).bind(id).first();
+
+    if (!article) {
+        return json({ success: false, error: "المقال غير موجود." }, 404);
+    }
+
+    if (status === "rejected" && !rejectionReason) {
+        return json({ success: false, error: "يرجى كتابة سبب رفض المقال." }, 400);
+    }
+
+    const publishedAt = status === "published"
+        ? "CURRENT_TIMESTAMP"
+        : "NULL";
+
+    await db.prepare(`
+        UPDATE articles
+        SET status = ?,
+            rejection_reason = ?,
+            published_at = ${publishedAt},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    `).bind(
+        status,
+        status === "rejected" ? rejectionReason : null,
+        id
+    ).run();
+
+    return json({
+        success: true,
+        message:
+            status === "published"
+                ? "تم نشر المقال بنجاح."
+                : status === "rejected"
+                    ? "تم رفض المقال وحفظ سبب الرفض."
+                    : "تم تحديث حالة المقال بنجاح.",
+        id,
+        status
+    });
+}
+
+async function deleteArticle(request, db) {
+    const url = new URL(request.url);
+    const id = Number(url.searchParams.get("id"));
+
+    if (!Number.isInteger(id) || id <= 0) {
+        return json({ success: false, error: "معرّف المقال غير صالح." }, 400);
+    }
+
+    const result = await db.prepare(`
+        DELETE FROM articles WHERE id = ?
+    `).bind(id).run();
+
+    if (!result.meta?.changes) {
+        return json({ success: false, error: "المقال غير موجود." }, 404);
+    }
+
+    return json({ success: true, message: "تم حذف المقال بنجاح.", id });
 }
 
 function clean(value, maxLength = 5000) {
@@ -168,7 +264,7 @@ function json(data, status = 200) {
             "Cache-Control": "no-store",
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS"
         }
     });
 }
