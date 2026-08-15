@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إرسال مقال | MedLife</title>
+<link rel="icon" type="image/png" href="logo.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--red:#FF2A54;--navy:#151D36;--bg:#F7F9FC;--text:#1E293B;--muted:#64748B;--border:#E2E8F0;--green:#059669;--shadow:0 18px 50px rgba(21,29,54,.09)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,sans-serif}.container{width:min(900px,calc(100% - 32px));margin:auto}header{background:#fff;border-bottom:1px solid var(--border)}.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between}.logo{height:50px}.back{color:var(--red);text-decoration:none;font-weight:800}.hero{padding:38px 0 20px}.hero h1{color:var(--navy);margin:0 0 7px}.hero p{color:var(--muted);margin:0}.card{background:#fff;border:1px solid var(--border);border-radius:22px;padding:28px;box-shadow:var(--shadow);margin-bottom:30px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}label{display:block;font-weight:800;margin-bottom:7px}input,textarea,select{width:100%;border:1px solid var(--border);border-radius:12px;padding:12px;font:inherit;outline:none;background:#fff}textarea{min-height:170px;resize:vertical}.full{grid-column:1/-1}.hint{font-size:12px;color:var(--muted);margin-top:5px}.upload{border:2px dashed #CBD5E1;border-radius:16px;padding:20px;text-align:center;background:#F8FAFC}.upload input{border:0;padding:8px}.preview{display:none;margin:15px auto 0;max-width:100%;max-height:280px;border-radius:14px}.button{border:0;border-radius:12px;padding:13px 22px;font:inherit;font-weight:800;cursor:pointer;background:var(--red);color:#fff}.button:disabled{opacity:.55;cursor:not-allowed}.message{display:none;margin-top:15px;padding:13px;border-radius:12px}.success{display:block;background:#ECFDF5;color:#047857}.error{display:block;background:#FEE2E2;color:#991B1B}.status{display:none;margin-top:10px;color:var(--muted);font-size:13px}@media(max-width:700px){.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+<body>
+<header><div class="container nav"><a href="index.html"><img class="logo" src="logo.PNG" alt="MedLife"></a><a class="back" href="articles.html">العودة إلى المقالات</a></div></header>
+<main class="container">
+<section class="hero"><h1>إرسال مقال إلى MedLife</h1><p>اكتب مقالك وأرسله إلى فريق التحرير للمراجعة قبل النشر.</p></section>
+<section class="card">
+<form id="articleForm">
+<div class="grid">
+<div><label for="title_ar">عنوان المقال بالعربي *</label><input id="title_ar" required maxlength="500"></div>
+<div><label for="title_en">عنوان المقال بالإنجليزي</label><input id="title_en" maxlength="500"></div>
+<div class="full"><label for="excerpt_ar">الملخص بالعربي</label><textarea id="excerpt_ar" maxlength="2000" style="min-height:110px"></textarea></div>
+<div class="full"><label for="excerpt_en">الملخص بالإنجليزي</label><textarea id="excerpt_en" maxlength="2000" style="min-height:110px"></textarea></div>
+<div class="full"><label for="content_ar">محتوى المقال بالعربي *</label><textarea id="content_ar" required maxlength="100000"></textarea></div>
+<div class="full"><label for="content_en">محتوى المقال بالإنجليزي</label><textarea id="content_en" maxlength="100000"></textarea></div>
+<div><label for="author_name">اسم الكاتب *</label><input id="author_name" required maxlength="200"></div>
+<div><label for="author_email">البريد الإلكتروني</label><input id="author_email" type="email" maxlength="200"></div>
+<div><label for="category">التصنيف</label><select id="category"><option value="General Medicine">General Medicine</option><option value="Obstetrics & Gynecology">Obstetrics & Gynecology</option><option value="Pediatrics">Pediatrics</option><option value="Surgery">Surgery</option><option value="Public Health">Public Health</option><option value="Medical Education">Medical Education</option><option value="Health Awareness">Health Awareness</option></select></div>
+<div><label for="author_member_id">رقم عضو MedLife (اختياري)</label><input id="author_member_id" type="number" min="1"><div class="hint">إذا كنت عضوًا مسجلًا، يساعدنا هذا على ربط المقال بحسابك.</div></div>
+<div class="full"><label>صورة المقال</label><div class="upload"><input id="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><div class="hint">JPG أو PNG أو WEBP أو GIF — الحد الأقصى 5 MB</div><img id="preview" class="preview" alt="معاينة صورة المقال"></div><div id="uploadStatus" class="status"></div></div>
+</div>
+<button class="button" id="submitButton" type="submit" style="margin-top:20px">إرسال المقال للمراجعة</button>
+<div id="message" class="message"></div>
+</form>
+</section>
+</main>
+<script>
+const form=document.getElementById('articleForm'),imageInput=document.getElementById('image'),preview=document.getElementById('preview'),uploadStatus=document.getElementById('uploadStatus'),submitButton=document.getElementById('submitButton'),message=document.getElementById('message');
+let imageUrl='';
+imageInput.addEventListener('change',()=>{const file=imageInput.files[0];imageUrl='';preview.style.display='none';if(!file)return;if(file.size>5*1024*1024){show('حجم الصورة يجب ألا يتجاوز 5 ميغابايت.','error');imageInput.value='';return}const reader=new FileReader();reader.onload=e=>{preview.src=e.target.result;preview.style.display='block'};reader.readAsDataURL(file)});
+form.addEventListener('submit',async e=>{e.preventDefault();message.className='message';message.textContent='';submitButton.disabled=true;try{const file=imageInput.files[0];if(file){uploadStatus.style.display='block';uploadStatus.textContent='جاري رفع الصورة...';const upload=await fetch('/api/article-image',{method:'POST',headers:{'Content-Type':file.type},body:file});const data=await upload.json();if(!upload.ok||!data.success)throw new Error(data.error||'تعذر رفع الصورة.');imageUrl=data.image_url;uploadStatus.textContent='تم رفع الصورة بنجاح.'}const body={title_ar:v('title_ar'),title_en:v('title_en'),excerpt_ar:v('excerpt_ar'),excerpt_en:v('excerpt_en'),content_ar:v('content_ar'),content_en:v('content_en'),author_name:v('author_name'),author_email:v('author_email'),category:v('category'),author_member_id:v('author_member_id')?Number(v('author_member_id')):null,image_url:imageUrl};const response=await fetch('/api/articles',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.error||'تعذر إرسال المقال.');show('تم إرسال المقال بنجاح إلى فريق التحرير للمراجعة.','success');form.reset();preview.style.display='none';imageUrl='';uploadStatus.style.display='none'}catch(err){show(err.message,'error')}finally{submitButton.disabled=false}});
+function v(id){return document.getElementById(id).value.trim()}function show(text,type){message.textContent=text;message.className='message '+type}
+</script>
+</body>
+</html>
