@@ -17,24 +17,45 @@ function initVolunteerRegistrationLinks() {
     const registrationUrl = "join-us.html";
 
     document.querySelectorAll("[data-volunteer-trigger]").forEach(trigger => {
+        trigger.setAttribute("href", registrationUrl);
         trigger.addEventListener("click", event => {
             event.preventDefault();
             window.location.href = registrationUrl;
         });
-
-        if (trigger.tagName === "A") {
-            trigger.setAttribute("href", registrationUrl);
-        }
     });
 
-    // The homepage previously said that volunteer opportunities were closed.
-    // Applications are now available through the new registration form.
+    // Also cover any volunteer CTA that does not yet have data-volunteer-trigger.
+    document.querySelectorAll(".volunteer-btn, a[href='#volunteer']").forEach(trigger => {
+        trigger.setAttribute("href", registrationUrl);
+        trigger.addEventListener("click", event => {
+            event.preventDefault();
+            window.location.href = registrationUrl;
+        });
+    });
+
+    // Make the homepage volunteer section use the registration page.
+    const volunteerSection = document.getElementById("volunteer");
+    if (volunteerSection) {
+        const buttons = volunteerSection.querySelectorAll("a, button");
+        buttons.forEach(button => {
+            const text = (button.textContent || "").trim();
+            if (/تطوع|انضم|طلب|join|volunteer|apply/i.test(text)) {
+                if (button.tagName === "A") {
+                    button.setAttribute("href", registrationUrl);
+                }
+                button.addEventListener("click", event => {
+                    event.preventDefault();
+                    window.location.href = registrationUrl;
+                });
+            }
+        });
+    }
+
     const volunteerText = document.querySelector("#volunteer p[data-ar]");
 
     if (volunteerText) {
-        volunteerText.dataset.ar = "في ميدلايف، لا نبحث فقط عن الأشخاص الذين يمتلكون الخبرة. نبحث أيضاً عن الأشخاص الذين يمتلكون الشغف والرغبة بالتعلم وصناعة الأثر. يمكنك الآن تقديم طلب الانضمام إلى فريق ميدلايف عبر نموذج التسجيل، وسيتم مراجعة طلبك من قبل فريق الإدارة.");
-        volunteerText.dataset.en = "At MedLife, we look not only for people with experience, but also for people with passion, curiosity, and a desire to create impact. You can now submit your application to join the MedLife team through our registration form, and your application will be reviewed by the administration team.");
-
+        volunteerText.dataset.ar = "في ميدلايف، لا نبحث فقط عن الأشخاص الذين يمتلكون الخبرة. نبحث أيضاً عن الأشخاص الذين يمتلكون الشغف والرغبة بالتعلم وصناعة الأثر. يمكنك الآن تقديم طلب الانضمام إلى فريق ميدلايف عبر نموذج التسجيل، وسيتم مراجعة طلبك من قبل فريق الإدارة.";
+        volunteerText.dataset.en = "At MedLife, we look not only for people with experience, but also for people with passion, curiosity, and a desire to create impact. You can now submit your application to join the MedLife team through our registration form, and your application will be reviewed by the administration team.";
         volunteerText.textContent = volunteerText.dataset.ar;
     }
 
