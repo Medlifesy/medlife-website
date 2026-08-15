@@ -2,8 +2,11 @@
    MEDLIFE ARTICLES API
    /api/articles
 
-   GET  -> public published articles
-   POST -> create article submission
+   GET  -> public published articles from DB
+   POST -> create article submission in DB
+
+   Member validation uses MEMBERS_DB.
+   Articles are stored exclusively in DB.
 ========================================================= */
 
 export async function onRequest(context) {
@@ -27,7 +30,14 @@ export async function onRequest(context) {
         }
 
         if (method === "POST") {
-            return await createArticle(request, env.DB);
+            if (!env.MEMBERS_DB) {
+                return json({
+                    success: false,
+                    error: "Database binding 'MEMBERS_DB' is not configured."
+                }, 500);
+            }
+
+            return await createArticle(request, env.DB, env.MEMBERS_DB);
         }
 
         return json({ success: false, error: "Method not allowed." }, 405);
@@ -67,7 +77,7 @@ async function listPublishedArticles(db) {
     });
 }
 
-async function createArticle(request, db) {
+async function createArticle(request, articlesDb, membersDb) {
     const body = await request.json();
 
     const titleAr = clean(body.title_ar, 500);
@@ -92,7 +102,7 @@ async function createArticle(request, db) {
     let authorMemberId = null;
 
     if (Number.isInteger(memberId) && memberId > 0) {
-        const member = await db.prepare(`
+        const member = await membersDb.prepare(`
             SELECT id, full_name, email, status
             FROM members
             WHERE id = ?
@@ -106,7 +116,7 @@ async function createArticle(request, db) {
         authorMemberId = member.id;
     }
 
-    const result = await db.prepare(`
+    const result = await articlesDb.prepare(`
         INSERT INTO articles (
             title_ar,
             title_en,
