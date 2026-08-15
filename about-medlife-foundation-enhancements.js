@@ -1,0 +1,10 @@
+(function(){
+  'use strict';
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.card,.num,.press a,.vol').forEach((el,i)=>{el.classList.add('mlf-reveal');el.style.setProperty('--d',(i%6)*70+'ms')});
+  if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('mlf-visible');io.unobserve(e.target)}}),{threshold:.12});document.querySelectorAll('.mlf-reveal,.title').forEach(e=>io.observe(e))}else document.querySelectorAll('.mlf-reveal').forEach(e=>e.classList.add('mlf-visible'));
+  if(!reduce){document.querySelectorAll('.card,.press a').forEach(el=>{el.addEventListener('pointermove',e=>{if(innerWidth<800)return;const r=el.getBoundingClientRect(),x=e.clientX/r.width-r.left/r.width-.5,y=e.clientY/r.height-r.top/r.height-.5;el.style.transform=`perspective(800px) rotateX(${(-y*2.5).toFixed(2)}deg) rotateY(${(x*2.5).toFixed(2)}deg) translateY(-6px)`},{passive:true});el.addEventListener('pointerleave',()=>el.style.transform='')});}
+  const hero=document.querySelector('.hero');if(hero&&!reduce){hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();hero.style.setProperty('--x',((e.clientX-r.left)/r.width*100)+'%');hero.style.setProperty('--y',((e.clientY-r.top)/r.height*100)+'%')},{passive:true})}
+  document.querySelectorAll('.press a').forEach(a=>{const pic=a.querySelector('.pic');if(!pic)return;pic.addEventListener('click',()=>{});});
+  const nums=document.querySelectorAll('.num strong');if(!reduce&&'IntersectionObserver' in window){const co=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,m=el.textContent.match(/\d+/);if(!m)return;const t=+m[0];if(t<10)return;let n=0;const step=Math.max(1,Math.ceil(t/35));el.textContent='0';const tick=()=>{n=Math.min(t,n+step);el.textContent=n+(el.dataset.suffix||'');if(n<t)requestAnimationFrame(tick)};tick();co.unobserve(el)}),{threshold:.8});nums.forEach(e=>co.observe(e))}
+})();
