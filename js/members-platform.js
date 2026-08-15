@@ -1,201 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const authPanel = document.getElementById("authPanel");
-    const app = document.getElementById("app");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const loginTab = document.getElementById("loginTab");
-    const registerTab = document.getElementById("registerTab");
-    const loginForm = document.getElementById("loginForm");
-    const registerForm = document.getElementById("registerForm");
-    const authMessage = document.getElementById("authMessage");
-    const feed = document.getElementById("feed");
-
-    let currentMember = null;
-
-    loginTab.addEventListener("click", () => switchAuth("login"));
-    registerTab.addEventListener("click", () => switchAuth("register"));
-
-    loginForm.addEventListener("submit", async event => {
-        event.preventDefault();
-        setMessage("جاري تسجيل الدخول...", "ok");
-        try {
-            const data = await api("/api/member-auth?action=login", "POST", {
-                username: document.getElementById("loginUsername").value,
-                password: document.getElementById("loginPassword").value
-            });
-            if (!data.success) throw new Error(data.error || "تعذر تسجيل الدخول.");
-            currentMember = data.member;
-            enterApp();
-        } catch (error) {
-            setMessage(error.message, "error");
-        }
-    });
-
-    registerForm.addEventListener("submit", async event => {
-        event.preventDefault();
-        setMessage("جاري إنشاء الحساب...", "ok");
-        try {
-            const data = await api("/api/member-auth?action=register", "POST", {
-                invite_code: document.getElementById("inviteCode").value,
-                username: document.getElementById("registerUsername").value,
-                password: document.getElementById("registerPassword").value
-            });
-            if (!data.success) throw new Error(data.error || "تعذر إنشاء الحساب.");
-            currentMember = data.member;
-            enterApp();
-        } catch (error) {
-            setMessage(error.message, "error");
-        }
-    });
-
-    logoutBtn.addEventListener("click", async () => {
-        await api("/api/member-auth?action=logout", "POST");
-        location.reload();
-    });
-
-    document.getElementById("saveProfile").addEventListener("click", async () => {
-        const data = await api("/api/community?action=profile", "POST", {
-            display_name: document.getElementById("displayName").value,
-            bio: document.getElementById("bio").value,
-            avatar_url: document.getElementById("avatarUrl").value,
-            skills: document.getElementById("skills").value.split(",").map(x => x.trim()).filter(Boolean)
-        });
-        if (data.success) alert("تم حفظ الملف الشخصي.");
-        else alert(data.error || "تعذر حفظ الملف.");
-    });
-
-    document.getElementById("addAchievement").addEventListener("click", async () => {
-        const title = document.getElementById("achievementTitle").value.trim();
-        if (!title) return alert("اكتب عنوان الإنجاز أولاً.");
-        const data = await api("/api/community?action=achievement", "POST", {
-            title,
-            description: document.getElementById("achievementDescription").value
-        });
-        if (data.success) {
-            document.getElementById("achievementTitle").value = "";
-            document.getElementById("achievementDescription").value = "";
-            await loadProfileExtras();
-        } else alert(data.error || "تعذر إضافة الإنجاز.");
-    });
-
-    document.getElementById("publishPost").addEventListener("click", async () => {
-        const content = document.getElementById("postContent").value.trim();
-        if (!content) return alert("اكتب محتوى المنشور أولاً.");
-        const data = await api("/api/community?action=post", "POST", { content });
-        if (data.success) {
-            document.getElementById("postContent").value = "";
-            await loadFeed();
-        } else alert(data.error || "تعذر نشر المشاركة.");
-    });
-
-    async function init() {
-        try {
-            const data = await api("/api/member-auth?action=me", "GET");
-            if (data.success && data.authenticated) {
-                currentMember = data.member;
-                enterApp();
-            }
-        } catch (_) {}
-    }
-
-    function enterApp() {
-        authPanel.classList.add("hidden");
-        app.classList.remove("hidden");
-        logoutBtn.classList.remove("hidden");
-        renderProfile();
-        loadFeed();
-        loadProfileExtras();
-    }
-
-    function renderProfile() {
-        document.getElementById("profileName").textContent = currentMember.display_name || currentMember.full_name || "متطوع MedLife";
-        document.getElementById("profileSub").textContent = [currentMember.profession, currentMember.field_city].filter(Boolean).join(" · ") || "عضو في المجتمع";
-        document.getElementById("displayName").value = currentMember.display_name || currentMember.full_name || "";
-        document.getElementById("bio").value = currentMember.bio || "";
-        document.getElementById("skills").value = Array.isArray(currentMember.skills) ? currentMember.skills.join(", ") : "";
-        document.getElementById("avatarUrl").value = currentMember.avatar_url || "";
-        const avatar = document.getElementById("avatar");
-        if (currentMember.avatar_url) avatar.innerHTML = `<img src="${escapeAttr(currentMember.avatar_url)}" alt="">`;
-        else avatar.textContent = initials(currentMember.display_name || currentMember.full_name || "ML");
-    }
-
-    async function loadProfileExtras() {
-        const data = await api(`/api/community?action=achievements&member_id=${currentMember.id}`, "GET");
-        if (!data.success) return;
-        document.getElementById("achievementCount").textContent = (data.achievements || []).length;
-    }
-
-    async function loadFeed() {
-        feed.innerHTML = `<div class="empty">جاري تحميل المجتمع...</div>`;
-        const data = await api("/api/community?action=feed", "GET");
-        if (!data.success) {
-            feed.innerHTML = `<div class="empty">تعذر تحميل المجتمع.</div>`;
-            return;
-        }
-        const posts = data.posts || [];
-        document.getElementById("postsCount").textContent = posts.filter(p => p.member_id === currentMember.id).length;
-        if (!posts.length) {
-            feed.innerHTML = `<div class="empty">لا توجد منشورات بعد. كن أول من يشارك شيئاً مع مجتمع MedLife!</div>`;
-            return;
-        }
-        feed.innerHTML = posts.map(renderPost).join("");
-        feed.querySelectorAll("[data-like]").forEach(btn => btn.addEventListener("click", async () => {
-            const postId = Number(btn.dataset.like);
-            const res = await api("/api/community?action=like", "POST", { post_id: postId });
-            if (res.success) await loadFeed();
-        }));
-        feed.querySelectorAll("[data-comment-form]").forEach(form => form.addEventListener("submit", async e => {
-            e.preventDefault();
-            const postId = Number(form.dataset.commentForm);
-            const input = form.querySelector("input");
-            const content = input.value.trim();
-            if (!content) return;
-            const res = await api("/api/community?action=comment", "POST", { post_id: postId, content });
-            if (res.success) { input.value = ""; await loadFeed(); }
-        }));
-    }
-
-    function renderPost(post) {
-        const comments = (post.comments || []).map(comment => `
-            <div class="comment"><div class="comment-body"><div class="comment-name">${escapeHtml(comment.author_name || "عضو")}</div><div class="comment-text">${escapeHtml(comment.content)}</div></div></div>
-        `).join("");
-        return `
-            <article class="card post">
-                <div class="post-top"><div class="avatar" style="width:44px;height:44px;font-size:16px">${post.avatar_url ? `<img src="${escapeAttr(post.avatar_url)}" alt="">` : escapeHtml(initials(post.author_name || "ML"))}</div><div><div class="post-author">${escapeHtml(post.author_name || "عضو MedLife")}</div><div class="post-time">${formatDate(post.created_at)}</div></div></div>
-                <div class="post-content">${escapeHtml(post.content)}</div>
-                <div class="post-actions"><button class="action" data-like="${post.id}"><i class="fa-regular fa-heart"></i> ${post.likes_count || 0}</button><span class="action"><i class="fa-regular fa-comment"></i> ${post.comments_count || 0}</span></div>
-                ${comments}
-                <form class="comment-form" data-comment-form="${post.id}"><input placeholder="اكتب تعليقاً..."><button class="btn btn-light">إرسال</button></form>
-            </article>
-        `;
-    }
-
-    function switchAuth(type) {
-        const login = type === "login";
-        loginTab.classList.toggle("active", login);
-        registerTab.classList.toggle("active", !login);
-        loginForm.classList.toggle("hidden", !login);
-        registerForm.classList.toggle("hidden", login);
-        authMessage.className = "message";
-    }
-
-    function setMessage(text, type) {
-        authMessage.textContent = text;
-        authMessage.className = `message show ${type}`;
-    }
-
-    async function api(url, method, body) {
-        const options = { method, credentials: "same-origin", headers: { "Accept": "application/json" } };
-        if (body !== undefined) { options.headers["Content-Type"] = "application/json"; options.body = JSON.stringify(body); }
-        const response = await fetch(url, options);
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok && !data.error) data.error = "تعذر تنفيذ الطلب.";
-        return data;
-    }
-
-    function initials(name) { return String(name).trim().split(/\s+/).slice(0,2).map(x => x[0]).join("").toUpperCase() || "ML"; }
-    function formatDate(value) { const d = new Date(value); return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("ar-SY", {year:"numeric",month:"long",day:"numeric"}); }
-    function escapeHtml(value) { return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
-    function escapeAttr(value) { return escapeHtml(value); }
-
+    const authPanel=document.getElementById("authPanel"),app=document.getElementById("app"),logoutBtn=document.getElementById("logoutBtn"),loginTab=document.getElementById("loginTab"),registerTab=document.getElementById("registerTab"),loginForm=document.getElementById("loginForm"),registerForm=document.getElementById("registerForm"),authMessage=document.getElementById("authMessage"),feed=document.getElementById("feed");
+    let currentMember=null;
+    const invite=new URLSearchParams(location.search).get("invite");
+    if(invite){document.getElementById("inviteCode").value=invite;switchAuth("register")}
+    loginTab.addEventListener("click",()=>switchAuth("login"));registerTab.addEventListener("click",()=>switchAuth("register"));
+    loginForm.addEventListener("submit",async e=>{e.preventDefault();setMessage("جاري تسجيل الدخول...","ok");try{const data=await api("/api/member-auth?action=login","POST",{username:document.getElementById("loginUsername").value,password:document.getElementById("loginPassword").value});if(!data.success)throw new Error(data.error||"تعذر تسجيل الدخول.");currentMember=data.member;enterApp()}catch(error){setMessage(error.message,"error")}});
+    registerForm.addEventListener("submit",async e=>{e.preventDefault();setMessage("جاري إنشاء الحساب...","ok");try{const data=await api("/api/member-auth?action=register","POST",{invite_code:document.getElementById("inviteCode").value,username:document.getElementById("registerUsername").value,password:document.getElementById("registerPassword").value});if(!data.success)throw new Error(data.error||"تعذر إنشاء الحساب.");currentMember=data.member;history.replaceState({},document.title,"members.html");enterApp()}catch(error){setMessage(error.message,"error")}});
+    logoutBtn.addEventListener("click",async()=>{await api("/api/member-auth?action=logout","POST");location.reload()});
+    document.getElementById("saveProfile").addEventListener("click",async()=>{try{const data=await api("/api/community?action=profile","POST",{display_name:document.getElementById("displayName").value,bio:document.getElementById("bio").value,avatar_url:document.getElementById("avatarUrl").value,skills:document.getElementById("skills").value.split(",").map(x=>x.trim()).filter(Boolean)});if(data.success)alert("تم حفظ الملف الشخصي.");else alert(data.error||"تعذر حفظ الملف.")}catch(e){alert(e.message)}});
+    document.getElementById("addAchievement").addEventListener("click",async()=>{const title=document.getElementById("achievementTitle").value.trim();if(!title)return alert("اكتب عنوان الإنجاز أولاً.");const data=await api("/api/community?action=achievement","POST",{title,description:document.getElementById("achievementDescription").value});if(data.success){document.getElementById("achievementTitle").value="";document.getElementById("achievementDescription").value="";await loadProfileExtras()}else alert(data.error||"تعذر إضافة الإنجاز.")});
+    document.getElementById("publishPost").addEventListener("click",async()=>{const content=document.getElementById("postContent").value.trim();if(!content)return alert("اكتب محتوى المنشور أولاً.");const data=await api("/api/community?action=post","POST",{content});if(data.success){document.getElementById("postContent").value="";await loadFeed()}else alert(data.error||"تعذر نشر المشاركة.")});
+    async function init(){try{const data=await api("/api/member-auth?action=me","GET");if(data.success&&data.authenticated){currentMember=data.member;enterApp()}}catch(_) {}}
+    function enterApp(){authPanel.classList.add("hidden");app.classList.remove("hidden");logoutBtn.classList.remove("hidden");renderProfile();loadFeed();loadProfileExtras()}
+    function renderProfile(){document.getElementById("profileName").textContent=currentMember.display_name||currentMember.full_name||"عضو MedLife";document.getElementById("profileSub").textContent=[currentMember.medlife_role,currentMember.governorate].filter(Boolean).join(" · ")||"عضو في المجتمع";document.getElementById("displayName").value=currentMember.display_name||currentMember.full_name||"";document.getElementById("bio").value=currentMember.bio||"";document.getElementById("skills").value=Array.isArray(currentMember.skills)?currentMember.skills.join(", "):"";document.getElementById("avatarUrl").value=currentMember.avatar_url||"";const avatar=document.getElementById("avatar");if(currentMember.avatar_url)avatar.innerHTML=`<img src="${escapeAttr(currentMember.avatar_url)}" alt="">`;else avatar.textContent=initials(currentMember.display_name||currentMember.full_name||"ML")}
+    async function loadProfileExtras(){const data=await api(`/api/community?action=achievements&member_id=${currentMember.id}`,"GET");if(data.success)document.getElementById("achievementCount").textContent=(data.achievements||[]).length}
+    async function loadFeed(){feed.innerHTML=`<div class="empty">جاري تحميل المجتمع...</div>`;const data=await api("/api/community?action=feed","GET");if(!data.success){feed.innerHTML=`<div class="empty">تعذر تحميل المجتمع.</div>`;return}const posts=data.posts||[];document.getElementById("postsCount").textContent=posts.filter(p=>Number(p.member_id)===Number(currentMember.id)).length;if(!posts.length){feed.innerHTML=`<div class="empty">لا توجد منشورات بعد. كن أول من يشارك شيئاً مع مجتمع MedLife!</div>`;return}feed.innerHTML=posts.map(renderPost).join("");feed.querySelectorAll("[data-like]").forEach(btn=>btn.addEventListener("click",async()=>{const res=await api("/api/community?action=like","POST",{post_id:Number(btn.dataset.like)});if(res.success)await loadFeed()}));feed.querySelectorAll("[data-comment-form]").forEach(form=>form.addEventListener("submit",async e=>{e.preventDefault();const input=form.querySelector("input"),content=input.value.trim();if(!content)return;const res=await api("/api/community?action=comment","POST",{post_id:Number(form.dataset.commentForm),content});if(res.success){input.value="";await loadFeed()}}))}
+    function renderPost(post){const comments=(post.comments||[]).map(c=>`<div class="comment"><div class="comment-body"><div class="comment-name">${escapeHtml(c.author_name||"عضو")}</div><div class="comment-text">${escapeHtml(c.content)}</div></div></div>`).join("");return `<article class="card post"><div class="post-top"><div class="avatar" style="width:44px;height:44px;font-size:16px">${post.avatar_url?`<img src="${escapeAttr(post.avatar_url)}" alt="">`:escapeHtml(initials(post.author_name||"ML"))}</div><div><div class="post-author">${escapeHtml(post.author_name||"عضو MedLife")}</div><div class="post-time">${formatDate(post.created_at)}</div></div></div><div class="post-content">${escapeHtml(post.content)}</div><div class="post-actions"><button class="action" data-like="${post.id}"><i class="fa-regular fa-heart"></i> ${post.likes_count||0}</button><span class="action"><i class="fa-regular fa-comment"></i> ${post.comments_count||0}</span></div>${comments}<form class="comment-form" data-comment-form="${post.id}"><input placeholder="اكتب تعليقاً..."><button class="btn btn-light">إرسال</button></form></article>`}
+    function switchAuth(type){const login=type==="login";loginTab.classList.toggle("active",login);registerTab.classList.toggle("active",!login);loginForm.classList.toggle("hidden",!login);registerForm.classList.toggle("hidden",login);authMessage.className="message"}
+    function setMessage(text,type){authMessage.textContent=text;authMessage.className=`message show ${type}`}
+    async function api(url,method="GET",body){const options={method,credentials:"same-origin",headers:{Accept:"application/json"}};if(body!==undefined){options.headers["Content-Type"]="application/json";options.body=JSON.stringify(body)}const response=await fetch(url,options);const data=await response.json().catch(()=>({}));if(!response.ok&&!data.error)data.error="تعذر تنفيذ الطلب.";return data}
+    function initials(name){return String(name).trim().split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase()||"ML"}function formatDate(v){const d=new Date(v);return Number.isNaN(d.getTime())?"":d.toLocaleDateString("ar-SY",{year:"numeric",month:"long",day:"numeric"})}function escapeHtml(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;")}function escapeAttr(v){return escapeHtml(v)}
     init();
 });
