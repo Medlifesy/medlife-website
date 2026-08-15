@@ -1,0 +1,2 @@
+import { ensureAuthTables, getCookie, hashToken, json, cookie } from './_auth.js';
+export async function onRequest({request,env}){if(request.method!=='POST')return json({success:false,error:'Method not allowed.'},405);try{await ensureAuthTables(env.MEMBERS_DB);const raw=getCookie(request,'medlife_session');if(raw)await env.MEMBERS_DB.prepare('DELETE FROM member_sessions WHERE token_hash=?').bind(await hashToken(raw)).run();return json({success:true},200,{'Set-Cookie':cookie('medlife_session','',0)})}catch(e){return json({success:false,error:'تعذر تسجيل الخروج.'},500)}}
