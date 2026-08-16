@@ -9,17 +9,9 @@ export async function onRequest(context) {
 
   let html = await response.text();
 
-  // Keep the homepage navigation clean.
-  html = html.replace(
-    /<li><a href="#activities">[\s\S]*?<\/a><\/li>/i,
-    '<li><a href="#homepageGallery">صورنا</a></li>'
-  );
-  html = html.replace(
-    /<a href="#activities">[\s\S]*?<\/a>/i,
-    '<a href="#homepageGallery">صورنا</a>'
-  );
+  html = html.replace(/<li><a href="#activities">[\s\S]*?<\/a><\/li>/i,'<li><a href="#homepageGallery">صورنا</a></li>');
+  html = html.replace(/<a href="#activities">[\s\S]*?<\/a>/i,'<a href="#homepageGallery">صورنا</a>');
 
-  // Remove any previous fixed/dynamic homepage gallery so only one remains.
   html = html.replace(/<section[^>]+id=["']activities["'][\s\S]*?<\/section>/gi, "");
   html = html.replace(/<section[^>]+id=["']homepageGallery["'][\s\S]*?<\/section>/gi, "");
 
@@ -44,27 +36,25 @@ export async function onRequest(context) {
         ? files.filter(f => f && f.type === "file" && allowed.test(f.name))
         : [];
 
-      images.sort((a, b) => String(a.name).localeCompare(String(b.name), undefined, { numeric: true, sensitivity: "base" }));
+      images.sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{numeric:true,sensitivity:"base"}));
 
-      cards = images.map((image, index) => {
-        const clean = String(image.name || "")
-          .replace(/\.[^/.]+$/, "")
-          .replace(/[_-]+/g, " ")
-          .trim();
-        const titles = [
+      // Homepage: show only a small curated selection. The full archive lives on gallery.html.
+      const featured = images.slice(0, 6);
+
+      cards = featured.map((image,index)=>{
+        const clean=String(image.name||"").replace(/\.[^/.]+$/,'').replace(/[_-]+/g,' ').trim();
+        const titles=[
           "من ميدان العمل التطوعي",
           "مبادرة صحية من ميدلايف",
           "فريق ميدلايف في الميدان",
           "معاً نصنع الأثر",
           "من أنشطة ميدلايف المجتمعية",
-          "لقطة من مسيرة العطاء",
-          "ميدلايف تجمعنا",
-          "نحو مجتمع أكثر صحة"
+          "لحظات من مسيرة العطاء"
         ];
-        const title = clean && !/^\d+$/.test(clean) ? clean : titles[index % titles.length];
-        const src = image.download_url || `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${image.path.split("/").map(encodeURIComponent).join("/")}`;
-        const safe = String(src).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
-        const safeTitle = String(title).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+        const title=clean&&!/^\d+$/.test(clean)?clean:titles[index%titles.length];
+        const src=image.download_url||`https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${image.path.split('/').map(encodeURIComponent).join('/')}`;
+        const safe=String(src).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+        const safeTitle=String(title).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
         return `<article class="photo-card"><img src="${safe}" alt="${safeTitle}" loading="lazy" decoding="async"><div class="photo-shade"></div><div class="photo-info"><strong>${safeTitle}</strong><span>لقطة من أنشطة ومبادرات فريق ميدلايف.</span></div></article>`;
       }).join("");
     }
@@ -73,7 +63,6 @@ export async function onRequest(context) {
   if (!cards) {
     cards = `<div class="gallery-empty">تعذر تحميل الصور حالياً.</div>`;
   } else {
-    // Duplicate the set once for a seamless continuous marquee.
     cards += cards;
   }
 
@@ -88,6 +77,9 @@ export async function onRequest(context) {
     <div class="photo-marquee" aria-label="صور من أنشطة ميدلايف">
       <div class="photo-track">${cards}</div>
     </div>
+    <div class="gallery-more-wrap">
+      <a class="gallery-more-btn" href="gallery.html"><span>رؤية المزيد من الصور</span><i class="fa-solid fa-arrow-left"></i></a>
+    </div>
   </div>
 </section>`;
 
@@ -96,7 +88,7 @@ export async function onRequest(context) {
   const style = `<style id="medlife-home-gallery-style">
 .medlife-photo-section{background:linear-gradient(180deg,#fff,#f6f8fc)}
 .medlife-photo-section .photo-marquee{overflow:hidden;position:relative;padding:8px 0 20px;mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
-.medlife-photo-section .photo-track{display:flex;gap:18px;width:max-content;direction:ltr;animation:medlifePhotoMove 75s linear infinite}
+.medlife-photo-section .photo-track{display:flex;gap:18px;width:max-content;direction:ltr;animation:medlifePhotoMove 42s linear infinite}
 .medlife-photo-section .photo-marquee:hover .photo-track{animation-play-state:paused}
 .medlife-photo-section .photo-card{position:relative;flex:0 0 290px;height:330px;border-radius:24px;overflow:hidden;background:#fff;border:1px solid #e2e8f0;box-shadow:0 15px 45px rgba(21,29,54,.1);cursor:zoom-in;transition:transform .35s,box-shadow .35s}
 .medlife-photo-section .photo-card:hover{transform:translateY(-8px) scale(1.015);box-shadow:0 25px 65px rgba(21,29,54,.18)}
@@ -106,16 +98,15 @@ export async function onRequest(context) {
 .medlife-photo-section .photo-info{position:absolute;right:0;left:0;bottom:0;padding:22px 18px;color:#fff;text-align:right}
 .medlife-photo-section .photo-info strong{display:block;font-size:17px}.medlife-photo-section .photo-info span{display:block;margin-top:3px;color:#e2e8f0;font-size:12px}
 .medlife-photo-section .gallery-empty{padding:40px;color:#64748b;background:#fff;border:1px solid #e2e8f0;border-radius:20px;text-align:center;min-width:320px}
+.gallery-more-wrap{text-align:center;margin-top:10px}.gallery-more-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:14px;background:#ff2a54;color:#fff;font-weight:900;box-shadow:0 12px 30px rgba(255,42,84,.22);transition:.25s}.gallery-more-btn:hover{transform:translateY(-3px);box-shadow:0 16px 35px rgba(255,42,84,.3)}
 @keyframes medlifePhotoMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(max-width:700px){.medlife-photo-section .photo-card{flex-basis:250px;height:290px}.medlife-photo-section .photo-track{gap:12px;animation-duration:60s}}
+@media(max-width:700px){.medlife-photo-section .photo-card{flex-basis:250px;height:290px}.medlife-photo-section .photo-track{gap:12px;animation-duration:32s}.gallery-more-btn{width:100%;justify-content:center}}
 @media(prefers-reduced-motion:reduce){.medlife-photo-section .photo-track{animation:none!important}}
 </style>`;
 
-  if (!html.includes('id="medlife-home-gallery-style"')) {
-    html = html.replace("</head>", `${style}</head>`);
-  }
+  if (!html.includes('id="medlife-home-gallery-style"')) html=html.replace("</head>",`${style}</head>`);
 
-  const headers = new Headers(response.headers);
-  headers.set("cache-control", "no-cache, no-store, must-revalidate");
-  return new Response(html, { status: response.status, statusText: response.statusText, headers });
+  const headers=new Headers(response.headers);
+  headers.set("cache-control","no-cache, no-store, must-revalidate");
+  return new Response(html,{status:response.status,statusText:response.statusText,headers});
 }
