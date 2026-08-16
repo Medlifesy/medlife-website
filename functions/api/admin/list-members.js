@@ -1,11 +1,13 @@
 import { ensureAuthTables, json } from '../_auth.js';
+import { authenticateAdmin } from '../_admin-auth.js';
 
 export async function onRequest({request,env}){
   if(request.method!=='GET') return json({success:false,error:'Method not allowed.'},405);
   if(!env.MEMBERS_DB) return json({success:false,error:'Database binding is not configured.'},500);
-  if(!env.ADMIN_API_KEY || request.headers.get('X-Admin-Key')!==env.ADMIN_API_KEY) return json({success:false,error:'غير مصرح.'},401);
   try{
     await ensureAuthTables(env.MEMBERS_DB);
+    const admin=await authenticateAdmin(request,env.MEMBERS_DB);
+    if(!admin) return json({success:false,error:'غير مصرح.'},401);
     const cols=await env.MEMBERS_DB.prepare('PRAGMA table_info(members)').all();
     const have=new Set((cols.results||[]).map(x=>x.name));
     for(const [name,type] of [['employment_status','TEXT'],['consultation_specialty','TEXT']]) if(!have.has(name)) await env.MEMBERS_DB.prepare(`ALTER TABLE members ADD COLUMN ${name} ${type}`).run();
