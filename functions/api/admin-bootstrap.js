@@ -1,4 +1,3 @@
-import { ensureAdminTables } from './_admin-auth.js';
 import { hashPassword, json } from './_auth.js';
 
 const ADMIN_EMAIL = 'admin@medlifesy.org';
@@ -20,112 +19,63 @@ export async function onRequest({ request, env }) {
     if (password !== confirmPassword) return json({ success: false, error: 'كلمتا المرور غير متطابقتين.' }, 400);
 
     const db = env.MEMBERS_DB;
-    await ensureAdminTables(db);
 
-    const existingAdmin = await db.prepare(`
-      SELECT m.id
-      FROM members m
-      WHERE lower(COALESCE(m.account_email,''))=?
-        AND (
-          lower(COALESCE(m.medlife_role,'')) LIKE '%admin%'
-          OR lower(COALESCE(m.medlife_role,'')) LIKE '%administrator%'
-          OR lower(COALESCE(m.medlife_role,'')) LIKE '%مشرف%'
-          OR lower(COALESCE(m.medlife_role,'')) LIKE '%إدارة%'
-          OR lower(COALESCE(m.medlife_role,'')) LIKE '%مدير%'
-          OR lower(COALESCE(m.medlife_role,'')) LIKE '%رئيس%'
-        )
-      LIMIT 1
-    `).bind(ADMIN_EMAIL).first();
-
-    if (existingAdmin) {
-      return json({ success: false, error: 'حساب الإدارة الأول موجود بالفعل. استخدم صفحة تسجيل الدخول.' }, 409);
-    }
-
-    const existingEmail = await db.prepare(`
-      SELECT id FROM members
-      WHERE lower(COALESCE(email,''))=? OR lower(COALESCE(account_email,''))=?
-      LIMIT 1
-    `).bind(ADMIN_EMAIL, ADMIN_EMAIL).first();
-
-    if (existingEmail) {
-      return json({ success: false, error: 'البريد الإلكتروني مستخدم مسبقاً.' }, 409);
-    }
-
-    const passwordHash = await hashPassword(password);
-
-    // Prefer the existing verified MedLife member instead of creating a duplicate person.
+    // Do not create a second person. Reuse the existing verified member.
     const existingMember = await db.prepare(`
-      SELECT id, full_name, email, status
+      SELECT id, full_name, email, status, account_email, medlife_role
       FROM members
       WHERE lower(COALESCE(email,''))=?
       LIMIT 1
     `).bind(EXISTING_ADMIN_MEMBER_EMAIL).first();
 
-    if (existingMember) {
-      const memberCode = `ADMIN-${Date.now()}`;
-      await db.prepare(`
-        UPDATE members
-        SET account_email=?,
-            password_hash=?,
-            account_status='active',
-            medlife_role='admin',
-            status='active',
-            member_code=?,
-            updated_at=CURRENT_TIMESTAMP
-        WHERE id=?
-      `).bind(
-        ADMIN_EMAIL,
-        passwordHash,
-        memberCode,
-        existingMember.id
-      ).run();
-
-      return json({
-        success: true,
-        message: 'تم تفعيل حساب الإدارة على العضو الموجود بنجاح.',
-        member_id: existingMember.id,
-        email: ADMIN_EMAIL
-      });
+    if (!existingMember) {
+      return json({ success: false, error: 'لم يتم العثور على العضو الإداري الموجود.', error_code: 'EXISTING_MEMBER_NOT_FOUND' }, 404);
     }
 
-    // Fallback only if the existing member cannot be found.
+    const emailOwner = await db.prepare(`
+      SELECT id, email, account_email
+      FROM members
+      WHERE id<>?
+        AND (lower(COALESCE(email,''))=? OR lower(COALESCE(account_email,''))=?)
+      LIMIT 1
+    `).bind(existingMember.id, ADMIN_EMAIL, ADMIN_EMAIL).first();
+
+    if (emailOwner) {
+      return json({ success: false, error: 'البريد الإداري مستخدم من عضو آخر.', error_code: 'ADMIN_EMAIL_ALREADY_USED' }, 409);
+    }
+
+    const passwordHash = await hashPassword(password);
     const memberCode = `ADMIN-${Date.now()}`;
-    const fullName = 'MedLife Administrator';
-    const nationalId = `ADMIN-${Date.now()}`;
 
     const result = await db.prepare(`
-      INSERT INTO members (
-        full_name,mother_name,national_id,email,gender,education_level,
-        governorate,medlife_role,cell,join_date,volunteer_certificate,
-        status,account_email,password_hash,account_status,member_code
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-    `).bind(
-      fullName,
-      'MedLife',
-      nationalId,
-      ADMIN_EMAIL,
-      'not_specified',
-      'administrator',
-      'Tartous',
-      'admin',
-      'administration',
-      new Date().toISOString().slice(0, 10),
-      'no',
-      'active',
-      ADMIN_EMAIL,
-      passwordHash,
-      'active',
-      memberCode
-    ).run();
+      UPDATE members
+      SET account_email=?,
+          password_hash=?,
+          account_status='active',
+          medlife_role='admin',
+          status='active',
+          member_code=?,
+          updated_at=CURRENT_TIMESTAMP
+      WHERE id=?
+    `).bind(ADMIN_EMAIL, passwordHash, memberCode, existingMember.id).run();
+
+    const changes = Number(result?.meta?.changes ?? 0);
+    if (changes !== 1) {
+      return json({ success: false, error: 'تعذر تحديث سجل العضو الإداري.', error_code: 'MEMBER_UPDATE_FAILED' }, 500);
+    }
 
     return json({
       success: true,
-      message: 'تم إنشاء حساب الإدارة بنجاح.',
-      member_id: result.meta?.last_row_id || null,
+      message: 'تم تفعيل حساب الإدارة على العضو الموجود بنجاح.',
+      member_id: existingMember.id,
       email: ADMIN_EMAIL
     });
   } catch (error) {
     console.error('admin-bootstrap error:', error);
-    return json({ success: false, error: 'تعذر إنشاء حساب الإدارة.' }, 500);
+    return json({
+      success: false,
+      error: 'تعذر إنشاء حساب الإدارة.',
+      error_code: 'ADMIN_BOOTSTRAP_ERROR'
+    }, 500);
   }
 }
