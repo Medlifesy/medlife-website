@@ -1,59 +1,73 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MedLife | لوحة الإدارة</title>
+<meta name="theme-color" content="#12203a">
 <link rel="icon" href="logo.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/homepage-redesign.css">
 <style>
-:root{--primary:#0b8f87;--primary-dark:#08736d;--secondary:#1b4965;--bg:#f5faf9;--card:#fff;--text:#24323d;--muted:#71808c;--border:#e4eceb;--success:#198754;--warning:#d99a00;--danger:#dc3545;--shadow:0 10px 35px rgba(20,70,70,.08)}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Tahoma,sans-serif;background:var(--bg);color:var(--text)}
-header{background:#fff;border-bottom:1px solid var(--border);padding:18px 24px;position:sticky;top:0;z-index:10}.header-inner{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:13px}.logo{width:52px;height:52px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:800}.brand h1{margin:0;color:var(--secondary);font-size:22px}.brand p{margin:4px 0 0;color:var(--muted);font-size:12px}.back{color:var(--primary);text-decoration:none;border:1px solid var(--primary);padding:10px 16px;border-radius:9px;font-weight:700}.back:hover{background:var(--primary);color:#fff}
-.wrap{max-width:1200px;margin:34px auto;padding:0 20px}.welcome{margin-bottom:24px}.welcome h2{margin:0 0 7px;color:var(--secondary);font-size:29px}.welcome p{margin:0;color:var(--muted)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:25px}.stat{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:20px;box-shadow:var(--shadow)}.stat .label{color:var(--muted);font-size:13px}.stat .num{font-size:30px;font-weight:800;color:var(--primary);margin-top:8px}.stat.warning .num{color:var(--warning)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}.card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:25px;box-shadow:var(--shadow)}.icon{font-size:34px;margin-bottom:12px}.card h3{margin:0 0 8px;color:var(--secondary);font-size:21px}.card p{margin:0 0 20px;color:var(--muted);line-height:1.8;font-size:14px}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-block;text-decoration:none;border:0;border-radius:9px;padding:11px 17px;font-family:inherit;font-weight:700;cursor:pointer}.primary{background:var(--primary);color:#fff}.primary:hover{background:var(--primary-dark)}.secondary{background:#eef6f5;color:var(--primary-dark)}.secondary:hover{background:#e0efed}
-.status{margin-top:22px;padding:15px 17px;border-radius:11px;background:#eef6f5;color:var(--primary-dark);font-size:14px}.status.error{background:#fdecec;color:var(--danger)}footer{margin-top:50px;background:var(--secondary);color:#fff;text-align:center;padding:25px 20px;font-size:13px}
-@media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.header-inner{align-items:flex-start}.wrap{margin-top:25px}}@media(max-width:480px){.stats{grid-template-columns:1fr}.header-inner{flex-direction:column}.back{width:100%;text-align:center}}
+.admin-page{background:var(--ml-bg);min-height:100vh;color:var(--ml-ink)}
+.admin-header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--ml-line);box-shadow:0 8px 30px rgba(18,32,58,.05)}
+.admin-header-inner{width:min(var(--ml-max),calc(100% - 32px));min-height:82px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.admin-brand{display:flex;align-items:center;gap:13px}.admin-logo{width:52px;height:52px;object-fit:contain;flex:none}.admin-brand h1{margin:0;color:var(--ml-navy);font-size:20px;font-weight:900}.admin-brand p{margin:2px 0 0;color:var(--ml-muted);font-size:11px;font-weight:700}
+.admin-back{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 17px;border:1px solid var(--ml-line);border-radius:13px;color:var(--ml-navy);background:#fff;font-size:12px;font-weight:900;transition:.3s}.admin-back:hover{transform:translateY(-2px);border-color:#ffd4dc;color:var(--ml-red);box-shadow:0 12px 25px rgba(18,32,58,.07)}
+.admin-main{width:min(var(--ml-max),calc(100% - 32px));margin:auto;padding:58px 0 80px}.admin-heading{text-align:center;max-width:780px;margin:0 auto 38px}.admin-heading .ml-eyebrow{margin-bottom:6px}.admin-heading h2{margin:8px 0 12px;color:var(--ml-navy);font-size:clamp(30px,4vw,44px);line-height:1.62}.admin-heading p{margin:0;color:var(--ml-muted);font-size:13px;line-height:2.1}
+.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border:1px solid var(--ml-line);border-radius:22px;box-shadow:var(--ml-shadow);overflow:hidden;margin-bottom:26px}.admin-stat{text-align:center;padding:23px 12px;position:relative}.admin-stat+.admin-stat:before{content:"";position:absolute;inset:25% auto 25% 0;border-left:1px solid var(--ml-line)}.admin-stat .label{display:block;color:var(--ml-muted);font-size:11px;font-weight:800}.admin-stat .num{display:block;margin-top:7px;color:var(--ml-red);font-size:30px;font-weight:900;line-height:1.2}.admin-stat.warning .num{color:#b77900}
+.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.admin-card{position:relative;overflow:hidden;background:rgba(255,255,255,.97);border:1px solid var(--ml-line);border-radius:var(--ml-radius);padding:30px;box-shadow:0 15px 45px rgba(18,32,58,.06);transition:.35s}.admin-card:before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:3px;background:linear-gradient(90deg,var(--ml-red),transparent)}.admin-card:hover{transform:translateY(-5px);box-shadow:var(--ml-shadow)}.admin-icon{width:54px;height:54px;display:grid;place-items:center;border-radius:16px;background:#fff1f4;color:var(--ml-red);font-size:25px;margin-bottom:17px}.admin-card h3{margin:0 0 9px;color:var(--ml-navy);font-size:21px;line-height:1.55}.admin-card p{margin:0 0 21px;color:var(--ml-muted);font-size:13px;line-height:2.08}.admin-actions{display:flex;gap:9px;flex-wrap:wrap}.admin-btn{display:inline-flex;align-items:center;justify-content:center;min-height:45px;padding:10px 17px;border-radius:13px;font-family:Cairo,sans-serif;font-size:12px;font-weight:900;transition:.3s;border:0;cursor:pointer}.admin-btn:hover:not(:disabled){transform:translateY(-2px)}.admin-btn-primary{background:var(--ml-red);color:#fff;box-shadow:0 12px 25px rgba(229,31,69,.18)}.admin-btn-primary:hover{background:var(--ml-red-dark)}.admin-btn-secondary{background:#fff;color:var(--ml-navy);border:1px solid var(--ml-line)}.admin-btn-secondary:hover{border-color:#ffd4dc;color:var(--ml-red)}.admin-btn:disabled{opacity:.55;cursor:not-allowed}
+.admin-status{margin-top:20px;padding:15px 18px;border-radius:16px;background:#fff;border:1px solid var(--ml-line);color:var(--ml-muted);font-size:12px;line-height:1.9}.admin-status.ok{background:#f0faf6;color:#167346;border-color:#d8f0e3}.admin-status.error{background:#fff5f6;color:#b42323;border-color:#ffd8df}
+.admin-footer{background:#0b1220;color:#94a3b8;text-align:center;padding:27px 20px;font-size:10px;line-height:2}.admin-footer strong{display:block;color:#e2e8f0;font-size:11px;margin-bottom:3px}
+@media(max-width:900px){.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-stat:nth-child(odd):after{content:"";position:absolute;inset:25% 0 25% auto;border-right:1px solid var(--ml-line)}.admin-stat:nth-child(-n+2):after{content:"";position:absolute;left:0;right:0;bottom:0;border-bottom:1px solid var(--ml-line)}.admin-stat+.admin-stat:before{display:none}}
+@media(max-width:700px){.admin-header-inner{min-height:72px}.admin-brand h1{font-size:17px}.admin-logo{width:45px;height:45px}.admin-back{min-height:40px;padding:8px 12px;font-size:10px}.admin-main{width:calc(100% - 24px);padding:48px 0 65px}.admin-grid{grid-template-columns:1fr}.admin-heading h2{font-size:30px}.admin-heading p{font-size:12px}.admin-card{padding:24px}.admin-stats{border-radius:18px}.admin-stat{padding:18px 7px}.admin-stat .num{font-size:25px}.admin-stat .label{font-size:9px}}
+@media(max-width:430px){.admin-header-inner{gap:10px}.admin-back{font-size:9px;padding-inline:10px}.admin-brand p{font-size:9px}.admin-brand h1{font-size:15px}.admin-main{padding-top:38px}}
 </style>
 </head>
-<body>
-<header><div class="header-inner"><div class="brand"><div class="logo">ML</div><div><h1>MED-LIFE</h1><p>لوحة الإدارة المركزية</p></div></div><a class="back" href="/">العودة إلى الموقع</a></div></header>
-<main class="wrap">
-<section class="welcome"><h2>لوحة إدارة MedLife</h2><p>من هنا يمكنك إدارة أعضاء الفريق والمقالات والطلبات الواردة.</p></section>
-<section class="stats">
-<div class="stat"><div class="label">إجمالي الأعضاء</div><div class="num" id="membersCount">—</div></div>
-<div class="stat warning"><div class="label">طلبات الانضمام</div><div class="num" id="applicationsCount">—</div></div>
-<div class="stat"><div class="label">حالة قاعدة الأعضاء</div><div class="num" id="dbStatus">—</div></div>
-<div class="stat"><div class="label">النظام</div><div class="num">Admin</div></div>
+<body class="admin-page">
+<header class="admin-header">
+<div class="admin-header-inner">
+<div class="admin-brand"><img class="admin-logo" src="/logo.PNG" alt="MedLife"><div><h1>MED-LIFE</h1><p>لوحة الإدارة المركزية</p></div></div>
+<a class="admin-back" href="/">العودة إلى الموقع <span aria-hidden="true">←</span></a>
+</div>
+</header>
+<main class="admin-main">
+<section class="admin-heading"><div class="ml-eyebrow">إدارة ميدلايف</div><h2>لوحة الإدارة المركزية</h2><p>مساحة موحدة لإدارة أعضاء الفريق، طلبات الانضمام، والمقالات التي يرسلها فريق ميدلايف.</p></section>
+<section class="admin-stats">
+<div class="admin-stat"><span class="label">إجمالي الأعضاء</span><strong class="num" id="membersCount">—</strong></div>
+<div class="admin-stat warning"><span class="label">طلبات الانضمام</span><strong class="num" id="applicationsCount">—</strong></div>
+<div class="admin-stat"><span class="label">قاعدة الأعضاء</span><strong class="num" id="dbStatus">—</strong></div>
+<div class="admin-stat"><span class="label">حالة اللوحة</span><strong class="num">Admin</strong></div>
 </section>
-<section class="grid">
-<article class="card"><div class="icon">👥</div><h3>إدارة الأعضاء</h3><p>مراجعة طلبات الانضمام، قبول أو رفض المتقدمين، ومتابعة الأعضاء وحالة حساباتهم.</p><div class="actions"><a class="btn primary" href="/admin-members.html">فتح إدارة الأعضاء</a></div></article>
-<article class="card"><div class="icon">📝</div><h3>إدارة المقالات</h3><p>مراجعة المقالات التي يرسلها أعضاء الفريق، والموافقة عليها ونشرها أو رفضها.</p><div class="actions"><a class="btn primary" href="/articles-admin.html">فتح إدارة المقالات</a></div></article>
-<article class="card"><div class="icon">🔐</div><h3>تسجيل الدخول والحسابات</h3><p>قسم مخصص لنظام تسجيل الدخول والجلسات وصلاحيات الأعضاء. سنفعّله بعد تثبيت لوحة الإدارة.</p><div class="actions"><a class="btn secondary" href="/login.html">صفحة تسجيل الدخول</a></div></article>
-<article class="card"><div class="icon">⚙️</div><h3>إعدادات الإدارة</h3><p>سيتم هنا لاحقاً إدارة صلاحيات المشرفين وإعدادات النظام وسجل العمليات.</p><div class="actions"><button class="btn secondary" disabled>قريباً</button></div></article>
+<section class="admin-grid">
+<article class="admin-card"><div class="admin-icon" aria-hidden="true">♙</div><h3>إدارة الأعضاء</h3><p>مراجعة طلبات الانضمام، قبول أو رفض المتقدمين، ومتابعة الأعضاء وحالة حساباتهم وبياناتهم.</p><div class="admin-actions"><a class="admin-btn admin-btn-primary" href="/admin-members.html">فتح إدارة الأعضاء</a></div></article>
+<article class="admin-card"><div class="admin-icon" aria-hidden="true">✎</div><h3>إدارة المقالات</h3><p>مراجعة المقالات التي يرسلها أعضاء الفريق، ثم اعتمادها للنشر أو رفضها وفق نظام المراجعة.</p><div class="admin-actions"><a class="admin-btn admin-btn-primary" href="/articles-admin.html">فتح إدارة المقالات</a></div></article>
+<article class="admin-card"><div class="admin-icon" aria-hidden="true">⌁</div><h3>تسجيل الدخول والحسابات</h3><p>نظام تسجيل الدخول والجلسات وصلاحيات الأعضاء. سنربطه باللوحة بعد تثبيت نظام الإدارة.</p><div class="admin-actions"><a class="admin-btn admin-btn-secondary" href="/login.html">صفحة تسجيل الدخول</a></div></article>
+<article class="admin-card"><div class="admin-icon" aria-hidden="true">⚙</div><h3>إعدادات الإدارة</h3><p>مساحة مستقبلية لإدارة صلاحيات المشرفين، إعدادات النظام، وسجل العمليات الإدارية.</p><div class="admin-actions"><button class="admin-btn admin-btn-secondary" disabled>قريباً</button></div></article>
 </section>
-<div id="status" class="status">جارٍ تحميل إحصائيات الأعضاء...</div>
+<div id="status" class="admin-status">جارٍ تحميل إحصائيات الأعضاء...</div>
 </main>
-<footer><div>MedLife Medical Charitable Organization</div><div>لوحة الإدارة المركزية</div></footer>
+<footer class="admin-footer"><strong>MedLife Medical Charitable Organization</strong>لوحة الإدارة المركزية</footer>
 <script>
 const $=id=>document.getElementById(id);
 async function loadStats(){
- try{
-   const key=sessionStorage.getItem('medlife_admin_key')||'';
-   const headers=key?{'X-Admin-Key':key}:{};
-   const r=await fetch('/api/admin/list-members',{headers});
-   const d=await r.json();
-   if(!r.ok||!d.success) throw new Error(d.error||'تعذر تحميل البيانات');
-   $('membersCount').textContent=(d.members||[]).length;
-   $('applicationsCount').textContent=(d.applications||[]).filter(x=>x.status==='pending').length;
-   $('dbStatus').textContent='متصلة';
-   $('status').textContent='تم تحميل بيانات الأعضاء بنجاح.';
- }catch(e){
-   $('membersCount').textContent='—';$('applicationsCount').textContent='—';$('dbStatus').textContent='—';
-   $('status').textContent='لم يتم تحميل الإحصائيات: افتح إدارة الأعضاء وأدخل مفتاح الإدارة إذا كان النظام الحالي يتطلبه.';
-   $('status').classList.add('error');
- }
-}
+try{
+const key=sessionStorage.getItem('medlife_admin_key')||'';
+const headers=key?{'X-Admin-Key':key}:{};
+const r=await fetch('/api/admin/list-members',{headers});
+const d=await r.json();
+if(!r.ok||!d.success)throw new Error(d.error||'تعذر تحميل البيانات');
+$('membersCount').textContent=(d.members||[]).length;
+$('applicationsCount').textContent=(d.applications||[]).filter(x=>x.status==='pending').length;
+$('dbStatus').textContent='متصلة';
+$('status').textContent='تم تحميل بيانات الأعضاء بنجاح.';
+$('status').classList.add('ok');
+}catch(e){
+$('membersCount').textContent='—';$('applicationsCount').textContent='—';$('dbStatus').textContent='—';
+$('status').textContent='لم يتم تحميل الإحصائيات حالياً. نظام الحماية الحالي يعتمد على مفتاح الإدارة إلى أن نكمل تسجيل الدخول الآمن.';
+$('status').classList.add('error');
+}}
 loadStats();
 </script>
 </body>
