@@ -1,48 +1,55 @@
 export async function onRequest(context) {
-    const response = await context.next();
-    const url = new URL(context.request.url);
-    const publicPages = [
-        "/", "/index.html", "/about-medlife.html", "/about-medlife-foundation.html",
-        "/articles.html", "/article.html", "/forum.html", "/forum", "/forum-v3.html",
-        "/join-options.html", "/join-us.html", "/login.html", "/contact.html"
-    ];
-    const adminPages = [
-        "/admin.html", "/admin-members.html", "/articles-admin.html", "/feedback-admin.html",
-        "/members-admin.html", "/members-platform-admin.html", "/new-members-admin.html"
-    ];
-    if (![...publicPages, ...adminPages].includes(url.pathname)) return response;
-    const contentType = response.headers.get('content-type') || '';
-    if (!contentType.includes('text/html')) return response;
+  const response = await context.next();
+  const url = new URL(context.request.url);
+  const pathname = url.pathname;
 
+  // Never interfere with static assets or non-HTML responses.
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.toLowerCase().includes('text/html')) return response;
+
+  // Keep public pages directly accessible. Only inject optional enhancement
+  // scripts after the page has been successfully served.
+  const publicPages = new Set([
+    '/', '/index.html',
+    '/about-medlife.html', '/about-medlife-foundation.html',
+    '/articles.html', '/article.html',
+    '/forum.html', '/forum', '/forum-v3.html',
+    '/join-options.html', '/join-us.html',
+    '/login.html', '/contact.html'
+  ]);
+
+  if (!publicPages.has(pathname) || response.status < 200 || response.status >= 300) {
+    return response;
+  }
+
+  try {
     const rewriter = new HTMLRewriter()
-        .on('a[href="#volunteer"]', { element(element) { element.setAttribute('href', '/join-options.html'); } })
-        .on('a[href="index.html#volunteer"]', { element(element) { element.setAttribute('href', '/join-options.html'); } })
-        .on('a[href="/#volunteer"]', { element(element) { element.setAttribute('href', '/join-options.html'); } })
-        .on('a[href="#contact"]', { element(element) { element.setAttribute('href', '/contact.html'); } })
-        .on('a[href="index.html#contact"]', { element(element) { element.setAttribute('href', '/contact.html'); } })
-        .on('a[href="/#contact"]', { element(element) { element.setAttribute('href', '/contact.html'); } })
-        .on('body', {
-            element(element) {
-                if (publicPages.includes(url.pathname)) {
-                    element.append('<script src="/site-fixes.js?v=20260816" defer></script>', { html: true });
-                }
-                if (url.pathname === '/' || url.pathname === '/index.html') {
-                    element.append('<script src="/js/members.js" defer></script>', { html: true });
-                    element.append('<script src="/js/home-enhancements.js" defer></script>', { html: true });
-                    element.append('<script src="/support-medlife.js?v=20260816" defer></script>', { html: true });
-                    element.append(`<script>(function(){document.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('#loginBtn,#mobileLoginBtn,[data-volunteer-trigger]');if(!el)return;e.preventDefault();e.stopImmediatePropagation();location.href=(el.id==='loginBtn'||el.id==='mobileLoginBtn')?'/login.html':'/join-options.html'},true);var modal=document.getElementById('loginModal');if(modal){var p=modal.querySelector('p');if(p)p.textContent='يمكنك الآن تسجيل الدخول إلى حسابك في منصة MedLife.';var b=document.getElementById('closeLogin2');if(b){b.textContent='تسجيل الدخول';b.onclick=function(){location.href='/login.html'}}}})();</script>`, { html: true });
-                }
-                if (url.pathname === '/articles.html') element.append('<script src="/js/articles.js?v=20260814" defer></script>', { html: true });
-                if (url.pathname === '/forum.html' || url.pathname === '/forum' || url.pathname === '/forum-v3.html') {
-                    element.append('<script src="/forum-booking.js?v=20260816" defer></script>', { html: true });
-                    element.append('<script src="/support-medlife.js?v=20260816" defer></script>', { html: true });
-                }
-            }
-        });
-
-    if (url.pathname === '/admin.html') {
-        rewriter.on('head', { element(element) { element.append('<script src="/js/admin-auth.js"></script>', { html: true }); } });
-    }
+      .on('a[href="#volunteer"]', { element(el) { el.setAttribute('href', '/join-options.html'); } })
+      .on('a[href="index.html#volunteer"]', { element(el) { el.setAttribute('href', '/join-options.html'); } })
+      .on('a[href="/#volunteer"]', { element(el) { el.setAttribute('href', '/join-options.html'); } })
+      .on('a[href="#contact"]', { element(el) { el.setAttribute('href', '/contact.html'); } })
+      .on('a[href="index.html#contact"]', { element(el) { el.setAttribute('href', '/contact.html'); } })
+      .on('a[href="/#contact"]', { element(el) { el.setAttribute('href', '/contact.html'); } })
+      .on('body', {
+        element(el) {
+          if (pathname === '/' || pathname === '/index.html') {
+            el.append('<script src="/js/members.js" defer></script>', { html: true });
+            el.append('<script src="/js/home-enhancements.js" defer></script>', { html: true });
+            el.append('<script src="/support-medlife.js?v=20260816" defer></script>', { html: true });
+          }
+          if (pathname === '/articles.html') {
+            el.append('<script src="/js/articles.js?v=20260814" defer></script>', { html: true });
+          }
+          if (pathname === '/forum.html' || pathname === '/forum' || pathname === '/forum-v3.html') {
+            el.append('<script src="/forum-booking.js?v=20260816" defer></script>', { html: true });
+            el.append('<script src="/support-medlife.js?v=20260816" defer></script>', { html: true });
+          }
+        }
+      });
 
     return rewriter.transform(response);
+  } catch (_) {
+    // If enhancement fails for any reason, serve the original page untouched.
+    return response;
+  }
 }
