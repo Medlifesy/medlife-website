@@ -1,5 +1,5 @@
 const RESET_MINUTES = 60;
-const TOKEN_TABLE = "member_password_reset_v2";
+const TOKEN_TABLE = "member_password_reset_v3";
 const PBKDF2_ITERATIONS = 120000;
 
 export async function onRequest(context) {
@@ -15,22 +15,14 @@ export async function onRequest(context) {
     try {
         const action = new URL(request.url).searchParams.get("action") || "forgot";
 
-        if (request.method === "POST" && action === "forgot") {
-            return await forgot(request, env, db);
-        }
-
-        if (request.method === "GET" && action === "validate-reset") {
-            return await validateReset(request, db);
-        }
-
-        if (request.method === "POST" && action === "reset") {
-            return await resetPassword(request, db);
-        }
+        if (request.method === "POST" && action === "forgot") return await forgot(request, env, db);
+        if (request.method === "GET" && action === "validate-reset") return await validateReset(request, db);
+        if (request.method === "POST" && action === "reset") return await resetPassword(request, db);
 
         return json({ success: false, error: "Method or action not allowed." }, 405);
     } catch (error) {
         console.error("member-forgot error:", error);
-        return json({ success: false, error: "حدث خطأ أثناء تنفيذ العملية." }, 500);
+        return json({ success: false, error: error?.message || "حدث خطأ أثناء تنفيذ العملية." }, 500);
     }
 }
 
@@ -51,7 +43,6 @@ async function findMembersDatabase(env) {
             console.error("member DB detection error:", error);
         }
     }
-
     return null;
 }
 
@@ -97,9 +88,7 @@ async function forgot(request, env, db) {
 
     const member = await loadMemberByEmail(db, email);
 
-    if (!member) {
-        return json({ success: true, message: generic });
-    }
+    if (!member) return json({ success: true, message: generic });
 
     const memberId = Number(member.id);
     const status = String(member.status || "").toLowerCase();
@@ -109,20 +98,12 @@ async function forgot(request, env, db) {
         return json({ success: false, error: "سجل العضو غير صالح في قاعدة البيانات." }, 500);
     }
 
-    if (!(status === "active" || status === "approved")) {
-        return json({ success: true, message: generic });
-    }
+    if (!(status === "active" || status === "approved")) return json({ success: true, message: generic });
+    if (["blocked", "suspended", "disabled", "rejected"].includes(accountStatus)) return json({ success: true, message: generic });
 
-    if (["blocked", "suspended", "disabled", "rejected"].includes(accountStatus)) {
-        return json({ success: true, message: generic });
-    }
-
-    // Always create and send a fresh reset email.
-    // The old 5-minute cooldown could report success without sending anything
-    // when a previous request had already created a token.
+    // Generate and send a fresh message on every request.
     const token = randomToken();
     const tokenHash = await sha256Hex(token);
-
     const emailAddress = String(member.email || member.account_email || email).trim().toLowerCase();
     const resetUrl = `https://medlifesy.org/reset-password.html?token=${encodeURIComponent(token)}`;
 
@@ -152,16 +133,11 @@ async function forgot(request, env, db) {
 
     if (!response.ok) {
         console.error("Resend reset error:", result);
-        return json({
-            success: false,
-            error: typeof result?.message === "string"
-                ? `فشل إرسال البريد: ${result.message}`
-                : "تعذر إرسال رسالة إعادة تعيين كلمة المرور حالياً."
-        }, 502);
+        const detail = typeof result?.message === "string" ? result.message : "رفضت خدمة البريد الطلب.";
+        return json({ success: false, error: `فشل إرسال البريد: ${detail}` }, 502);
     }
 
-    // Only after Resend accepts the message do we invalidate old tokens
-    // and store the new token.
+    // Only after Resend accepts the message do we save the token.
     try {
         await db.prepare(`
             UPDATE ${TOKEN_TABLE}
@@ -178,11 +154,7 @@ async function forgot(request, env, db) {
         return json({ success: false, error: "تم إرسال البريد لكن تعذر حفظ رمز إعادة التعيين. يرجى طلب رابط جديد." }, 500);
     }
 
-    return json({
-        success: true,
-        message: generic,
-        email_id: result?.id || null
-    });
+    return json({ success: true, message: generic, email_id: result?.id || null });
 }
 
 async function validateReset(request, db) {
@@ -204,7 +176,6 @@ async function validateReset(request, db) {
 
 async function resetPassword(request, db) {
     await ensureSchema(db);
-
     const body = await request.json();
     const token = String(body.token || "").trim();
     const password = String(body.password || "");
@@ -223,9 +194,7 @@ async function resetPassword(request, db) {
         LIMIT 1
     `).bind(tokenHash).first();
 
-    if (!resetRow) {
-        return json({ success: false, error: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية." }, 400);
-    }
+    if (!resetRow) return json({ success: false, error: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية." }, 400);
 
     const salt = randomBytes(16);
     const hash = await hashPassword(password, salt, PBKDF2_ITERATIONS);
@@ -240,11 +209,7 @@ async function resetPassword(request, db) {
         WHERE id = ?
     `).bind(storedPassword, resetRow.member_id).run();
 
-    await db.prepare(`
-        UPDATE ${TOKEN_TABLE}
-        SET used_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-    `).bind(resetRow.id).run();
+    await db.prepare(`UPDATE ${TOKEN_TABLE} SET used_at = CURRENT_TIMESTAMP WHERE id = ?`).bind(resetRow.id).run();
 
     try {
         await db.prepare(`DELETE FROM member_sessions_v2 WHERE member_id = ?`).bind(resetRow.member_id).run();
@@ -256,20 +221,8 @@ async function resetPassword(request, db) {
 }
 
 async function hashPassword(password, salt, iterations) {
-    const key = await crypto.subtle.importKey(
-        "raw",
-        new TextEncoder().encode(password),
-        "PBKDF2",
-        false,
-        ["deriveBits"]
-    );
-
-    const bits = await crypto.subtle.deriveBits(
-        { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
-        key,
-        256
-    );
-
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+    const bits = await crypto.subtle.deriveBits({ name:"PBKDF2", salt, iterations, hash:"SHA-256" }, key, 256);
     return bytesToHex(new Uint8Array(bits));
 }
 
@@ -284,39 +237,36 @@ function randomToken() {
 }
 
 async function sha256Hex(value) {
-    const digest = await crypto.subtle.digest(
-        "SHA-256",
-        new TextEncoder().encode(value)
-    );
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
     return bytesToHex(new Uint8Array(digest));
 }
 
 function bytesToHex(bytes) {
-    return [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
+    return [...bytes].map(byte => byte.toString(16).padStart(2,"0")).join("");
 }
 
 function escapeHtml(value) {
     return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/\"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 }
 
 function buildResetEmail(name, resetUrl) {
     return `<!doctype html><html lang="ar" dir="rtl"><body style="margin:0;background:#f7f9fc;font-family:Arial,Tahoma,sans-serif;color:#1e293b"><div style="max-width:620px;margin:35px auto;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:30px"><div style="text-align:center"><h2 style="color:#151d36;margin-bottom:10px">MedLife Syria</h2><p style="color:#64748b">إعادة تعيين كلمة مرور حساب الأعضاء</p></div><p>مرحباً ${escapeHtml(name)},</p><p>تم طلب إعادة تعيين كلمة المرور لحسابك في منصة متطوعي MedLife. إذا كنت أنت من طلب ذلك، اضغط على الزر التالي:</p><p style="text-align:center;margin:30px 0"><a href="${resetUrl}" style="display:inline-block;background:#ff2a54;color:#fff;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:700">إعادة تعيين كلمة المرور</a></p><p style="color:#64748b;font-size:13px">الرابط صالح لمدة ساعة واحدة ويُستخدم مرة واحدة فقط.</p><p style="color:#64748b;font-size:13px">إذا لم تطلب إعادة تعيين كلمة المرور، يمكنك تجاهل هذه الرسالة.</p><hr style="border:0;border-top:1px solid #e2e8f0;margin:25px 0"><p style="color:#94a3b8;font-size:12px;text-align:center">MedLife Syria · بالعمل التطوعي نصنع الأثر.</p></div></body></html>`;
 }
 
-function json(data, status = 200) {
-    return new Response(JSON.stringify(data), {
+function json(data,status=200){
+    return new Response(JSON.stringify(data),{
         status,
-        headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-            "Cache-Control": "no-store",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+        headers:{
+            "Content-Type":"application/json; charset=UTF-8",
+            "Cache-Control":"no-store",
+            "Access-Control-Allow-Origin":"*",
+            "Access-Control-Allow-Headers":"Content-Type",
+            "Access-Control-Allow-Methods":"GET,POST,OPTIONS"
         }
     });
 }
