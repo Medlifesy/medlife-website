@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MedLife | تهيئة حساب الإدارة</title>
+<meta name="theme-color" content="#12203a">
+<link rel="icon" href="logo.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/homepage-redesign.css">
+<style>
+body{margin:0;background:var(--ml-bg);font-family:Cairo,sans-serif;color:var(--ml-ink);min-height:100vh}.wrap{min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box}.card{width:min(470px,100%);background:#fff;border:1px solid var(--ml-line);border-radius:24px;padding:32px;box-shadow:var(--ml-shadow);position:relative;overflow:hidden}.card:before{content:"";position:absolute;top:0;right:0;left:0;height:4px;background:linear-gradient(90deg,var(--ml-red),#12203a)}.brand{text-align:center;margin-bottom:24px}.brand img{width:65px;height:65px;object-fit:contain}.brand h1{margin:8px 0 3px;color:var(--ml-navy);font-size:23px;font-weight:900}.brand p{margin:0;color:var(--ml-muted);font-size:11px}.notice{padding:13px 15px;border-radius:14px;background:#fff8e8;border:1px solid #f1dfae;color:#795b12;font-size:11px;line-height:1.9;margin-bottom:20px}.field{margin-bottom:16px}.field label{display:block;color:var(--ml-navy);font-size:11px;font-weight:800;margin-bottom:7px}.field input{width:100%;box-sizing:border-box;border:1px solid var(--ml-line);border-radius:12px;padding:12px 13px;font-family:Cairo,sans-serif;font-size:13px;outline:none;background:#fff;transition:.25s}.field input:focus{border-color:var(--ml-red);box-shadow:0 0 0 3px rgba(229,31,69,.08)}.email{background:#f7f8fa!important;color:#667085}.btn{width:100%;border:0;border-radius:13px;padding:13px;font-family:Cairo,sans-serif;font-weight:900;color:#fff;background:var(--ml-red);cursor:pointer;box-shadow:0 12px 25px rgba(229,31,69,.18);transition:.25s}.btn:hover{background:var(--ml-red-dark);transform:translateY(-1px)}.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}.result{display:none;margin-top:16px;padding:13px 15px;border-radius:14px;font-size:11px;line-height:1.9}.result.ok{display:block;background:#f0faf6;border:1px solid #d8f0e3;color:#167346}.result.error{display:block;background:#fff5f6;border:1px solid #ffd8df;color:#b42323}.back{display:block;text-align:center;margin-top:18px;color:var(--ml-muted);font-size:11px;text-decoration:none}.back:hover{color:var(--ml-red)}
+</style>
+</head>
+<body><div class="wrap"><main class="card">
+<div class="brand"><img src="/logo.PNG" alt="MedLife"><h1>تهيئة حساب الإدارة</h1><p>MedLife Medical Charitable Organization</p></div>
+<div class="notice">هذه الصفحة مخصصة لإنشاء <strong>أول حساب Admin فقط</strong>. بعد إنشاء الحساب لن يمكن استخدامها مرة أخرى لهذا البريد. لا تشارك رمز التهيئة مع أي شخص.</div>
+<form id="form">
+<div class="field"><label>البريد الإلكتروني</label><input class="email" value="admin@medlifesy.org" readonly></div>
+<div class="field"><label for="secret">رمز التهيئة</label><input id="secret" type="password" autocomplete="off" required></div>
+<div class="field"><label for="password">كلمة مرور الإدارة</label><input id="password" type="password" autocomplete="new-password" minlength="12" required><small style="display:block;color:#8a94a6;font-size:9px;margin-top:5px">12 محرفاً على الأقل.</small></div>
+<div class="field"><label for="confirmPassword">تأكيد كلمة المرور</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="12" required></div>
+<button class="btn" id="submit" type="submit">إنشاء حساب الإدارة</button>
+</form><div id="result" class="result"></div><a class="back" href="/admin-login.html">العودة إلى تسجيل دخول الإدارة</a>
+</main></div>
+<script>
+const form=document.getElementById('form'),btn=document.getElementById('submit'),result=document.getElementById('result');
+form.addEventListener('submit',async e=>{e.preventDefault();result.className='result';result.textContent='';btn.disabled=true;btn.textContent='جارٍ إنشاء الحساب...';try{const r=await fetch('/api/admin-bootstrap',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({secret:document.getElementById('secret').value,password:document.getElementById('password').value,confirmPassword:document.getElementById('confirmPassword').value})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'تعذر إنشاء الحساب');result.className='result ok';result.innerHTML='تم إنشاء حساب الإدارة بنجاح. يمكنك الآن الانتقال إلى <a href="/admin-login.html">تسجيل الدخول</a>.';form.reset();}catch(err){result.className='result error';result.textContent=err.message;}finally{btn.disabled=false;btn.textContent='إنشاء حساب الإدارة';}});
+</script></body></html>
