@@ -1,5 +1,4 @@
 const RESET_MINUTES = 60;
-const COOLDOWN_MINUTES = 5;
 const TOKEN_TABLE = "member_password_reset_v2";
 const PBKDF2_ITERATIONS = 120000;
 
@@ -118,51 +117,38 @@ async function forgot(request, env, db) {
         return json({ success: true, message: generic });
     }
 
-    const recent = await db.prepare(`
-        SELECT id
-        FROM ${TOKEN_TABLE}
-        WHERE member_id = ?
-          AND used_at IS NULL
-          AND datetime(created_at) > datetime('now', ?)
-        LIMIT 1
-    `).bind(memberId, `-${COOLDOWN_MINUTES} minutes`).first();
-
-    if (recent) {
-        return json({ success: true, message: generic });
-    }
-
-    await db.prepare(`
-        UPDATE ${TOKEN_TABLE}
-        SET used_at = CURRENT_TIMESTAMP
-        WHERE member_id = ? AND used_at IS NULL
-    `).bind(memberId).run();
-
+    // Always create and send a fresh reset email.
+    // The old 5-minute cooldown could report success without sending anything
+    // when a previous request had already created a token.
     const token = randomToken();
     const tokenHash = await sha256Hex(token);
-
-    await db.prepare(`
-        INSERT INTO ${TOKEN_TABLE}(member_id, token_hash, expires_at)
-        VALUES(?, ?, datetime('now', '+60 minutes'))
-    `).bind(memberId, tokenHash).run();
 
     const emailAddress = String(member.email || member.account_email || email).trim().toLowerCase();
     const resetUrl = `https://medlifesy.org/reset-password.html?token=${encodeURIComponent(token)}`;
 
-    const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${env.RESEND_API_KEY}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            from: "MedLife Syria <noreply@medlifesy.org>",
-            to: [emailAddress],
-            subject: "إعادة تعيين كلمة مرور MedLife",
-            html: buildResetEmail(member.full_name || "عضو MedLife", resetUrl)
-        })
-    });
+    let response;
+    let result;
 
-    const result = await response.json().catch(() => ({}));
+    try {
+        response = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                from: "MedLife Syria <noreply@medlifesy.org>",
+                to: [emailAddress],
+                subject: "إعادة تعيين كلمة مرور MedLife",
+                html: buildResetEmail(member.full_name || "عضو MedLife", resetUrl)
+            })
+        });
+
+        result = await response.json().catch(() => ({}));
+    } catch (error) {
+        console.error("RESET RESEND REQUEST ERROR:", error);
+        return json({ success: false, error: "تعذر الاتصال بخدمة البريد لإرسال رابط إعادة التعيين." }, 502);
+    }
 
     if (!response.ok) {
         console.error("Resend reset error:", result);
@@ -174,7 +160,29 @@ async function forgot(request, env, db) {
         }, 502);
     }
 
-    return json({ success: true, message: generic });
+    // Only after Resend accepts the message do we invalidate old tokens
+    // and store the new token.
+    try {
+        await db.prepare(`
+            UPDATE ${TOKEN_TABLE}
+            SET used_at = CURRENT_TIMESTAMP
+            WHERE member_id = ? AND used_at IS NULL
+        `).bind(memberId).run();
+
+        await db.prepare(`
+            INSERT INTO ${TOKEN_TABLE}(member_id, token_hash, expires_at)
+            VALUES(?, ?, datetime('now', '+${RESET_MINUTES} minutes'))
+        `).bind(memberId, tokenHash).run();
+    } catch (error) {
+        console.error("RESET DB TOKEN SAVE ERROR:", error);
+        return json({ success: false, error: "تم إرسال البريد لكن تعذر حفظ رمز إعادة التعيين. يرجى طلب رابط جديد." }, 500);
+    }
+
+    return json({
+        success: true,
+        message: generic,
+        email_id: result?.id || null
+    });
 }
 
 async function validateReset(request, db) {
