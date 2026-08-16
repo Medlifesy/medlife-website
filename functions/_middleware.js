@@ -11,11 +11,13 @@ export async function onRequest(context) {
     const html = await response.text();
     const scripts = ['/site-nav.js','/site-polish.js'];
     if (path === '/' || path === '/index.html') scripts.push('/homepage-gallery.js','/homepage-redesign.js','/homepage-story.js');
-    if (path.endsWith('/contact.html')) scripts.push('/contact-map-fix.js');
+    if (path.endsWith('/contact.html')) scripts.push('/contact-map.js');
     if (path.endsWith('/support.html')) scripts.push('/support-page.js');
     if (path.endsWith('/support-request.html')) scripts.push('/support-request.js');
+
     const missing = scripts.filter(src => !html.includes(src));
     if (!missing.length) return response;
+
     const marker = missing.map(src => `<script src="${src}" defer></script>`).join('');
     const updated = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
     const headers = new Headers(response.headers);
