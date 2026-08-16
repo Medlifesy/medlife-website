@@ -1,8 +1,8 @@
 export async function onRequest(context) {
     const { request, env } = context;
     if (request.method === "OPTIONS") return json({ success: true });
-    if (!env.MEMBERS_DB) return json({ success: false, error: "Database binding 'MEMBERS_DB' is not configured." }, 500);
-    const db = env.MEMBERS_DB;
+    if (!env.DB) return json({ success: false, error: "Database binding 'DB' is not configured." }, 500);
+    const db = env.DB;
     await ensureSchema(db);
     const url = new URL(request.url);
     const action = url.searchParams.get("action") || "feed";
@@ -27,7 +27,7 @@ export async function onRequest(context) {
 
 async function feed(db, url) {
     const limit = Math.min(Math.max(Number(url.searchParams.get("limit") || 20), 1), 50);
-    const rows = await db.prepare(`SELECT p.id,p.member_id,p.content,p.image_url,p.created_at,COALESCE(pr.display_name,m.full_name) AS author_name,COALESCE(pr.avatar_url,'') AS avatar_url,(SELECT COUNT(*) FROM member_likes l WHERE l.post_id=p.id) AS likes_count,(SELECT COUNT(*) FROM member_comments c WHERE c.post_id=p.id AND c.status='published') AS comments_count FROM member_posts p JOIN members m ON m.id=p.member_id LEFT JOIN member_profiles pr ON pr.member_id=p.member_id WHERE p.status='published' AND m.status='active' ORDER BY p.created_at DESC LIMIT ?`).bind(limit).all();
+    const rows = await db.prepare(`SELECT p.id,p.member_id,p.content,p.image_url,p.created_at,COALESCE(pr.display_name,m.full_name) AS author_name,COALESCE(pr.avatar_url,'') AS avatar_url,(SELECT COUNT(*) FROM member_likes l WHERE l.post_id=p.id) AS likes_count,(SELECT COUNT(*) FROM member_comments c WHERE c.post_id=p.id AND c.status='published') AS comments_count FROM member_posts p JOIN members m ON m.id=p.member_id LEFT JOIN member_profiles pr ON pr.member_id=p.member_id WHERE p.status='published' AND (m.status='active' OR m.status='approved') ORDER BY p.created_at DESC LIMIT ?`).bind(limit).all();
     const posts = rows.results || [];
     for (const post of posts) {
         const c = await db.prepare(`SELECT c.id,c.content,c.created_at,c.member_id,COALESCE(pr.display_name,m.full_name) AS author_name,COALESCE(pr.avatar_url,'') AS avatar_url FROM member_comments c JOIN members m ON m.id=c.member_id LEFT JOIN member_profiles pr ON pr.member_id=c.member_id WHERE c.post_id=? AND c.status='published' ORDER BY c.created_at ASC LIMIT 50`).bind(post.id).all();
@@ -38,7 +38,7 @@ async function feed(db, url) {
 
 async function profile(db, url, account) {
     const memberId = Number(url.searchParams.get("member_id") || account.member_id);
-    const member = await db.prepare(`SELECT m.id,m.membership_number,m.full_name,m.email,m.medlife_role,m.cell,m.governorate,p.display_name,p.bio,p.avatar_url,p.cover_url,p.skills,p.social_links,p.privacy FROM members m LEFT JOIN member_profiles p ON p.member_id=m.id WHERE m.id=? AND m.status='active' LIMIT 1`).bind(memberId).first();
+    const member = await db.prepare(`SELECT m.id,m.membership_number,m.full_name,m.email,m.medlife_role,m.cell,m.governorate,p.display_name,p.bio,p.avatar_url,p.cover_url,p.skills,p.social_links,p.privacy FROM members m LEFT JOIN member_profiles p ON p.member_id=m.id WHERE m.id=? AND (m.status='active' OR m.status='approved') LIMIT 1`).bind(memberId).first();
     if (!member) return json({ success: false, error: "Profile not found." }, 404);
     if (member.privacy === 'private' && memberId !== account.member_id && account.role === 'member') return json({ success: true, profile: { id: member.id, display_name: member.display_name || member.full_name, medlife_role: member.medlife_role, cell: member.cell, governorate: member.governorate } });
     member.skills = safeJson(member.skills, []);
@@ -71,15 +71,16 @@ async function toggleLike(request, db, account) { const postId = Number((await r
 async function deleteOwnPost(request, db, account) { const id = Number(new URL(request.url).searchParams.get("id")); if (!Number.isInteger(id) || id <= 0) return json({ success: false, error: "Invalid post." }, 400); const r = await db.prepare(`UPDATE member_posts SET status='deleted',updated_at=CURRENT_TIMESTAMP WHERE id=? AND member_id=?`).bind(id, account.member_id).run(); return r.meta?.changes ? json({ success: true }) : json({ success: false, error: "المنشور غير موجود." }, 404); }
 
 async function authenticatedAccount(request, db) {
-    const cookies = parseCookies(request.headers.get("Cookie") || "");
-    const token = cookies["medlife_member_session"];
+    const raw = request.headers.get("Cookie") || "";
+    let token = null;
+    for (const part of raw.split(";")) { const item = part.trim(); if (item.startsWith("medlife_member_session=")) token = decodeURIComponent(item.slice("medlife_member_session=".length)); }
     if (!token) return null;
-    return await db.prepare(`SELECT a.*,m.full_name,m.status AS member_status FROM member_sessions s JOIN member_accounts a ON a.id=s.account_id JOIN members m ON m.id=a.member_id WHERE s.id=? AND datetime(s.expires_at)>datetime('now') AND a.account_status='active' AND m.status='active' LIMIT 1`).bind(token).first();
+    const tokenHash = await sha256Hex(token);
+    return await db.prepare(`SELECT a.*,m.full_name,m.status AS member_status FROM member_auth_sessions s JOIN member_accounts a ON a.id=s.account_id JOIN members m ON m.id=a.member_id WHERE s.token_hash=? AND datetime(s.expires_at)>datetime('now') AND a.account_status='active' AND (m.status='active' OR m.status='approved') LIMIT 1`).bind(tokenHash).first();
 }
 
 async function ensureSchema(db) { await db.batch([
-    db.prepare(`CREATE TABLE IF NOT EXISTS member_accounts(id INTEGER PRIMARY KEY AUTOINCREMENT,member_id INTEGER NOT NULL UNIQUE,username TEXT UNIQUE,password_hash TEXT NOT NULL,password_salt TEXT NOT NULL,role TEXT NOT NULL DEFAULT 'member',account_status TEXT NOT NULL DEFAULT 'active',last_login_at DATETIME,created_at DATETIME DEFAULT CURRENT_TIMESTAMP,updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`),
-    db.prepare(`CREATE TABLE IF NOT EXISTS member_sessions(id TEXT PRIMARY KEY,account_id INTEGER NOT NULL,expires_at DATETIME NOT NULL,created_at DATETIME DEFAULT CURRENT_TIMESTAMP,last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP)`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS member_auth_sessions(id INTEGER PRIMARY KEY AUTOINCREMENT,token_hash TEXT NOT NULL UNIQUE,account_id INTEGER NOT NULL,expires_at DATETIME NOT NULL,created_at DATETIME DEFAULT CURRENT_TIMESTAMP,last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP)`),
     db.prepare(`CREATE TABLE IF NOT EXISTS member_profiles(member_id INTEGER PRIMARY KEY,display_name TEXT,bio TEXT,avatar_url TEXT,cover_url TEXT,skills TEXT,social_links TEXT,privacy TEXT DEFAULT 'members',updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`),
     db.prepare(`CREATE TABLE IF NOT EXISTS member_achievements(id INTEGER PRIMARY KEY AUTOINCREMENT,member_id INTEGER NOT NULL,title TEXT NOT NULL,description TEXT,achievement_date TEXT,credential_url TEXT,image_url TEXT,created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`),
     db.prepare(`CREATE TABLE IF NOT EXISTS member_posts(id INTEGER PRIMARY KEY AUTOINCREMENT,member_id INTEGER NOT NULL,content TEXT NOT NULL,image_url TEXT,status TEXT DEFAULT 'published',created_at DATETIME DEFAULT CURRENT_TIMESTAMP,updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`),
@@ -88,5 +89,5 @@ async function ensureSchema(db) { await db.batch([
 ]); }
 function clean(v, m) { return String(v ?? '').trim().slice(0, m); }
 function safeJson(v, f) { try { return v ? JSON.parse(v) : f; } catch { return f; } }
-function parseCookies(v) { const o = {}; for (const p of v.split(/;\s*/)) { const i = p.indexOf('='); if (i > 0) o[p.slice(0, i)] = decodeURIComponent(p.slice(i + 1)); } return o; }
+async function sha256Hex(value){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))].map(b=>b.toString(16).padStart(2,'0')).join('')}
 function json(data, status = 200) { return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json; charset=UTF-8', 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS' } }); }
