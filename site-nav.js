@@ -4,7 +4,8 @@
   const activeKey=()=>{if(page==='gallery.html')return'gallery';if(home&&location.hash==='#programs')return'programs';if(home&&location.hash==='#homepageGallery')return'gallery';if(home)return'home';const m=items.find(x=>x[0].split('#')[0]===page&&!x[0].includes('#'));return m?m[2]:''};
   const setActive=k=>document.querySelectorAll('.medlife-global-nav a,.medlife-global-mobile a').forEach(a=>a.classList.toggle('active',a.dataset.key===k));
   function build(){
-    document.querySelectorAll('header.medlife-global-header').forEach(h=>h.remove());
+    document.querySelectorAll('.medlife-global-header').forEach(h=>h.remove());
+    document.querySelectorAll('body > header').forEach(h=>h.remove());
     const current=activeKey(),header=document.createElement('header');header.className='medlife-global-header';
     header.innerHTML=`<div class="medlife-global-wrap"><a class="medlife-global-brand" href="index.html" aria-label="مؤسسة ميدلايف"><img src="/logo.PNG" alt="مؤسسة ميدلايف"></a><nav class="medlife-global-nav" aria-label="التنقل الرئيسي">${items.map(([u,l,k])=>`<a href="${u}" data-key="${k}" class="${k===current?'active':''}">${l}</a>`).join('')}</nav><div class="medlife-global-actions"><a href="login.html">دخول الأعضاء</a><a class="join" href="join-options.html">الانضمام</a></div><button class="medlife-global-menu" type="button" aria-label="فتح القائمة" aria-expanded="false">القائمة</button></div><div class="medlife-global-mobile" hidden>${items.map(([u,l,k])=>`<a href="${u}" data-key="${k}" class="${k===current?'active':''}">${l}</a>`).join('')}<a href="login.html">دخول الأعضاء</a><a href="join-options.html">الانضمام إلى ميدلايف</a></div>`;
     document.body.prepend(header);
