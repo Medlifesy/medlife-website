@@ -1,10 +1,20 @@
 export async function onRequest(context) {
   const response = await context.next();
   const url = new URL(context.request.url);
-  if (url.pathname !== "/" && url.pathname !== "/index.html") return response;
   const type = response.headers.get("content-type") || "";
   if (!type.includes("text/html")) return response;
   let html = await response.text();
+
+  // Support page: always expose the private help-request entry point.
+  if (url.pathname === "/support.html") {
+    const requestBox = `<div style="max-width:1120px;margin:18px auto 0;padding:0 14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 22px;border-radius:20px;background:linear-gradient(135deg,#151d36,#293351);color:#fff;box-shadow:0 15px 45px rgba(21,29,54,.12)"><div><strong style="font-size:18px">هل تحتاج إلى دعم؟</strong><div style="color:#cbd5e1;font-size:12px;margin-top:3px">قدّم طلبك إلى فريق ميدلايف ليتم مراجعته والتحقق من الوثائق قبل نشر أي حالة.</div></div><a href="support-request.html" style="flex:none;background:#ff2a54;color:#fff;text-decoration:none;padding:11px 17px;border-radius:12px;font-weight:900">تقديم طلب دعم</a></div></div>`;
+    if (!html.includes('href="support-request.html"')) html = html.replace(/<section\b/i, requestBox + "<section");
+    const headers = new Headers(response.headers);
+    headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    return new Response(html, {status: response.status, statusText: response.statusText, headers});
+  }
+
+  if (url.pathname !== "/" && url.pathname !== "/index.html") return response;
 
   const images = [
     ["./images/image.png", "المبادرات المجتمعية", "لحظة من العمل التطوعي الذي يجمع الفريق حول خدمة المجتمع."],
@@ -16,7 +26,6 @@ export async function onRequest(context) {
     ["./images/photo_136@05-12-2024_15-36-07_thumb.jpg", "التطوع", "كل متطوع يضيف خبرة ووقتاً وطاقة إلى مسيرة ميدلايف."],
     ["./images/photo_13_2026-01-01_19-20-24.jpg", "فعاليات ميدلايف", "لحظات تجمع الفريق والمتطوعين حول رسالة واحدة: صناعة الأثر."]
   ];
-
   const esc = v => String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");
   const cards = images.map(([src,title,text]) => `<article class="medlife-photo-card"><img src="${esc(src)}" alt="${esc(title)}" loading="lazy" decoding="async"><div class="medlife-photo-shade"></div><div class="medlife-photo-info"><strong>${esc(title)}</strong><span>${esc(text)}</span></div></article>`).join("");
   const section = `<section class="section soft medlife-photo-section" id="homepageGallery"><div class="wrap"><div class="section-title"><div class="eyebrow">صورنا</div><h2>صور من أنشطة ميدلايف</h2><p>لمحات من العمل الصحي والإنساني والتطوعي والتدريب والفعاليات المجتمعية.</p></div><div class="medlife-photo-marquee"><div class="medlife-photo-track">${cards}${cards}</div></div><div class="medlife-photo-more"><a href="gallery.html">رؤية المزيد من الصور <i class="fa-solid fa-arrow-left"></i></a></div></div></section>`;
@@ -30,17 +39,18 @@ export async function onRequest(context) {
   html = html.replace(/href=["']#activities["']/gi, 'href="#homepageGallery"');
   if (!html.includes('href="#homepageGallery"')) html = html.replace(/(<a[^>]+href=["']articles\.html["'][^>]*>)/i, '<a href="#homepageGallery">صورنا</a>\n$1');
 
-  // Add a visible Support Fund link to both desktop and mobile navigation.
-  if (!html.includes('href="support.html"')) {
-    const supportLink = '<a href="support.html"><i class="fa-solid fa-hand-holding-heart"></i> صندوق الدعم</a>';
-    const articleLink = /(<a[^>]+href=["']articles\.html["'][^>]*>[\s\S]*?<\/a>)/i;
-    if (articleLink.test(html)) html = html.replace(articleLink, supportLink + "\n" + "$1");
-    else html = html.replace(/(<nav\b[^>]*>)/i, "$1" + supportLink);
-    const mobileArticle = /(<a[^>]+href=["']articles\.html["'][^>]*>[\s\S]*?<\/a>)/i;
-    if (mobileArticle.test(html)) html = html.replace(mobileArticle, supportLink + "\n" + "$1");
+  // Always add the Support Fund item to the desktop and mobile navigation.
+  const supportLink = '<a href="support.html"><i class="fa-solid fa-hand-holding-heart"></i> صندوق الدعم</a>';
+  const navOpen = /<nav\b[^>]*>/i;
+  const desktopNav = /<nav\b[\s\S]*?<\/nav>/i;
+  if (desktopNav.test(html) && !desktopNav.exec(html)?.[0].includes('href="support.html"')) {
+    html = html.replace(desktopNav, nav => nav.replace(/(<a[^>]+href=["']articles\.html["'][^>]*>[\s\S]*?<\/a>)/i, supportLink + "$1"));
+  }
+  const mobileBlock = /<div[^>]+class=["'][^"']*mobile[^"']*["'][^>]*>[\s\S]*?<\/div>/i;
+  if (mobileBlock.test(html)) {
+    html = html.replace(mobileBlock, block => block.includes('href="support.html"') ? block : block.replace(/(<a[^>]+href=["']articles\.html["'][^>]*>[\s\S]*?<\/a>)/i, supportLink + "$1"));
   }
 
-  // Add a prominent support card to the homepage.
   if (!html.includes('id="supportFundHome"')) {
     const supportCard = `<section class="section reveal" id="supportFundHome"><div class="wrap"><div class="support-home-card"><div><div class="eyebrow">صندوق الدعم</div><h2>ساهم في تأمين احتياج حقيقي</h2><p>تعرّف على الحالات والمشاريع التي تحتاج إلى دعم، واطّلع على المبلغ المطلوب وما تم تأمينه والوثائق المتاحة لكل حالة.</p></div><a class="support-home-btn" href="support.html"><i class="fa-solid fa-hand-holding-heart"></i> استكشف صندوق الدعم</a></div></div></section>`;
     if (contact.test(html)) html = html.replace(contact, supportCard + "\n" + "$&");
