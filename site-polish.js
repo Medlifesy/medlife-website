@@ -1,24 +1,17 @@
 (() => {
-  const init = () => {
+  const init=()=>{
     document.documentElement.classList.add('medlife-enhanced');
-    if (!document.getElementById('medlife-polish-style')) {
-      const s = document.createElement('style'); s.id='medlife-polish-style';
-      s.textContent = `
-        html{scroll-padding-top:88px}
-        body{overflow-x:hidden}
-        img,video,iframe{max-width:100%;height:auto}
-        button,a{touch-action:manipulation}
-        :focus-visible{outline:3px solid rgba(255,42,84,.35);outline-offset:3px}
-        .medlife-enhanced main section,.medlife-enhanced body>section{animation:medlifeFade .55s ease both}
-        .medlife-enhanced .card,.medlife-enhanced article,.medlife-enhanced .feature,.medlife-enhanced .number,.medlife-enhanced .stat{transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease}
-        .medlife-enhanced .card:hover,.medlife-enhanced .feature:hover{transform:translateY(-5px)}
+    if(!document.getElementById('medlife-polish-style')){
+      const s=document.createElement('style');s.id='medlife-polish-style';s.textContent=`
+        html{scroll-padding-top:92px}body{overflow-x:hidden;background:#f7f9fc}img,video,iframe{max-width:100%;height:auto}button,a{touch-action:manipulation}:focus-visible{outline:3px solid rgba(255,42,84,.35);outline-offset:3px}
+        .medlife-enhanced main section,.medlife-enhanced body>section{animation:medlifeFade .55s ease both}.medlife-enhanced .card,.medlife-enhanced article,.medlife-enhanced .feature,.medlife-enhanced .number,.medlife-enhanced .stat{transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease}.medlife-enhanced .card:hover,.medlife-enhanced .feature:hover{transform:translateY(-5px);box-shadow:0 18px 42px rgba(21,29,54,.10)}
+        .medlife-page-shell{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:42px 0 78px}.medlife-page-hero{position:relative;overflow:hidden;padding:72px 20px;text-align:center;color:#fff;background:linear-gradient(135deg,#071b3a,#0d668c);border-radius:0 0 34px 34px}.medlife-page-hero:before{content:"";position:absolute;width:420px;height:420px;border:1px solid rgba(255,255,255,.12);border-radius:50%;left:-180px;top:-260px}.medlife-page-hero>*{position:relative;z-index:1}.medlife-page-hero h1{margin:0 0 10px;font-size:clamp(34px,5vw,56px);line-height:1.25}.medlife-page-hero p{max-width:760px;margin:auto;line-height:2;opacity:.9}.medlife-kicker{display:inline-flex;padding:7px 13px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.09);font-size:12px;font-weight:800}
+        .medlife-enhanced .section-title{position:relative}.medlife-enhanced .section-title:after{content:"";display:block;width:52px;height:3px;border-radius:99px;background:#ff2a54;margin:10px auto 0}.medlife-enhanced .btn,.medlife-enhanced button{transition:transform .2s ease,box-shadow .2s ease}.medlife-enhanced .btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(21,29,54,.12)}
+        .medlife-enhanced .gallery-strip{scroll-snap-type:x mandatory}.medlife-enhanced .gallery-strip>*{scroll-snap-align:start}
         @keyframes medlifeFade{from{opacity:.94;transform:translateY(7px)}to{opacity:1;transform:none}}
-        @media(max-width:900px){.wrap{max-width:100%}.grid{gap:14px}}
-        @media(max-width:640px){body{font-size:14px}.wrap{width:min(100% - 24px,560px)}.section{padding:58px 0}.hero{padding:58px 0 70px}.hero h1{font-size:clamp(32px,11vw,48px)}.hero p{font-size:14px}.hero-actions,.actions{width:100%}.hero-actions a,.actions .btn{min-height:46px}.card{border-radius:18px}.numbers,.statsbox{grid-template-columns:1fr!important}.grid{grid-template-columns:1fr!important}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}}
+        @media(max-width:900px){.wrap{max-width:100%}.grid{gap:14px}.medlife-page-shell{width:min(100% - 28px,760px)}.medlife-page-hero{padding:58px 18px;border-radius:0 0 26px 26px}}
+        @media(max-width:640px){body{font-size:14px}.wrap{width:min(100% - 24px,560px)}.section{padding:52px 0}.hero{padding:58px 0 70px}.hero h1{font-size:clamp(32px,11vw,48px)}.hero p{font-size:14px}.hero-actions,.actions{width:100%}.hero-actions a,.actions .btn{min-height:46px}.card{border-radius:18px}.numbers,.statsbox{grid-template-columns:1fr!important}.grid{grid-template-columns:1fr!important}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.medlife-page-shell{width:calc(100% - 22px);padding:28px 0 54px}.medlife-page-hero{padding:50px 15px}.medlife-page-hero h1{font-size:clamp(31px,10vw,42px)}}
         @media(prefers-reduced-motion:reduce){.medlife-enhanced main section,.medlife-enhanced body>section{animation:none}.medlife-enhanced .card,.medlife-enhanced .feature{transition:none}}
-      `;
-      document.head.appendChild(s);
-    }
-  };
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+      `;document.head.appendChild(s)}
+  };if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
