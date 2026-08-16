@@ -29,31 +29,24 @@ export async function onRequest(context) {
         }
 
         return json({ success: false, error: "Method or action not allowed." }, 405);
-
     } catch (error) {
         console.error("member-forgot error:", error);
-        return json({
-            success: false,
-            error: "حدث خطأ أثناء تنفيذ العملية."
-        }, 500);
+        return json({ success: false, error: "حدث خطأ أثناء تنفيذ العملية." }, 500);
     }
 }
 
 async function findMembersDatabase(env) {
     const candidates = [];
-
     if (env.MEMBERS_DB) candidates.push(env.MEMBERS_DB);
     if (env.DB && env.DB !== env.MEMBERS_DB) candidates.push(env.DB);
 
     for (const db of candidates) {
         try {
             const table = await db.prepare(`
-                SELECT name
-                FROM sqlite_master
+                SELECT name FROM sqlite_master
                 WHERE type='table' AND name='members'
                 LIMIT 1
             `).first();
-
             if (table) return db;
         } catch (error) {
             console.error("member DB detection error:", error);
@@ -76,6 +69,17 @@ async function ensureSchema(db) {
     `).run();
 }
 
+async function loadMemberByEmail(db, email) {
+    const rows = await db.prepare(`SELECT * FROM members LIMIT 2000`).all();
+    const members = Array.isArray(rows?.results) ? rows.results : [];
+
+    return members.find(member => {
+        const primary = String(member?.email || "").trim().toLowerCase();
+        const account = String(member?.account_email || "").trim().toLowerCase();
+        return primary === email || account === email;
+    }) || null;
+}
+
 async function forgot(request, env, db) {
     const generic = "إذا كان البريد الإلكتروني مرتبطاً بحساب MedLife، فسيصلك رابط لإعادة تعيين كلمة المرور خلال دقائق.";
 
@@ -92,15 +96,25 @@ async function forgot(request, env, db) {
 
     await ensureSchema(db);
 
-    const member = await db.prepare(`
-        SELECT id AS member_id, full_name, email, account_email, status, account_status
-        FROM members
-        WHERE lower(COALESCE(email,'')) = ?
-           OR lower(COALESCE(account_email,'')) = ?
-        LIMIT 1
-    `).bind(email, email).first();
+    const member = await loadMemberByEmail(db, email);
 
-    if (!member || !isApprovedMember(member)) {
+    if (!member) {
+        return json({ success: true, message: generic });
+    }
+
+    const memberId = Number(member.id);
+    const status = String(member.status || "").toLowerCase();
+    const accountStatus = String(member.account_status || "").toLowerCase();
+
+    if (!Number.isInteger(memberId) || memberId <= 0) {
+        return json({ success: false, error: "سجل العضو غير صالح في قاعدة البيانات." }, 500);
+    }
+
+    if (!(status === "active" || status === "approved")) {
+        return json({ success: true, message: generic });
+    }
+
+    if (["blocked", "suspended", "disabled", "rejected"].includes(accountStatus)) {
         return json({ success: true, message: generic });
     }
 
@@ -111,7 +125,7 @@ async function forgot(request, env, db) {
           AND used_at IS NULL
           AND datetime(created_at) > datetime('now', ?)
         LIMIT 1
-    `).bind(member.member_id, `-${COOLDOWN_MINUTES} minutes`).first();
+    `).bind(memberId, `-${COOLDOWN_MINUTES} minutes`).first();
 
     if (recent) {
         return json({ success: true, message: generic });
@@ -121,16 +135,17 @@ async function forgot(request, env, db) {
         UPDATE ${TOKEN_TABLE}
         SET used_at = CURRENT_TIMESTAMP
         WHERE member_id = ? AND used_at IS NULL
-    `).bind(member.member_id).run();
+    `).bind(memberId).run();
 
     const token = randomToken();
     const tokenHash = await sha256Hex(token);
 
     await db.prepare(`
         INSERT INTO ${TOKEN_TABLE}(member_id, token_hash, expires_at)
-        VALUES(?, ?, datetime('now', '+${RESET_MINUTES} minutes'))
-    `).bind(member.member_id, tokenHash).run();
+        VALUES(?, ?, datetime('now', '+60 minutes'))
+    `).bind(memberId, tokenHash).run();
 
+    const emailAddress = String(member.email || member.account_email || email).trim().toLowerCase();
     const resetUrl = `https://medlifesy.org/reset-password.html?token=${encodeURIComponent(token)}`;
 
     const response = await fetch("https://api.resend.com/emails", {
@@ -141,7 +156,7 @@ async function forgot(request, env, db) {
         },
         body: JSON.stringify({
             from: "MedLife Syria <noreply@medlifesy.org>",
-            to: [email],
+            to: [emailAddress],
             subject: "إعادة تعيين كلمة مرور MedLife",
             html: buildResetEmail(member.full_name || "عضو MedLife", resetUrl)
         })
@@ -164,18 +179,12 @@ async function forgot(request, env, db) {
 
 async function validateReset(request, db) {
     await ensureSchema(db);
-
     const token = new URL(request.url).searchParams.get("token") || "";
-
-    if (!token) {
-        return json({ success: true, valid: false });
-    }
+    if (!token) return json({ success: true, valid: false });
 
     const tokenHash = await sha256Hex(token);
-
     const row = await db.prepare(`
-        SELECT id
-        FROM ${TOKEN_TABLE}
+        SELECT id FROM ${TOKEN_TABLE}
         WHERE token_hash = ?
           AND used_at IS NULL
           AND datetime(expires_at) > datetime('now')
@@ -193,14 +202,10 @@ async function resetPassword(request, db) {
     const password = String(body.password || "");
 
     if (!token || password.length < 10) {
-        return json({
-            success: false,
-            error: "رابط إعادة التعيين غير صالح أو كلمة المرور قصيرة جداً."
-        }, 400);
+        return json({ success: false, error: "رابط إعادة التعيين غير صالح أو كلمة المرور قصيرة جداً." }, 400);
     }
 
     const tokenHash = await sha256Hex(token);
-
     const resetRow = await db.prepare(`
         SELECT id, member_id
         FROM ${TOKEN_TABLE}
@@ -211,70 +216,35 @@ async function resetPassword(request, db) {
     `).bind(tokenHash).first();
 
     if (!resetRow) {
-        return json({
-            success: false,
-            error: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية."
-        }, 400);
+        return json({ success: false, error: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية." }, 400);
     }
 
     const salt = randomBytes(16);
     const hash = await hashPassword(password, salt, PBKDF2_ITERATIONS);
     const storedPassword = `pbkdf2$sha256$${PBKDF2_ITERATIONS}$${bytesToHex(salt)}$${hash}`;
 
-    await db.batch([
-        db.prepare(`
-            UPDATE members
-            SET password_hash = ?,
-                account_status = COALESCE(account_status, 'active'),
-                account_email = COALESCE(NULLIF(account_email,''), email),
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `).bind(storedPassword, resetRow.member_id),
-        db.prepare(`
-            UPDATE ${TOKEN_TABLE}
-            SET used_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `).bind(resetRow.id),
-        db.prepare(`
-            DELETE FROM member_sessions_v2
-            WHERE member_id = ?
-        `).bind(resetRow.member_id)
-    ]).catch(async error => {
-        if (String(error?.message || '').includes('member_sessions_v2')) {
-            await db.batch([
-                db.prepare(`
-                    UPDATE members
-                    SET password_hash = ?,
-                        account_status = COALESCE(account_status, 'active'),
-                        account_email = COALESCE(NULLIF(account_email,''), email),
-                        updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
-                `).bind(storedPassword, resetRow.member_id),
-                db.prepare(`
-                    UPDATE ${TOKEN_TABLE}
-                    SET used_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
-                `).bind(resetRow.id)
-            ]);
-        } else {
-            throw error;
-        }
-    });
+    await db.prepare(`
+        UPDATE members
+        SET password_hash = ?,
+            account_status = CASE WHEN account_status IS NULL OR account_status = '' THEN 'active' ELSE account_status END,
+            account_email = CASE WHEN account_email IS NULL OR account_email = '' THEN email ELSE account_email END,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    `).bind(storedPassword, resetRow.member_id).run();
 
-    return json({
-        success: true,
-        message: "تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول."
-    });
-}
+    await db.prepare(`
+        UPDATE ${TOKEN_TABLE}
+        SET used_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    `).bind(resetRow.id).run();
 
-function isApprovedMember(member) {
-    const status = String(member.status || '').toLowerCase();
-    const accountStatus = String(member.account_status || '').toLowerCase();
+    try {
+        await db.prepare(`DELETE FROM member_sessions_v2 WHERE member_id = ?`).bind(resetRow.member_id).run();
+    } catch (error) {
+        console.warn("member_sessions_v2 cleanup skipped:", error);
+    }
 
-    const approved = status === 'active' || status === 'approved';
-    const blocked = ['blocked', 'suspended', 'disabled', 'rejected'].includes(accountStatus);
-
-    return approved && !blocked;
+    return json({ success: true, message: "تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول." });
 }
 
 async function hashPassword(password, salt, iterations) {
@@ -287,12 +257,7 @@ async function hashPassword(password, salt, iterations) {
     );
 
     const bits = await crypto.subtle.deriveBits(
-        {
-            name: "PBKDF2",
-            salt,
-            iterations,
-            hash: "SHA-256"
-        },
+        { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
         key,
         256
     );
@@ -315,14 +280,11 @@ async function sha256Hex(value) {
         "SHA-256",
         new TextEncoder().encode(value)
     );
-
     return bytesToHex(new Uint8Array(digest));
 }
 
 function bytesToHex(bytes) {
-    return [...bytes]
-        .map(byte => byte.toString(16).padStart(2, "0"))
-        .join("");
+    return [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function escapeHtml(value) {
