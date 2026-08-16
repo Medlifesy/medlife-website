@@ -9,7 +9,7 @@ export async function onRequest(context) {
     if (/\/(admin|admin-members|articles-admin|support-admin|support-applications-admin)\.html$/.test(path)) return response;
 
     const html = await response.text();
-    const scripts = ['/site-nav.js'];
+    const scripts = ['/site-nav.js','/site-polish.js'];
     if (path === '/' || path === '/index.html') scripts.push('/homepage-gallery.js');
     if (path.endsWith('/support.html')) scripts.push('/support-page.js');
     if (path.endsWith('/support-request.html')) scripts.push('/support-request.js');
