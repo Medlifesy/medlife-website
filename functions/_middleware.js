@@ -10,7 +10,9 @@ export async function onRequest(context) {
         .on('a[href="#volunteer"]', { element(element) { element.setAttribute('href', 'join-options.html'); } })
         .on('a[href="index.html#volunteer"]', { element(element) { element.setAttribute('href', 'join-options.html'); } })
         .on('a[href="/#volunteer"]', { element(element) { element.setAttribute('href', 'join-options.html'); } })
-        .on('a[href="#contact"]', { element(element) { element.setAttribute('href', '#contact'); } })
+        .on('a[href="#contact"]', { element(element) { element.setAttribute('href', '/contact.html'); } })
+        .on('a[href="index.html#contact"]', { element(element) { element.setAttribute('href', '/contact.html'); } })
+        .on('a[href="/#contact"]', { element(element) { element.setAttribute('href', '/contact.html'); } })
         .on('head', {
             element(element) {
                 if (url.pathname === '/admin.html') element.append('<script src="/js/admin-auth.js"></script>', { html: true });
