@@ -1,6 +1,8 @@
 const SESSION_COOKIE = "medlife_member_session";
 const SESSION_DAYS = 30;
 const PBKDF2_ITERATIONS = 120000;
+const RESET_MINUTES = 60;
+const RESET_REQUEST_COOLDOWN_MINUTES = 5;
 
 export async function onRequest(context) {
     const { request, env } = context;
@@ -16,6 +18,9 @@ export async function onRequest(context) {
         if (request.method === "POST" && action === "register") return await register(request, db);
         if (request.method === "POST" && action === "login") return await login(request, db);
         if (request.method === "POST" && action === "logout") return await logout(request, db);
+        if (request.method === "POST" && action === "forgot") return await forgot(request, env, db);
+        if (request.method === "POST" && action === "reset") return await reset(request, db);
+        if (request.method === "GET" && action === "validate-reset") return await validateReset(request, db);
         if (request.method === "GET" && action === "me") return await me(request, db);
         return json({ success: false, error: "Method or action not allowed." }, 405);
     } catch (error) {
@@ -103,6 +108,85 @@ async function login(request, db) {
     return withCookie(json({ success:true, member:await getMemberHome(db, account.member_id) }), await createSession(db, account.id));
 }
 
+async function forgot(request, env, db) {
+    const generic = "إذا كان البريد الإلكتروني مرتبطاً بحساب MedLife، فسيصلك رابط لإعادة تعيين كلمة المرور خلال دقائق.";
+    const body = await request.json();
+    const email = clean(body.email, 200).toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(email)) return json({ success:false, error:"يرجى إدخال بريد إلكتروني صالح." }, 400);
+
+    const member = await db.prepare(`
+        SELECT a.id AS account_id, a.account_status, m.id AS member_id, m.full_name, m.email
+        FROM members m
+        JOIN member_accounts a ON a.member_id=m.id
+        WHERE lower(COALESCE(m.email,''))=lower(?)
+        LIMIT 1
+    `).bind(email).first();
+
+    if (!member || member.account_status !== "active") return json({ success:true, message:generic });
+
+    const recent = await db.prepare(`SELECT id FROM member_password_resets WHERE account_id=? AND used_at IS NULL AND created_at > datetime('now', ?) LIMIT 1`).bind(member.account_id, `-${RESET_REQUEST_COOLDOWN_MINUTES} minutes`).first();
+    if (recent) return json({ success:true, message:generic });
+
+    await db.prepare(`UPDATE member_password_resets SET used_at=COALESCE(used_at,CURRENT_TIMESTAMP) WHERE account_id=? AND used_at IS NULL`).bind(member.account_id).run();
+
+    const token = bytesToHex(randomBytes(32));
+    const tokenHash = await sha256Hex(token);
+    await db.prepare(`INSERT INTO member_password_resets (account_id, token_hash, expires_at) VALUES (?, ?, datetime('now', '+60 minutes'))`).bind(member.account_id, tokenHash).run();
+
+    if (!env.RESEND_API_KEY) {
+        console.error("RESEND_API_KEY is not configured");
+        return json({ success:false, error:"خدمة البريد غير مهيأة حالياً." }, 500);
+    }
+
+    const resetUrl = `https://medlifesy.org/reset-password.html?token=${encodeURIComponent(token)}`;
+    const html = buildResetEmail(member.full_name || "عضو MedLife", resetUrl);
+    const sent = await sendEmail(env.RESEND_API_KEY, email, "إعادة تعيين كلمة مرور MedLife", html);
+
+    if (!sent.ok) {
+        console.error("Resend reset email error:", sent.data);
+        return json({ success:false, error:"تعذر إرسال رسالة إعادة تعيين كلمة المرور حالياً." }, 502);
+    }
+
+    return json({ success:true, message:generic });
+}
+
+async function validateReset(request, db) {
+    const token = new URL(request.url).searchParams.get("token") || "";
+    if (!token) return json({ success:false, valid:false }, 400);
+    const tokenHash = await sha256Hex(token);
+    const row = await db.prepare(`SELECT id FROM member_password_resets WHERE token_hash=? AND used_at IS NULL AND datetime(expires_at)>datetime('now') LIMIT 1`).bind(tokenHash).first();
+    return json({ success:true, valid:!!row });
+}
+
+async function reset(request, db) {
+    const body = await request.json();
+    const token = clean(body.token, 200);
+    const password = String(body.password || "");
+    if (!token || password.length < 10) return json({ success:false, error:"رابط إعادة التعيين غير صالح أو كلمة المرور قصيرة جداً." }, 400);
+
+    const tokenHash = await sha256Hex(token);
+    const resetRow = await db.prepare(`
+        SELECT r.id, r.account_id, a.member_id
+        FROM member_password_resets r
+        JOIN member_accounts a ON a.id=r.account_id
+        WHERE r.token_hash=? AND r.used_at IS NULL AND datetime(r.expires_at)>datetime('now')
+        LIMIT 1
+    `).bind(tokenHash).first();
+
+    if (!resetRow) return json({ success:false, error:"رابط إعادة التعيين غير صالح أو منتهي الصلاحية." }, 400);
+
+    const salt = randomBytes(16);
+    const passwordHash = await hashPassword(password, salt);
+
+    await db.batch([
+        db.prepare(`UPDATE member_accounts SET password_hash=?, password_salt=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`).bind(passwordHash, bytesToBase64(salt), resetRow.account_id),
+        db.prepare(`UPDATE member_password_resets SET used_at=CURRENT_TIMESTAMP WHERE id=?`).bind(resetRow.id),
+        db.prepare(`DELETE FROM member_sessions WHERE account_id=?`).bind(resetRow.account_id)
+    ]);
+
+    return json({ success:true, message:"تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول." });
+}
+
 async function logout(request, db) {
     const token = parseCookies(request.headers.get("Cookie") || "")[SESSION_COOKIE];
     if (token) await db.prepare(`DELETE FROM member_sessions WHERE id=?`).bind(token).run();
@@ -165,10 +249,32 @@ async function ensureSchema(db) {
         db.prepare(`CREATE TABLE IF NOT EXISTS member_posts (id INTEGER PRIMARY KEY AUTOINCREMENT, member_id INTEGER NOT NULL, content TEXT NOT NULL, image_url TEXT, status TEXT DEFAULT 'published', created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`),
         db.prepare(`CREATE TABLE IF NOT EXISTS member_comments (id INTEGER PRIMARY KEY AUTOINCREMENT, post_id INTEGER NOT NULL, member_id INTEGER NOT NULL, content TEXT NOT NULL, status TEXT DEFAULT 'published', created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`),
         db.prepare(`CREATE TABLE IF NOT EXISTS member_likes (post_id INTEGER NOT NULL, member_id INTEGER NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(post_id,member_id))`),
-        db.prepare(`CREATE TABLE IF NOT EXISTS member_invites (id INTEGER PRIMARY KEY AUTOINCREMENT, member_id INTEGER NOT NULL, invite_code_hash TEXT NOT NULL UNIQUE, expires_at DATETIME NOT NULL, used_at DATETIME, email_sent_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`)
+        db.prepare(`CREATE TABLE IF NOT EXISTS member_invites (id INTEGER PRIMARY KEY AUTOINCREMENT, member_id INTEGER NOT NULL, invite_code_hash TEXT NOT NULL UNIQUE, expires_at DATETIME NOT NULL, used_at DATETIME, email_sent_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`),
+        db.prepare(`CREATE TABLE IF NOT EXISTS member_password_resets (id INTEGER PRIMARY KEY AUTOINCREMENT, account_id INTEGER NOT NULL, token_hash TEXT NOT NULL UNIQUE, expires_at DATETIME NOT NULL, used_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`)
     ]);
 }
 
+async function sendEmail(apiKey, to, subject, html) {
+    const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+            from: "MedLife Syria <noreply@medlifesy.org>",
+            to: [to],
+            subject,
+            html,
+            tags: [{ name: "category", value: "password_reset" }]
+        })
+    });
+    const data = await response.json().catch(() => ({}));
+    return { ok: response.ok, data };
+}
+
+function buildResetEmail(name, resetUrl) {
+    return `<!doctype html><html lang="ar" dir="rtl"><body style="margin:0;background:#f7f9fc;font-family:Arial,Tahoma,sans-serif;color:#1e293b"><div style="max-width:620px;margin:35px auto;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:30px"><div style="text-align:center"><h2 style="color:#151d36;margin-bottom:10px">MedLife Syria</h2><p style="color:#64748b">إعادة تعيين كلمة مرور حساب الأعضاء</p></div><p>مرحباً ${escapeEmailText(name)},</p><p>تم طلب إعادة تعيين كلمة المرور لحسابك في منصة متطوعي MedLife. إذا كنت أنت من طلب ذلك، اضغط على الزر التالي:</p><p style="text-align:center;margin:30px 0"><a href="${resetUrl}" style="display:inline-block;background:#ff2a54;color:#fff;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:700">إعادة تعيين كلمة المرور</a></p><p style="color:#64748b;font-size:13px">الرابط صالح لمدة ساعة واحدة ويُستخدم مرة واحدة فقط.</p><p style="color:#64748b;font-size:13px">إذا لم تطلب إعادة تعيين كلمة المرور، يمكنك تجاهل هذه الرسالة.</p><hr style="border:0;border-top:1px solid #e2e8f0;margin:25px 0"><p style="color:#94a3b8;font-size:12px;text-align:center">MedLife Syria · بالعمل التطوعي نصنع الأثر.</p></div></body></html>`;
+}
+
+function escapeEmailText(value){return String(value||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
 function isApprovedStatus(status) { return status === "active" || status === "approved"; }
 async function hashPassword(password, salt) { const material=await crypto.subtle.importKey("raw",new TextEncoder().encode(password),"PBKDF2",false,["deriveBits"]); const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations:PBKDF2_ITERATIONS,hash:"SHA-256"},material,256); return bytesToHex(new Uint8Array(bits)); }
 async function sha256Hex(value){return bytesToHex(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(value))))}
