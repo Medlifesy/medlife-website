@@ -10,6 +10,7 @@ export async function onRequest(context) {
         .on('a[href="#volunteer"]', { element(element) { element.setAttribute('href', 'join-options.html'); } })
         .on('a[href="index.html#volunteer"]', { element(element) { element.setAttribute('href', 'join-options.html'); } })
         .on('a[href="/#volunteer"]', { element(element) { element.setAttribute('href', 'join-options.html'); } })
+        .on('a[href="#contact"]', { element(element) { element.setAttribute('href', '#contact'); } })
         .on('head', {
             element(element) {
                 if (url.pathname === '/admin.html') element.append('<script src="/js/admin-auth.js"></script>', { html: true });
@@ -20,13 +21,15 @@ export async function onRequest(context) {
                 if (url.pathname === '/' || url.pathname === '/index.html') {
                     element.append('<script src="/js/members.js" defer></script>', { html: true });
                     element.append('<script src="/js/home-enhancements.js" defer></script>', { html: true });
-                    element.append('<script src="/support-medlife.js" defer></script>', { html: true });
+                    element.append('<script src="/support-medlife.js?v=20260816" defer></script>', { html: true });
+                    element.append('<script src="/contact-map.js?v=20260816" defer></script>', { html: true });
                     element.append(`<script>(function(){document.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('#loginBtn,#mobileLoginBtn,[data-volunteer-trigger]');if(!el)return;e.preventDefault();e.stopImmediatePropagation();location.href=(el.id==='loginBtn'||el.id==='mobileLoginBtn')?'/login.html':'/join-options.html'},true);var modal=document.getElementById('loginModal');if(modal){var p=modal.querySelector('p');if(p)p.textContent='يمكنك الآن تسجيل الدخول إلى حسابك في منصة MedLife.';var b=document.getElementById('closeLogin2');if(b){b.textContent='تسجيل الدخول';b.onclick=function(){location.href='/login.html'}}}})();</script>`, { html: true });
                 }
                 if (url.pathname === '/articles.html') element.append('<script src="/js/articles.js?v=20260814" defer></script>', { html: true });
                 if (url.pathname === '/forum.html' || url.pathname === '/forum' || url.pathname === '/forum-v3.html') {
                     element.append('<script src="/forum-booking.js?v=20260816" defer></script>', { html: true });
                     element.append('<script src="/support-medlife.js?v=20260816" defer></script>', { html: true });
+                    element.append('<script src="/contact-map.js?v=20260816" defer></script>', { html: true });
                 }
             }
         })
