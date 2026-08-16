@@ -5,13 +5,16 @@ const PBKDF2_ITERATIONS = 120000;
 export async function onRequest(context) {
     const { request, env } = context;
     if (request.method === "OPTIONS") return json({ success: true });
-    if (!env.DB) return json({ success: false, error: "Database binding 'DB' is not configured." }, 500);
+
+    const db = await findMembersDatabase(env);
+    if (!db) return json({ success: false, error: "لم يتم العثور على قاعدة بيانات الأعضاء المرتبطة بالموقع." }, 500);
 
     const action = new URL(request.url).searchParams.get("action") || "me";
+
     try {
-        if (request.method === "POST" && action === "login") return await login(request, env.DB);
-        if (request.method === "POST" && action === "logout") return await logout(request, env.DB);
-        if (request.method === "GET" && action === "me") return await me(request, env.DB);
+        if (request.method === "POST" && action === "login") return await login(request, db);
+        if (request.method === "POST" && action === "logout") return await logout(request, db);
+        if (request.method === "GET" && action === "me") return await me(request, db);
         return json({ success: false, error: "Method or action not allowed." }, 405);
     } catch (error) {
         console.error("member-session error:", error);
@@ -19,12 +22,31 @@ export async function onRequest(context) {
     }
 }
 
+async function findMembersDatabase(env) {
+    const candidates = [];
+    if (env.MEMBERS_DB) candidates.push(env.MEMBERS_DB);
+    if (env.DB && env.DB !== env.MEMBERS_DB) candidates.push(env.DB);
+
+    for (const db of candidates) {
+        try {
+            const table = await db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='members' LIMIT 1`).first();
+            if (table) return db;
+        } catch (error) {
+            console.error("member DB detection error:", error);
+        }
+    }
+
+    return null;
+}
+
 async function login(request, db) {
     const body = await request.json();
     const identifier = String(body.identifier || body.username || body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
 
-    if (!identifier || !password) return json({ success:false, error:"يرجى إدخال البريد الإلكتروني أو اسم المستخدم وكلمة المرور." },400);
+    if (!identifier || !password) {
+        return json({ success:false, error:"يرجى إدخال البريد الإلكتروني أو اسم المستخدم وكلمة المرور." },400);
+    }
 
     const member = await db.prepare(`
         SELECT id,membership_number,full_name,email,account_email,password_hash,account_status,status,member_code,
@@ -36,29 +58,31 @@ async function login(request, db) {
         LIMIT 1
     `).bind(identifier,identifier,identifier).first();
 
-    if (!member) return json({ success:false, error:"بيانات الدخول غير صحيحة." },401);
-    if (!(member.status === "active" || member.status === "approved")) return json({ success:false, error:"عضويتك لم تُعتمد بعد من الإدارة." },403);
-    if (member.account_status && member.account_status !== "active") return json({ success:false, error:"حسابك غير مفعل حالياً." },403);
+    if (!member) return json({success:false, error:"بيانات الدخول غير صحيحة."},401);
+    if (!(member.status === "active" || member.status === "approved")) return json({success:false, error:"عضويتك لم تُعتمد بعد من الإدارة."},403);
+    if (member.account_status && member.account_status !== "active") return json({success:false, error:"حسابك غير مفعل حالياً."},403);
 
     const stored = parseStoredPassword(member.password_hash);
-    if (!stored) return json({ success:false, error:"لم يتم إنشاء كلمة مرور لهذا الحساب بعد. استخدم رمز الدعوة لإنشاء الحساب." },401);
+    if (!stored) return json({success:false, error:"لم يتم إنشاء كلمة مرور لهذا الحساب بعد. استخدم رمز الدعوة لإنشاء الحساب."},401);
 
     const candidate = await hashPassword(password, stored.salt, stored.iterations);
-    if (!timingSafeEqual(candidate,stored.hash)) return json({ success:false, error:"بيانات الدخول غير صحيحة." },401);
+    if (!timingSafeEqual(candidate,stored.hash)) return json({success:false, error:"بيانات الدخول غير صحيحة."},401);
 
-    return withCookie(json({success:true,member}), await createSession(db, member.id));
+    return withCookie(json({success:true,member:await getMember(db,member.id)}), await createSession(db, member.id));
 }
 
 async function me(request,db){
     const memberId = await authenticatedMemberId(request,db);
     if(!memberId) return json({success:false,authenticated:false},401);
-    const member=await getMember(db,memberId);
-    return json({success:true,authenticated:true,member});
+    return json({success:true,authenticated:true,member:await getMember(db,memberId)});
 }
 
 async function logout(request,db){
     const token=getCookie(request,SESSION_COOKIE);
-    if(token) await db.prepare(`DELETE FROM member_sessions_v2 WHERE token_hash=?`).bind(await sha256Hex(token)).run();
+    if(token){
+        await ensureSchema(db);
+        await db.prepare(`DELETE FROM member_sessions_v2 WHERE token_hash=?`).bind(await sha256Hex(token)).run();
+    }
     const response=json({success:true});
     const h=new Headers(response.headers);
     h.set("Set-Cookie",`${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax`);
@@ -70,6 +94,7 @@ async function ensureSchema(db){
 }
 
 async function createSession(db,memberId){
+    await ensureSchema(db);
     const token=randomToken();
     await db.prepare(`INSERT INTO member_sessions_v2(id,token_hash,member_id,expires_at) VALUES(?,?,?,datetime('now','+30 days'))`).bind(token,await sha256Hex(token),memberId).run();
     return token;
@@ -78,6 +103,7 @@ async function createSession(db,memberId){
 async function authenticatedMemberId(request,db){
     const token=getCookie(request,SESSION_COOKIE);
     if(!token) return null;
+    await ensureSchema(db);
     const hash=await sha256Hex(token);
     const row=await db.prepare(`SELECT member_id FROM member_sessions_v2 WHERE token_hash=? AND datetime(expires_at)>datetime('now') LIMIT 1`).bind(hash).first();
     if(!row) return null;
