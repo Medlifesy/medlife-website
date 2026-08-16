@@ -1,7 +1,10 @@
 /join-us.html /join-options.html 302
 /join /join-options.html 302
 /members /join-options.html 302
-/login /login.html 302
+/login /login.html 200
 /contact /contact.html 200
+/about /about-medlife.html 200
+/articles /articles.html 200
 /forum.html /forum-v3.html 200
 /forum /forum-v3.html 200
+/forum-v3 /forum-v3.html 200
