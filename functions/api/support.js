@@ -22,6 +22,23 @@ async function ensure(db){
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   )`).run();
+
+  const addColumn = async (name, definition) => {
+    try { await db.prepare(`ALTER TABLE support_cases ADD COLUMN ${name} ${definition}`).run(); } catch (_) {}
+  };
+  await addColumn('beneficiary_count','INTEGER NOT NULL DEFAULT 0');
+  await addColumn('beneficiary_label','TEXT');
+  await addColumn('duration_months','INTEGER NOT NULL DEFAULT 0');
+  await addColumn('monthly_per_beneficiary','INTEGER NOT NULL DEFAULT 0');
+  await addColumn('spent_amount','INTEGER NOT NULL DEFAULT 0');
+  await addColumn('amount_basis','TEXT');
+  await addColumn('financial_status','TEXT NOT NULL DEFAULT \'not_published\'');
+  await addColumn('start_date','TEXT');
+  await addColumn('end_date','TEXT');
+  await addColumn('verification_status','TEXT NOT NULL DEFAULT \'internal_review\'');
+  await addColumn('support_type','TEXT');
+  await addColumn('areas','TEXT');
+
   await db.prepare(`CREATE TABLE IF NOT EXISTS support_contributions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     case_id INTEGER NOT NULL,
@@ -66,10 +83,48 @@ async function ensure(db){
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   )`).run();
+
+  // Publicly safe featured records. No names or sensitive beneficiary data are stored.
+  await db.prepare(`INSERT OR IGNORE INTO support_cases
+    (code,type,title,summary,description,target_amount,funded_amount,status,urgent,governorate,public_notes,
+     beneficiary_count,beneficiary_label,duration_months,monthly_per_beneficiary,spent_amount,amount_basis,financial_status,
+     start_date,end_date,verification_status,support_type,areas)
+    VALUES
+    ('ML-IMPACT-ORPHANS-2026','project','دعم أكثر من 75 يتيماً لمدة 6 أشهر',
+     'مبادرة دعم شهري مستمر لأكثر من 75 يتيماً في طرطوس وبانياس وجبلة وحماة.',
+     'تم تنفيذ دعم شهري لمدة ستة أشهر. حفاظاً على الخصوصية لا تُنشر أسماء الأطفال أو بياناتهم التعريفية. القيمة المنشورة هنا هي قيمة مرجعية للحساب وليست بديلاً عن سجل الصرف الداخلي.',
+     6750000,6750000,'funded',0,'عدة محافظات',
+     'القيمة المرجعية مبنية على 75 مستفيداً كحد أدنى × 15,000 ل.س جديدة شهرياً × 6 أشهر. العدد الفعلي للمستفيدين كان أكثر من 75، لذلك لا نعرض الرقم كإجمالي صرف نهائي قبل اعتماد سجل الصرف.',
+     75,'+75',6,15000,0,
+     '15,000 ل.س جديدة تقريباً لكل مستفيد في الشهر؛ الحد الأدنى الحسابي لـ75 مستفيداً لمدة 6 أشهر = 6,750,000 ل.س جديدة.',
+     'reference_only','2026-01-01','2026-06-30','documented_internal','دعم شهري للأيتام','طرطوس • بانياس • جبلة • حماة');`).run();
+
+  await db.prepare(`INSERT OR IGNORE INTO support_cases
+    (code,type,title,summary,description,target_amount,funded_amount,status,urgent,governorate,public_notes,
+     beneficiary_count,beneficiary_label,duration_months,monthly_per_beneficiary,spent_amount,amount_basis,financial_status,
+     verification_status,support_type,areas)
+    VALUES
+    ('ML-OPEN-ORPHAN-SCHOOL-2026','case','طفلة يتيمة بحاجة إلى دعم تعليمي ولوجستي',
+     'حالة إنسانية في طرطوس تحتاج إلى دعم يساعد طفلة يتيمة على الاستمرار في تعليمها وتأمين احتياجاتها المدرسية واللوجستية.',
+     'تشمل الاحتياجات المستلزمات المدرسية، الاحتياجات الشخصية المرتبطة بالمدرسة، المواصلات والتنقل، والاحتياجات التعليمية الأساسية. لا تُنشر أي معلومات تعريفية عن الطفلة حفاظاً على سلامتها وخصوصيتها.',
+     0,0,'active',1,'طرطوس',
+     'سيتم نشر المبلغ المطلوب بعد اعتماد تقييم الاحتياج والفواتير أو عروض الأسعار، حتى لا يتم عرض أي رقم غير موثق.',
+     1,'طفلة واحدة',0,0,0,'سيتم تحديده بعد تقييم الاحتياج','not_published','pending_documentation','دعم تعليمي ولوجستي','طرطوس');`).run();
 }
 
 function admin(request,env){return !!env.ADMIN_API_KEY && request.headers.get('X-Admin-Key')===env.ADMIN_API_KEY}
-function cleanCase(x,docs=[]){return {...x,urgent:Boolean(x.urgent),target_amount:Number(x.target_amount||0),funded_amount:Number(x.funded_amount||0),documents:docs.filter(d=>d.public!==0)}}
+function cleanCase(x,docs=[]){
+  return {...x,
+    urgent:Boolean(x.urgent),
+    target_amount:Number(x.target_amount||0),
+    funded_amount:Number(x.funded_amount||0),
+    beneficiary_count:Number(x.beneficiary_count||0),
+    duration_months:Number(x.duration_months||0),
+    monthly_per_beneficiary:Number(x.monthly_per_beneficiary||0),
+    spent_amount:Number(x.spent_amount||0),
+    documents:docs.filter(d=>d.public!==0)
+  };
+}
 function text(v,max=5000){return String(v??'').trim().slice(0,max)}
 function validPhone(v){return /^[+0-9()\-\s]{7,25}$/.test(String(v||'').trim())}
 
@@ -80,15 +135,17 @@ export async function onRequest({request,env}){
 
     if(request.method==='GET'){
       const rows=await env.MEMBERS_DB.prepare(`SELECT * FROM support_cases WHERE status IN ('active','funded') ORDER BY CASE WHEN status='active' THEN 0 ELSE 1 END, urgent DESC, id DESC`).all();
-      const cases=[];for(const x of (rows.results||[])){const d=await env.MEMBERS_DB.prepare(`SELECT label,url,public FROM support_documents WHERE case_id=? AND public=1 ORDER BY id DESC`).bind(x.id).all();cases.push(cleanCase(x,d.results||[]))}
-      const total=await env.MEMBERS_DB.prepare(`SELECT COALESCE(SUM(funded_amount),0) total FROM support_cases`).first();
+      const cases=[];
+      for(const x of (rows.results||[])){
+        const d=await env.MEMBERS_DB.prepare(`SELECT label,url,public FROM support_documents WHERE case_id=? AND public=1 ORDER BY id DESC`).bind(x.id).all();
+        cases.push(cleanCase(x,d.results||[]));
+      }
+      const total=await env.MEMBERS_DB.prepare(`SELECT COALESCE(SUM(CASE WHEN financial_status='verified' THEN funded_amount ELSE 0 END),0) total FROM support_cases`).first();
       return json({success:true,cases,totalFunded:Number(total?.total||0)});
     }
 
     if(request.method==='POST'){
       const body=await request.json();
-
-      // Public request for help. It is never published automatically.
       if(body.action==='apply'){
         if(body.website) return json({success:true,message:'تم استلام الطلب.'});
         const applicant=text(body.applicant_name,160), phone=text(body.phone,40), governorate=text(body.governorate,80);
@@ -109,7 +166,9 @@ export async function onRequest({request,env}){
       const action=body.action;
       if(action==='create'){
         const code=text(body.code,80)||`ML-${Date.now().toString(36).toUpperCase()}`;
-        const r=await env.MEMBERS_DB.prepare(`INSERT INTO support_cases(code,type,title,summary,description,target_amount,status,urgent,governorate,public_notes) VALUES(?,?,?,?,?,?,?,?,?,?)`).bind(code,text(body.type,30)||'case',text(body.title,180),text(body.summary,600),text(body.description,4000),Math.max(0,Number(body.target_amount||0)),text(body.status,30)||'active',body.urgent?1:0,text(body.governorate,80),text(body.public_notes,1500)).run();
+        const r=await env.MEMBERS_DB.prepare(`INSERT INTO support_cases(code,type,title,summary,description,target_amount,status,urgent,governorate,public_notes,beneficiary_count,beneficiary_label,duration_months,monthly_per_beneficiary,spent_amount,amount_basis,financial_status,start_date,end_date,verification_status,support_type,areas) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(
+          code,text(body.type,30)||'case',text(body.title,180),text(body.summary,600),text(body.description,4000),Math.max(0,Number(body.target_amount||0)),text(body.status,30)||'active',body.urgent?1:0,text(body.governorate,80),text(body.public_notes,1500),Math.max(0,Number(body.beneficiary_count||0)),text(body.beneficiary_label,80),Math.max(0,Number(body.duration_months||0)),Math.max(0,Number(body.monthly_per_beneficiary||0)),Math.max(0,Number(body.spent_amount||0)),text(body.amount_basis,1500),text(body.financial_status,40)||'not_published',text(body.start_date,30),text(body.end_date,30),text(body.verification_status,40)||'internal_review',text(body.support_type,120),text(body.areas,300)
+        ).run();
         return json({success:true,id:r.meta?.last_row_id,code});
       }
       if(action==='applications'){
@@ -127,7 +186,10 @@ export async function onRequest({request,env}){
       if(action==='update'){
         const id=Number(body.id);const current=await env.MEMBERS_DB.prepare('SELECT * FROM support_cases WHERE id=?').bind(id).first();if(!current)return json({success:false,error:'الحالة غير موجودة.'},404);
         const target=Math.max(0,Number(body.target_amount??current.target_amount));const funded=Math.max(0,Number(body.funded_amount??current.funded_amount));const status=funded>=target&&target>0?'funded':(body.status||current.status);
-        await env.MEMBERS_DB.prepare(`UPDATE support_cases SET title=?,summary=?,description=?,target_amount=?,funded_amount=?,status=?,urgent=?,governorate=?,public_notes=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).bind(body.title??current.title,body.summary??current.summary,body.description??current.description,target,funded,status,body.urgent==null?current.urgent:(body.urgent?1:0),body.governorate??current.governorate,body.public_notes??current.public_notes,id).run();
+        await env.MEMBERS_DB.prepare(`UPDATE support_cases SET title=?,summary=?,description=?,target_amount=?,funded_amount=?,status=?,urgent=?,governorate=?,public_notes=?,beneficiary_count=?,beneficiary_label=?,duration_months=?,monthly_per_beneficiary=?,spent_amount=?,amount_basis=?,financial_status=?,start_date=?,end_date=?,verification_status=?,support_type=?,areas=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).bind(
+          body.title??current.title,body.summary??current.summary,body.description??current.description,target,funded,status,body.urgent==null?current.urgent:(body.urgent?1:0),body.governorate??current.governorate,body.public_notes??current.public_notes,
+          body.beneficiary_count==null?current.beneficiary_count:Math.max(0,Number(body.beneficiary_count)),body.beneficiary_label??current.beneficiary_label,body.duration_months==null?current.duration_months:Math.max(0,Number(body.duration_months)),body.monthly_per_beneficiary==null?current.monthly_per_beneficiary:Math.max(0,Number(body.monthly_per_beneficiary)),body.spent_amount==null?current.spent_amount:Math.max(0,Number(body.spent_amount)),body.amount_basis??current.amount_basis,body.financial_status??current.financial_status,body.start_date??current.start_date,body.end_date??current.end_date,body.verification_status??current.verification_status,body.support_type??current.support_type,body.areas??current.areas,id
+        ).run();
         return json({success:true,status});
       }
       if(action==='contribution'){
