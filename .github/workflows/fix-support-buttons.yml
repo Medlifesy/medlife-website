@@ -1,4 +1,4 @@
-name: Fix support page buttons
+name: Support page maintenance
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  fix-buttons:
-    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message != 'fix: support page hero buttons'
+  maintenance:
+    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message != 'chore: finalize support page maintenance'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -15,17 +15,84 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fix support hero navigation
+      - name: Finalize support page
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('support.html')
           s = p.read_text(encoding='utf-8')
-          old1 = '<a class="btn primary" href="#request">تقديم طلب مساعدة</a>'
-          new1 = '<button type="button" class="btn primary" onclick="document.getElementById(\'request\').scrollIntoView({behavior:\'smooth\',block:\'start\'});history.replaceState(null,\'\',\'#request\')">تقديم طلب مساعدة</button>'
-          old2 = '<a class="btn" href="#cases">استعراض الحالات</a>'
-          new2 = '<button type="button" class="btn" onclick="document.getElementById(\'cases\').scrollIntoView({behavior:\'smooth\',block:\'start\'});history.replaceState(null,\'\',\'#cases\')">استعراض الحالات</button>'
-          s = s.replace(old1, new1).replace(old2, new2)
+
+          replacements = {
+            '<a class="btn primary" href="#request">تقديم طلب مساعدة</a>': '<button type="button" class="btn primary" id="heroRequestBtn">تقديم طلب مساعدة</button>',
+            '<a class="btn" href="#cases">استعراض الحالات</a>': '<button type="button" class="btn" id="heroCasesBtn">استعراض الحالات</button>',
+            '<span class="done">مكتملة</span>': '<span class="done">مكتملة</span>',
+          }
+          for old, new in replacements.items():
+              s = s.replace(old, new)
+
+          marker = '<script>\n'
+          live = r'''<script>
+          (() => {
+            const fmt = n => new Intl.NumberFormat('en-US').format(Number(n || 0));
+            const scrollToId = id => {
+              const el = document.getElementById(id);
+              if (el) { el.scrollIntoView({behavior:'smooth', block:'start'}); history.replaceState(null,'','#'+id); }
+            };
+            document.getElementById('heroRequestBtn')?.addEventListener('click', () => scrollToId('request'));
+            document.getElementById('heroCasesBtn')?.addEventListener('click', () => scrollToId('cases'));
+
+            async function loadLiveSupport() {
+              try {
+                const res = await fetch('/api/support-stats', {headers:{'Accept':'application/json'}, cache:'no-store'});
+                const data = await res.json();
+                if (!data?.success) return;
+                const st = data.stats || {};
+                const numbers = document.querySelectorAll('[data-num]');
+                if (numbers[0]) numbers[0].textContent = fmt(st.completedCount);
+                if (numbers[1]) numbers[1].textContent = fmt(st.completedAmount);
+                if (numbers[2]) numbers[2].textContent = fmt(st.openCount);
+                if (numbers[3]) numbers[3].textContent = data.orphanInitiative?.beneficiaryLabel || '+75';
+
+                const tabs = document.querySelectorAll('.tab');
+                if (tabs[0]) tabs[0].querySelector('.count').textContent = fmt(st.completedCount);
+                if (tabs[1]) tabs[1].querySelector('.count').textContent = fmt(st.openCount);
+                if (tabs[2]) tabs[2].querySelector('.count').textContent = fmt(st.reviewCount);
+
+                const completedHeading = document.querySelector('#completed .section-heading p');
+                if (completedHeading) completedHeading.innerHTML = `${fmt(st.completedCount)} حالة · إجمالي المبالغ المسجلة: <strong>${fmt(st.completedAmount)} ل.س</strong>`;
+
+                const open = data.openCase;
+                if (open) {
+                  const target = Number(open.targetAmount || 0), funded = Number(open.fundedAmount || 0);
+                  const percent = target ? Math.min(100, Math.round(funded / target * 100)) : 0;
+                  const detail = document.querySelector('#open .open-details');
+                  if (detail) detail.innerHTML = `
+                    <div><b>${fmt(target)} ل.س</b>المبلغ المطلوب</div>
+                    <div><b>${fmt(funded)} ل.س</b>المبلغ المجموع</div>
+                    <div><b>${fmt(Math.max(0,target-funded))} ل.س</b>المتبقي</div>
+                    <div><b>${open.durationMonths ? fmt(open.durationMonths)+' أشهر' : 'حسب خطة الحالة'}</b>مدة الدعم</div>
+                    <div><b>${open.startDate || 'غير منشور'}</b>بداية المشروع</div>
+                    <div><b>${open.endDate || 'غير منشور'}</b>نهاية المشروع</div>
+                    <div><b>${open.governorate || 'غير منشور'}</b>المحافظة</div>
+                    <div><b>${open.progressStage === 'fundraising' ? 'جمع الدعم' : 'قيد المتابعة'}</b>مرحلة الحالة</div>`;
+                  const circle = document.querySelector('#open .progress-circle');
+                  if (circle) {
+                    circle.style.background = `conic-gradient(var(--red) ${percent * 3.6}deg,#eef1f5 ${percent * 3.6}deg)`;
+                    const label = circle.querySelector('strong'); if (label) label.textContent = percent + '%';
+                  }
+                }
+              } catch (e) {
+                console.warn('Support live stats unavailable', e);
+              }
+            }
+            loadLiveSupport();
+          })();
+          </script>
+          '''
+          if '/api/support-stats' not in s:
+              s = s.replace('</body>', live + '</body>')
+
+          s = s.replace('>موثق</b>حالة التوثيق', '>موثق ضمن السجلات الداخلية</b>حالة التوثيق')
           p.write_text(s, encoding='utf-8')
           PY
 
@@ -35,5 +102,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add support.html
           git diff --cached --quiet && exit 0
-          git commit -m "fix: support page hero buttons"
+          git commit -m "chore: finalize support page maintenance"
           git push
