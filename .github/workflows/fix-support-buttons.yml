@@ -1,0 +1,39 @@
+name: Fix support page buttons
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  fix-buttons:
+    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message != 'fix: support page hero buttons'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fix support hero navigation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('support.html')
+          s = p.read_text(encoding='utf-8')
+          old1 = '<a class="btn primary" href="#request">تقديم طلب مساعدة</a>'
+          new1 = '<button type="button" class="btn primary" onclick="document.getElementById(\'request\').scrollIntoView({behavior:\'smooth\',block:\'start\'});history.replaceState(null,\'\',\'#request\')">تقديم طلب مساعدة</button>'
+          old2 = '<a class="btn" href="#cases">استعراض الحالات</a>'
+          new2 = '<button type="button" class="btn" onclick="document.getElementById(\'cases\').scrollIntoView({behavior:\'smooth\',block:\'start\'});history.replaceState(null,\'\',\'#cases\')">استعراض الحالات</button>'
+          s = s.replace(old1, new1).replace(old2, new2)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add support.html
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: support page hero buttons"
+          git push
