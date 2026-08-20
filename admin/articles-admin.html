@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MedLife Articles Admin</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f7fb;padding:20px}input,textarea,button,select{width:100%;padding:10px;margin:6px 0}button{cursor:pointer;background:#0b7285;color:#fff;border:0;border-radius:6px}.card{background:white;padding:15px;border-radius:10px;margin:10px 0}.row{display:grid;gap:10px}
+</style>
+</head>
+<body>
+<h2>MedLife Articles Admin</h2>
+<div class="card">
+<input id="api" value="https://medlife-articles-api.broad-frog-3978.workers.dev">
+<input id="key" placeholder="ADMIN_API_KEY">
+<button onclick="load()">اتصال وجلب المقالات</button>
+</div>
+<div class="card">
+<input id="id" placeholder="ID للتعديل (اتركه فارغاً للإضافة)">
+<input id="title_ar" placeholder="العنوان العربي">
+<input id="title_en" placeholder="العنوان الإنكليزي">
+<textarea id="content_ar" placeholder="المحتوى العربي"></textarea>
+<textarea id="content_en" placeholder="المحتوى الإنكليزي"></textarea>
+<input id="author_name" placeholder="اسم الكاتب">
+<input id="category" placeholder="التصنيف">
+<select id="status"><option value="pending">pending</option><option value="draft">draft</option><option value="published">published</option></select>
+<button onclick="save()">حفظ</button>
+</div>
+<div id="list"></div>
+<script>
+const $=x=>document.getElementById(x);function headers(){return {'Content-Type':'application/json','Authorization':'Bearer '+$('key').value}}
+async function load(){let r=await fetch($('api').value+'/articles',{headers:headers()});let d=await r.json();$('list').innerHTML=JSON.stringify(d,null,2);}
+async function save(){let b={title_ar:$('title_ar').value,title_en:$('title_en').value,content_ar:$('content_ar').value,content_en:$('content_en').value,author_name:$('author_name').value,category:$('category').value,status:$('status').value};let id=$('id').value;let r=await fetch($('api').value+(id?'/articles/'+id:'/articles'),{method:id?'PUT':'POST',headers:headers(),body:JSON.stringify(b)});alert(await r.text());load();}
+</script>
+</body></html>
