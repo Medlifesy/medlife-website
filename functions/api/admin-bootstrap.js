@@ -8,14 +8,14 @@ function hex(bytes){return Array.from(new Uint8Array(bytes)).map(b=>b.toString(1
 async function createPasswordHash(password){const salt=new Uint8Array(16);crypto.getRandomValues(salt);const key=await crypto.subtle.importKey('raw',enc.encode(password),{name:'PBKDF2'},false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:PBKDF2_ITERATIONS,hash:'SHA-256'},key,256);return {hash:`pbkdf2$sha256$${PBKDF2_ITERATIONS}$${hex(salt)}$${hex(bits)}`,salt:hex(salt)};}
 export async function onRequest({request,env}){
  if(request.method!=='POST')return json({success:false,error:'Method not allowed.'},405);
- if(!env.MEMBERS_DB)return json({success:false,error:'Database binding is not configured.'},500);
+ if(!env.DB)return json({success:false,error:"Database binding 'DB' is not configured."},500);
  if(!env.ADMIN_BOOTSTRAP_SECRET)return json({success:false,error:'Admin bootstrap is not configured yet.'},503);
  try{
   const body=await request.json();const secret=String(body.secret||'');const password=String(body.password||'');const confirmPassword=String(body.confirmPassword||'');
   if(secret!==String(env.ADMIN_BOOTSTRAP_SECRET))return json({success:false,error:'رمز التهيئة غير صحيح.'},403);
   if(password.length<12)return json({success:false,error:'كلمة المرور يجب أن تكون 12 محرفاً على الأقل.'},400);
   if(password!==confirmPassword)return json({success:false,error:'كلمتا المرور غير متطابقتين.'},400);
-  const db=env.MEMBERS_DB;
+  const db=env.DB;
   const member=await db.prepare(`SELECT id,full_name,email,status FROM members WHERE lower(COALESCE(email,''))=? LIMIT 1`).bind(EXISTING_ADMIN_MEMBER_EMAIL).first();
   if(!member)return json({success:false,error:'لم يتم العثور على العضو الإداري الموجود.',error_code:'EXISTING_MEMBER_NOT_FOUND'},404);
   const existing=await db.prepare('SELECT id FROM member_accounts WHERE member_id=? OR lower(username)=lower(?) LIMIT 1').bind(member.id,ADMIN_USERNAME).first();
