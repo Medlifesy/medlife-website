@@ -8,11 +8,16 @@ export async function onRequest(context) {
     if (/\/(admin|admin-members|articles-admin|support-admin|support-applications-admin)\.html$/.test(path)) {
       if (path.endsWith('/articles-admin.html')) {
         let html = await response.text();
-        // Load ONLY the current editorial AI studio. The legacy AI layers are intentionally disabled.
-        const src = '/article-ai-editorial-v2.js?v=20260820-2';
-        if (!html.includes('/article-ai-editorial-v2.js')) {
-          const marker = `<script src="${src}" defer></script>`;
-          html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+        const scripts = [
+          '/article-ai-legacy-hide.js?v=20260820-1',
+          '/article-ai-editorial-v2.js?v=20260820-2'
+        ];
+        for (const src of scripts) {
+          const name = src.split('?')[0];
+          if (!html.includes(name)) {
+            const marker = `<script src="${src}" defer></script>`;
+            html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+          }
         }
         const headers = new Headers(response.headers);
         headers.delete('content-length');
