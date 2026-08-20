@@ -1,7 +1,7 @@
 /* MEDLIFE ARTICLES API
    Public: GET /api/articles
-   Admin: GET /api/articles?admin=1, PUT /api/articles, DELETE /api/articles?id=123
-   Admin authentication uses member_accounts + member_sessions.
+   Admin: GET /api/articles?admin=1, POST /api/articles, PUT /api/articles, DELETE /api/articles?id=123
+   Admin authentication uses member_accounts + member_sessions in the existing DB binding.
 */
 import { authenticateArticleAdmin, json } from '../article-admin-session.js';
 
@@ -9,16 +9,15 @@ export async function onRequest({ request, env }) {
   const method = request.method.toUpperCase();
   if (method === 'OPTIONS') return json({ success: true });
   if (!env.DB) return json({ success: false, error: "Database binding 'DB' is not configured." }, 500);
-  if (!env.MEMBERS_DB) return json({ success: false, error: "Database binding 'MEMBERS_DB' is not configured." }, 500);
   try {
     const url = new URL(request.url), isAdmin = url.searchParams.get('admin') === '1';
     if (method === 'GET') {
-      if (isAdmin) { const user = await authenticateArticleAdmin(request, env.MEMBERS_DB); if (!user) return json({ success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.' },401); return listAllArticles(env.DB,user); }
+      if (isAdmin) { const user = await authenticateArticleAdmin(request, env.DB); if (!user) return json({ success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.' },401); return listAllArticles(env.DB,user); }
       return listPublishedArticles(env.DB);
     }
-    if (method === 'POST') return createArticle(request, env.DB, env.MEMBERS_DB);
-    if (method === 'PUT') { const user=await authenticateArticleAdmin(request,env.MEMBERS_DB); if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401); return updateArticle(request,env.DB,user); }
-    if (method === 'DELETE') { const user=await authenticateArticleAdmin(request,env.MEMBERS_DB); if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401); if(user.role!=='admin')return json({success:false,error:'حذف المقالات متاح لمدير النظام فقط.'},403); return deleteArticle(request,env.DB); }
+    if (method === 'POST') { const user=await authenticateArticleAdmin(request,env.DB); if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401); return createArticle(request,env.DB,user); }
+    if (method === 'PUT') { const user=await authenticateArticleAdmin(request,env.DB); if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401); return updateArticle(request,env.DB,user); }
+    if (method === 'DELETE') { const user=await authenticateArticleAdmin(request,env.DB); if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401); if(user.role!=='admin')return json({success:false,error:'حذف المقالات متاح لمدير النظام فقط.'},403); return deleteArticle(request,env.DB); }
     return json({success:false,error:'Method not allowed.'},405);
   } catch (error) { console.error('Articles API error:',error); return json({success:false,error:'تعذر تنفيذ طلب المقالات حالياً.'},500); }
 }
@@ -32,13 +31,13 @@ async function listAllArticles(db,user){
   const result=await db.prepare(`SELECT id,title_ar,title_en,content_ar,content_en,excerpt_ar,excerpt_en,author_member_id,author_name,author_email,category,image_url,status,rejection_reason,published_at,created_at,updated_at FROM articles ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'draft' THEN 1 WHEN 'published' THEN 2 WHEN 'rejected' THEN 3 ELSE 4 END,datetime(created_at) DESC,id DESC`).all();
   const articles=result.results||[]; return json({success:true,admin:{member_id:user.member_id,account_id:user.account_id,username:user.username,role:user.role,display_name:user.display_name||user.username},articles,summary:{total:articles.length,pending:articles.filter(a=>a.status==='pending').length,published:articles.filter(a=>a.status==='published').length,rejected:articles.filter(a=>a.status==='rejected').length,draft:articles.filter(a=>a.status==='draft').length}});
 }
-async function createArticle(request,articlesDb,membersDb){
-  const b=await request.json(),titleAr=clean(b.title_ar,500),titleEn=clean(b.title_en,500),contentAr=clean(b.content_ar,100000),contentEn=clean(b.content_en,100000),excerptAr=clean(b.excerpt_ar,2000),excerptEn=clean(b.excerpt_en,2000),authorName=clean(b.author_name,200),authorEmail=clean(b.author_email,200),category=clean(b.category,100),imageUrl=clean(b.image_url,2000),memberId=Number(b.author_member_id);
+async function createArticle(request,db,user){
+  const b=await request.json(),titleAr=clean(b.title_ar,500),titleEn=clean(b.title_en,500),contentAr=clean(b.content_ar,100000),contentEn=clean(b.content_en,100000),excerptAr=clean(b.excerpt_ar,2000),excerptEn=clean(b.excerpt_en,2000),authorName=clean(b.author_name||user.display_name||user.username,200),authorEmail=clean(b.author_email,200),category=clean(b.category,100),imageUrl=clean(b.image_url,2000),requestedMemberId=Number(b.author_member_id);
   if(!titleAr||!contentAr||!authorName)return json({success:false,error:'العنوان العربي والمحتوى العربي واسم الكاتب حقول مطلوبة.'},400);
-  const duplicate=await articlesDb.prepare(`SELECT id,status FROM articles WHERE lower(trim(title_ar))=lower(trim(?)) AND status IN ('published','pending','draft') ORDER BY id DESC LIMIT 1`).bind(titleAr).first();
+  const duplicate=await db.prepare(`SELECT id,status FROM articles WHERE lower(trim(title_ar))=lower(trim(?)) AND status IN ('published','pending','draft') ORDER BY id DESC LIMIT 1`).bind(titleAr).first();
   if(duplicate)return json({success:false,error:'يوجد مقال آخر بالعنوان نفسه بالفعل.',duplicate_id:duplicate.id,duplicate_status:duplicate.status},409);
-  let authorMemberId=null; if(Number.isInteger(memberId)&&memberId>0){const member=await membersDb.prepare('SELECT id FROM members WHERE id=? LIMIT 1').bind(memberId).first();if(!member)return json({success:false,error:'عضو MedLife غير موجود.'},400);authorMemberId=member.id;}
-  const result=await articlesDb.prepare(`INSERT INTO articles(title_ar,title_en,content_ar,content_en,excerpt_ar,excerpt_en,author_member_id,author_name,author_email,category,image_url,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,'pending',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(titleAr,titleEn,contentAr,contentEn,excerptAr,excerptEn,authorMemberId,authorName,authorEmail,category,imageUrl).run();
+  let authorMemberId=user.member_id; if(Number.isInteger(requestedMemberId)&&requestedMemberId>0){if(user.role!=='admin'&&requestedMemberId!==user.member_id)return json({success:false,error:'لا يمكنك إنشاء مقال باسم عضو آخر.'},403);const member=await db.prepare('SELECT id FROM members WHERE id=? LIMIT 1').bind(requestedMemberId).first();if(!member)return json({success:false,error:'عضو MedLife غير موجود.'},400);authorMemberId=member.id;}
+  const result=await db.prepare(`INSERT INTO articles(title_ar,title_en,content_ar,content_en,excerpt_ar,excerpt_en,author_member_id,author_name,author_email,category,image_url,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,'pending',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(titleAr,titleEn,contentAr,contentEn,excerptAr,excerptEn,authorMemberId,authorName,authorEmail,category,imageUrl).run();
   return json({success:true,message:'تم إرسال المقال للمراجعة بنجاح.',id:result.meta?.last_row_id??null,status:'pending'},201);
 }
 async function updateArticle(request,db,user){
