@@ -9,14 +9,13 @@ export async function onRequest(context) {
     if (/\/(admin|admin-members|articles-admin|support-admin|support-applications-admin)\.html$/.test(path)) {
       if (path.endsWith('/articles-admin.html')) {
         let html = await response.text();
-        const scripts = ['/article-ai-studio.js','/article-ai-admin-enhanced.js'];
-        const missing = scripts.filter(src => !html.includes(src));
-        if (!missing.length) return response;
+        const scripts = ['/article-ai-studio.js?v=20260820-2','/article-ai-admin-enhanced.js?v=20260820-2'];
+        const missing = scripts.filter(src => !html.includes(src.split('?')[0]));
         const marker = missing.map(src => `<script src="${src}" defer></script>`).join('');
         html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
         const headers = new Headers(response.headers);
         headers.delete('content-length');
-        headers.set('cache-control','no-store, no-cache, must-revalidate');
+        headers.set('cache-control','no-store, no-cache, must-revalidate, max-age=0');
         return new Response(html,{status:response.status,statusText:response.statusText,headers});
       }
       return response;
@@ -56,7 +55,7 @@ export async function onRequest(context) {
     const updated = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
     const headers = new Headers(response.headers);
     headers.delete('content-length');
-    headers.set('cache-control','no-store, no-cache, must-revalidate');
+    headers.set('cache-control','no-store, no-cache, must-revalidate, max-age=0');
     return new Response(updated,{status:response.status,statusText:response.statusText,headers});
   } catch (error) {
     if (response) return response;
