@@ -4,39 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MedLife Articles Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--primary:#008c95;--dark:#006b70;--bg:#f4f8f8}
-*{box-sizing:border-box}body{font-family:Cairo,Arial,sans-serif;background:var(--bg);padding:20px;color:#243b3d}.container{max-width:1100px;margin:auto}.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 4px 15px #00000010}h1{color:var(--dark)}input,textarea,select,button{width:100%;padding:12px;margin:7px 0;border-radius:10px;border:1px solid #ddd;font-size:15px}textarea{min-height:140px}button{background:var(--primary);color:#fff;border:0;font-weight:bold;cursor:pointer}button:hover{background:var(--dark)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:#fff;padding:15px;border-radius:14px;text-align:center}.stat b{display:block;font-size:25px;color:var(--primary)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.article{border-right:4px solid var(--primary);padding:12px;margin:10px 0;background:#fafafa;border-radius:10px}@media(max-width:700px){.stats,.grid{grid-template-columns:1fr}}
+:root{--primary:#008c95;--dark:#006b70;--bg:#f1f8f8;--card:#fff;}
+*{box-sizing:border-box}body{margin:0;padding:25px;font-family:Cairo,Arial;background:linear-gradient(135deg,#f1f8f8,#fff);color:#183638}.container{max-width:1200px;margin:auto}.card{background:var(--card);border-radius:22px;padding:22px;margin-bottom:20px;box-shadow:0 10px 30px #008c9518;animation:fade .5s ease}.header{display:flex;justify-content:space-between;align-items:center}.logo{color:var(--primary);font-weight:800;font-size:28px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.stat{padding:20px;text-align:center;border-radius:18px;background:white;transition:.3s}.stat:hover{transform:translateY(-5px)}.stat b{display:block;font-size:30px;color:var(--primary)}input,textarea,select,button{width:100%;padding:13px;border-radius:14px;border:1px solid #d9e7e7;font-family:inherit;margin:6px 0}button{background:var(--primary);color:white;border:0;font-weight:bold;cursor:pointer;transition:.3s}button:hover{background:var(--dark);transform:translateY(-2px)}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.article{background:#f8fbfb;border-right:5px solid var(--primary);padding:15px;border-radius:16px;margin:10px 0;transition:.3s}.article:hover{transform:translateX(-5px);box-shadow:0 5px 15px #0001}@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+@media(max-width:700px){body{padding:12px}.stats,.grid{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
-<div class="container">
-<h1>📰 لوحة إدارة مقالات MedLife</h1>
+<body><div class="container">
+<div class="card header"><div class="logo">MedLife 📰</div><div>لوحة إدارة المقالات</div></div>
 <div class="stats"><div class="stat"><b id="total">0</b>الإجمالي</div><div class="stat"><b id="published">0</b>منشور</div><div class="stat"><b id="pending">0</b>مراجعة</div><div class="stat"><b id="draft">0</b>مسودة</div></div>
-<div class="card">
-<input id="api" value="https://medlife-articles-api.broad-frog-3978.workers.dev">
-<input id="key" placeholder="ADMIN_API_KEY">
-<button onclick="load()">جلب المقالات</button>
-</div>
-<div class="card">
-<h3>إضافة / تعديل مقال</h3>
-<div class="grid">
-<input id="id" placeholder="ID للتعديل">
-<input id="author_name" placeholder="اسم الكاتب">
-<input id="title_ar" placeholder="العنوان العربي">
-<input id="title_en" placeholder="العنوان الإنكليزي">
-<input id="category" placeholder="التصنيف">
-<select id="status"><option value="pending">قيد المراجعة</option><option value="draft">مسودة</option><option value="published">منشور</option></select>
-</div>
-<textarea id="content_ar" placeholder="المحتوى العربي"></textarea>
-<textarea id="content_en" placeholder="المحتوى الإنكليزي"></textarea>
-<button onclick="save()">حفظ المقال</button>
-</div>
-<div class="card"><h3>المقالات</h3><div id="list"></div></div>
-</div>
-<script>
-const $=x=>document.getElementById(x);function headers(){return {'Content-Type':'application/json','Authorization':'Bearer '+$('key').value}}
-async function load(){let r=await fetch($('api').value+'/articles',{headers:headers()});let d=await r.json();let a=Array.isArray(d)?d:(d.articles||[]);$('total').innerText=a.length;$('published').innerText=a.filter(x=>x.status==='published').length;$('pending').innerText=a.filter(x=>x.status==='pending').length;$('draft').innerText=a.filter(x=>x.status==='draft').length;$('list').innerHTML=a.map(x=>`<div class="article"><b>${x.title_ar||''}</b><br>${x.status||''} - ${x.author_name||''}</div>`).join('')}
-async function save(){let b={title_ar:$('title_ar').value,title_en:$('title_en').value,content_ar:$('content_ar').value,content_en:$('content_en').value,author_name:$('author_name').value,category:$('category').value,status:$('status').value};let id=$('id').value;await fetch($('api').value+(id?'/articles/'+id:'/articles'),{method:id?'PUT':'POST',headers:headers(),body:JSON.stringify(b)});load();alert('تم الحفظ')}
-</script>
-</body></html>
+<div class="card"><input id="api" value="https://medlife-articles-api.broad-frog-3978.workers.dev"><input id="key" placeholder="ADMIN_API_KEY"><button onclick="load()">تحديث البيانات</button></div>
+<div class="card"><h3>إضافة / تعديل مقال</h3><div class="grid"><input id="id" placeholder="ID"><input id="author_name" placeholder="الكاتب"><input id="title_ar" placeholder="العنوان العربي"><input id="title_en" placeholder="العنوان الإنكليزي"><input id="category" placeholder="التصنيف"><select id="status"><option value="pending">قيد المراجعة</option><option value="draft">مسودة</option><option value="published">منشور</option></select></div><textarea id="content_ar" placeholder="المحتوى العربي"></textarea><textarea id="content_en" placeholder="المحتوى الإنكليزي"></textarea><button onclick="save()">حفظ المقال</button></div>
+<div class="card"><h3>المقالات</h3><div id="list"></div></div></div>
+<script>const $=x=>document.getElementById(x);function headers(){return {'Content-Type':'application/json','Authorization':'Bearer '+$('key').value}}async function load(){let r=await fetch($('api').value+'/articles',{headers:headers()});let d=await r.json();let a=Array.isArray(d)?d:(d.articles||[]);total.innerText=a.length;published.innerText=a.filter(x=>x.status==='published').length;pending.innerText=a.filter(x=>x.status==='pending').length;draft.innerText=a.filter(x=>x.status==='draft').length;list.innerHTML=a.map(x=>`<div class='article'><b>${x.title_ar||''}</b><br>${x.status||''} - ${x.author_name||''}</div>`).join('')}async function save(){let b={title_ar:title_ar.value,title_en:title_en.value,content_ar:content_ar.value,content_en:content_en.value,author_name:author_name.value,category:category.value,status:status.value};let i=id.value;await fetch($('api').value+(i?'/articles/'+i:'/articles'),{method:i?'PUT':'POST',headers:headers(),body:JSON.stringify(b)});load()}</script></body></html>
