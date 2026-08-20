@@ -6,7 +6,20 @@ export async function onRequest(context) {
     if (!contentType.includes('text/html')) return response;
 
     const path = new URL(context.request.url).pathname.toLowerCase();
-    if (/\/(admin|admin-members|articles-admin|support-admin|support-applications-admin)\.html$/.test(path)) return response;
+    if (/\/(admin|admin-members|articles-admin|support-admin|support-applications-admin)\.html$/.test(path)) {
+      if (path.endsWith('/articles-admin.html')) {
+        let html = await response.text();
+        if (!html.includes('/article-ai-studio.js')) {
+          const marker = '<script src="/article-ai-studio.js" defer></script>';
+          html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+          const headers = new Headers(response.headers);
+          headers.delete('content-length');
+          headers.set('cache-control','no-store, no-cache, must-revalidate');
+          return new Response(html,{status:response.status,statusText:response.statusText,headers});
+        }
+      }
+      return response;
+    }
 
     let html = await response.text();
     const scripts = ['/site-nav.js','/site-polish.js'];
