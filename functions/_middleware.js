@@ -10,14 +10,13 @@ export async function onRequest(context) {
 
     let html = await response.text();
 
-    // Remove the legacy embedded AI studio from the HTML itself.
+    // MedLife editorial UI cleanup: remove the embedded legacy studio from the HTML response.
     html = html.replace(/<section\s+class=["']ai-studio["'][\s\S]*?<\/section>/gi, '');
-    // Remove the legacy AI script tag if it is embedded in the page.
     html = html.replace(/<script\s+src=["'][^"']*article-ai-studio\.js[^"']*["'][^>]*><\/script>/gi, '');
 
-    // Ensure the current Editorial Studio is loaded exactly once.
+    // Load only Editorial Studio V2.
     if (!html.includes('/article-ai-editorial-v2.js')) {
-      const marker = '<script src="/article-ai-editorial-v2.js?v=20260820-4" defer></script>';
+      const marker = '<script src="/article-ai-editorial-v2.js?v=20260820-5" defer></script>';
       html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
     }
 
