@@ -8,11 +8,16 @@ export async function onRequest(context) {
     if (/\/(admin|admin-members|articles-admin|support-admin|support-applications-admin)\.html$/.test(path)) {
       if (path.endsWith('/articles-admin.html')) {
         let html = await response.text();
-        const scripts = ['/article-ai-studio.js?v=20260820-4','/article-ai-admin-enhanced.js?v=20260820-4','/article-ai-final-polish.js?v=20260820-1','/article-ai-editorial-v2.js?v=20260820-1'];
-        const missing = scripts.filter(src => !html.includes(src.split('?')[0]));
-        const marker = missing.map(src => `<script src="${src}" defer></script>`).join('');
-        html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
-        const headers = new Headers(response.headers); headers.delete('content-length'); headers.set('cache-control','no-store, no-cache, must-revalidate, max-age=0'); headers.set('pragma','no-cache');
+        // Load ONLY the current editorial AI studio. The legacy AI layers are intentionally disabled.
+        const src = '/article-ai-editorial-v2.js?v=20260820-2';
+        if (!html.includes('/article-ai-editorial-v2.js')) {
+          const marker = `<script src="${src}" defer></script>`;
+          html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+        }
+        const headers = new Headers(response.headers);
+        headers.delete('content-length');
+        headers.set('cache-control','no-store, no-cache, must-revalidate, max-age=0');
+        headers.set('pragma','no-cache');
         return new Response(html,{status:response.status,statusText:response.statusText,headers});
       }
     }
