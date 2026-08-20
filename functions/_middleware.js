@@ -9,14 +9,15 @@ export async function onRequest(context) {
     if (/\/(admin|admin-members|articles-admin|support-admin|support-applications-admin)\.html$/.test(path)) {
       if (path.endsWith('/articles-admin.html')) {
         let html = await response.text();
-        if (!html.includes('/article-ai-studio.js')) {
-          const marker = '<script src="/article-ai-studio.js" defer></script>';
-          html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
-          const headers = new Headers(response.headers);
-          headers.delete('content-length');
-          headers.set('cache-control','no-store, no-cache, must-revalidate');
-          return new Response(html,{status:response.status,statusText:response.statusText,headers});
-        }
+        const scripts = ['/article-ai-studio.js','/article-ai-admin-enhanced.js'];
+        const missing = scripts.filter(src => !html.includes(src));
+        if (!missing.length) return response;
+        const marker = missing.map(src => `<script src="${src}" defer></script>`).join('');
+        html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+        const headers = new Headers(response.headers);
+        headers.delete('content-length');
+        headers.set('cache-control','no-store, no-cache, must-revalidate');
+        return new Response(html,{status:response.status,statusText:response.statusText,headers});
       }
       return response;
     }
