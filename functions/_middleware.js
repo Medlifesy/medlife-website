@@ -11,10 +11,7 @@ export async function onRequest(context) {
     let html = await response.text();
 
     // Remove all legacy article tooling from the admin response.
-    const legacySectionClasses = [
-      'ai-studio',
-      'images-studio'
-    ];
+    const legacySectionClasses = ['ai-studio', 'images-studio'];
     for (const className of legacySectionClasses) {
       const sectionPattern = new RegExp(`<section\\s+class=[\"']${className}[\"'][\\s\\S]*?<\\/section>`, 'gi');
       html = html.replace(sectionPattern, '');
@@ -36,11 +33,7 @@ export async function onRequest(context) {
     headers.delete('content-length');
     headers.set('cache-control', 'no-store, no-cache, must-revalidate, max-age=0');
     headers.set('pragma', 'no-cache');
-    return new Response(html, {
-      status: response.status,
-      statusText: response.statusText,
-      headers
-    });
+    return new Response(html, { status: response.status, statusText: response.statusText, headers });
   } catch (error) {
     return response || new Response('Middleware error', { status: 500 });
   }
