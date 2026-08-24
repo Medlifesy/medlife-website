@@ -50,8 +50,18 @@ export async function onRequest(context) {
     // article-images-studio\\.js
     // article-ai-upgrade\\.js
 
+    // Inject a deterministic, visible preview control into the editor toolbar.
+    // It is deliberately part of the HTML so it is visible whenever the editor opens.
+    const previewButton = '<button id="articlePreviewStatic" type="button" class="btn soft" style="font-weight:900;padding:12px 18px" onclick="window.__medlifePreview&&window.__medlifePreview()">👁️ معاينة المقالة</button>';
+    if (!html.includes('id="articlePreviewStatic"')) {
+      html = html.replace(
+        '<div class="editor-footer">',
+        `<div class="editor-footer">${previewButton}`
+      );
+    }
+
     // Inject only the current no-storage article management experience.
-    const marker = '<script src="/article-management-v3.js?v=20260825-5" defer></script>';
+    const marker = '<script src="/article-management-v3.js?v=20260825-6" defer></script>';
     if (!html.includes('/article-management-v3.js')) {
       html = html.includes('</body>')
         ? html.replace('</body>', `${marker}</body>`)
