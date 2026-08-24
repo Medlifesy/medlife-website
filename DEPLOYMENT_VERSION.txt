@@ -1,4 +1,4 @@
 MedLife production deployment trigger
 Commit: 2026-08-25
-Release: article-editor-final-polish
-Purpose: trigger production validation after article management, MedLife editorial AI formatting, visual suggestions, illustration, preview, and admin UX updates.
+Release: chatgpt-article-editor-fix
+Purpose: deploy the dedicated MedLife ChatGPT article formatter with robust Responses API parsing, diagnostics, and preview-first editorial workflow.
