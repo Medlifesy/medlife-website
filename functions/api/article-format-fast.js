@@ -1,6 +1,7 @@
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const FALLBACK_WORKER = 'https://medlife-articles-api.broad-frog-3978.workers.dev/api/article-ai';
 const MODEL = 'gpt-4.1-mini';
+const CF_MODEL = '@cf/meta/llama-3.1-8b-instruct';
 const TIMEOUT_MS = 25000;
 const FALLBACK_TIMEOUT_MS = 15000;
 
@@ -35,9 +36,19 @@ async function verifyAdmin(request, env) {
 
 async function fetchTimed(url, options, ms) { const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), ms); try { return await fetch(url, { ...options, signal: controller.signal }); } finally { clearTimeout(timer); } }
 function extractText(data) { if (typeof data?.output_text === 'string' && data.output_text.trim()) return data.output_text.trim(); const chunks=[]; for (const item of Array.isArray(data?.output) ? data.output : []) for (const part of Array.isArray(item?.content) ? item.content : []) if (typeof part?.text === 'string') chunks.push(part.text); return chunks.join('\n').trim(); }
+function extractModelText(data) { if (typeof data === 'string') return data.trim(); if (typeof data?.response === 'string') return data.response.trim(); if (typeof data?.result === 'string') return data.result.trim(); if (typeof data?.text === 'string') return data.text.trim(); return ''; }
 
 function buildDeveloperInstruction(extra = '') {
   return `You are the dedicated MedLife Arabic medical editorial formatter. Restructure and lightly edit the provided Arabic medical article to match MedLife's established article pattern: concise title and excerpt, short introduction, numbered medical sections with clear headings, readable short paragraphs, useful bullet or numbered lists, red-flags only when medically appropriate, treatment/management only from information in the source, prevention when relevant, and a concise conclusion. Preserve the author's medical facts and meaning. Never invent diagnoses, doses, contraindications, statistics, references, or claims. Do not output HTML or Markdown. Return only the requested JSON.${extra ? `\nAdditional editor instruction: ${extra}` : ''}`;
+}
+
+function extractJsonObject(text) {
+  const clean = String(text || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/i, '').trim();
+  try { return JSON.parse(clean); } catch {}
+  const start = clean.indexOf('{');
+  const end = clean.lastIndexOf('}');
+  if (start >= 0 && end > start) return JSON.parse(clean.slice(start, end + 1));
+  throw new Error('لم يرجع نموذج الذكاء الاصطناعي JSON صالحاً.');
 }
 
 export async function onRequestPost({ request, env }) {
@@ -46,10 +57,29 @@ export async function onRequestPost({ request, env }) {
   const article = input?.article || {}; const content = String(article.content || '').trim();
   if (!content) return json({ success:false, error:'محتوى المقال فارغ.' }, 400);
 
-  const payload = { title:String(article.title||'').slice(0,300), category:String(article.category||'').slice(0,160), excerpt:String(article.excerpt||'').slice(0,1200), content:content.slice(0,18000), instruction:String(input?.instruction||'').trim().slice(0,1200) };
+  const payload = { title:String(article.title||'').slice(0,300), category:String(article.category||'').slice(0,160), excerpt:String(article.excerpt||'').slice(0,1200), content:content.slice(0,16000), instruction:String(input?.instruction||'').trim().slice(0,1200) };
   const developer = buildDeveloperInstruction(payload.instruction);
 
-  // Preferred path: direct OpenAI secret configured on Pages/Worker environment.
+  // Primary path: Cloudflare Workers AI. This does not require an OpenAI API key.
+  if (env?.AI?.run) {
+    try {
+      const prompt = `${developer}\n\nReturn EXACTLY one JSON object matching this shape:\n{"title":"","excerpt":"","introduction":"","sections":[{"heading":"","content":""}],"conclusion":"","editor_notes":[]}\n\nARTICLE:\n${JSON.stringify(payload)}`;
+      const result = await Promise.race([
+        env.AI.run(CF_MODEL, { prompt, max_tokens: 2200, temperature: 0.2 }),
+        new Promise((_, reject) => setTimeout(() => reject(Object.assign(new Error('timeout'), { name: 'AbortError' })), 25000))
+      ]);
+      const text = extractModelText(result);
+      if (!text) throw new Error('Workers AI لم يُرجع نتيجة.');
+      const formatted = extractJsonObject(text);
+      return json({ success:true, provider:'cloudflare-workers-ai', model:CF_MODEL, article:formatted });
+    } catch (error) {
+      if (error?.name === 'AbortError') return json({ success:false, error:'انتهت مهلة محرر Cloudflare AI بعد 25 ثانية. جرّب مقالاً أقصر.' },504);
+      console.error('Cloudflare Workers AI formatter error', error);
+      // Continue to optional paid OpenAI or the existing MedLife gateway.
+    }
+  }
+
+  // Optional path: direct OpenAI when a paid API key is configured.
   if (env?.OPENAI_API_KEY) {
     try {
       const response = await fetchTimed(OPENAI_URL, { method:'POST', headers:{ Authorization:`Bearer ${env.OPENAI_API_KEY}`, 'Content-Type':'application/json' }, body:JSON.stringify({ model:env.MEDLIFE_FORMAT_MODEL||MODEL, store:false, input:[{role:'developer',content:developer},{role:'user',content:JSON.stringify(payload)}], text:{format:{type:'json_schema',name:'medlife_article_format',strict:true,schema:SCHEMA}} }) }, TIMEOUT_MS);
@@ -59,7 +89,7 @@ export async function onRequestPost({ request, env }) {
       const refusal = (data?.output||[]).flatMap(x=>Array.isArray(x?.content)?x.content:[]).find(x=>x?.type==='refusal');
       if (refusal?.refusal) return json({success:false,error:`ChatGPT رفض الطلب: ${refusal.refusal}`},502);
       const text = extractText(data); if (!text) return json({success:false,error:'ChatGPT لم يُرجع محتوى قابلاً للقراءة.'},502);
-      let formatted; try { formatted=JSON.parse(text); } catch(e) { return json({success:false,error:`تعذر قراءة نتيجة ChatGPT كـJSON: ${e?.message||'parse error'}`},502); }
+      const formatted = extractJsonObject(text);
       return json({success:true,provider:'openai',model:env.MEDLIFE_FORMAT_MODEL||MODEL,article:formatted});
     } catch(error) {
       if (error?.name==='AbortError') return json({success:false,error:'انتهت مهلة ChatGPT بعد 25 ثانية. جرّب مقالاً أقصر أو أعد المحاولة.'},504);
@@ -67,30 +97,16 @@ export async function onRequestPost({ request, env }) {
     }
   }
 
-  // Fallback path: use the existing MedLife AI gateway. This keeps the editor working
-  // when the Pages environment does not contain OPENAI_API_KEY.
+  // Final fallback: existing MedLife AI gateway.
   try {
     const headers = new Headers({ 'Content-Type':'application/json', 'Accept':'application/json' });
     const cookie = request.headers.get('Cookie'); if (cookie) headers.set('Cookie', cookie);
-    const response = await fetchTimed(FALLBACK_WORKER, {
-      method:'POST',
-      headers,
-      body:JSON.stringify({
-        action:'full_edit',
-        language:'ar',
-        article:{
-          title:payload.title,
-          category:payload.category,
-          content:payload.content,
-          requirements:developer
-        }
-      })
-    }, FALLBACK_TIMEOUT_MS);
+    const response = await fetchTimed(FALLBACK_WORKER, { method:'POST', headers, body:JSON.stringify({ action:'full_edit', language:'ar', article:{ title:payload.title, category:payload.category, content:payload.content, requirements:developer } }) }, FALLBACK_TIMEOUT_MS);
     const data = await response.json().catch(()=>({}));
-    if (!response.ok || !data?.success) return json({success:false,error:data?.error||'تعذر تشغيل محرر MedLife الذكي عبر بوابة AI.'},502);
+    if (!response.ok || !data?.success) return json({success:false,error:data?.error||'تعذر تشغيل محرر MedLife الذكي.'},502);
     return json({success:true,provider:'medlife-worker',article:data.article});
   } catch(error) {
-    if (error?.name==='AbortError') return json({success:false,error:'بوابة MedLife AI لم تُجب خلال 15 ثانية. تأكد من إعداد OPENAI_API_KEY في Worker medlife-articles-api.'},504);
-    return json({success:false,error:`فشل الاتصال ببوابة MedLife AI: ${error?.message||'Unknown error'}`},502);
+    if (error?.name==='AbortError') return json({success:false,error:'لم تستجب خدمات AI خلال المهلة المحددة.'},504);
+    return json({success:false,error:`تعذر تشغيل محرر MedLife: ${error?.message||'Unknown error'}`},502);
   }
 }
