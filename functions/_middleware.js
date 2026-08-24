@@ -6,7 +6,11 @@ export async function onRequest(context) {
     if (!contentType.includes('text/html')) return response;
 
     const path = new URL(context.request.url).pathname.toLowerCase();
-    if (!path.endsWith('/articles-admin.html')) return response;
+    const isArticlesAdmin =
+      path === '/articles-admin' ||
+      path === '/articles-admin/' ||
+      path.endsWith('/articles-admin.html');
+    if (!isArticlesAdmin) return response;
 
     let html = await response.text();
 
@@ -47,7 +51,7 @@ export async function onRequest(context) {
     // article-ai-upgrade\\.js
 
     // Inject only the current no-storage article management experience.
-    const marker = '<script src="/article-management-v3.js?v=20260825-4" defer></script>';
+    const marker = '<script src="/article-management-v3.js?v=20260825-5" defer></script>';
     if (!html.includes('/article-management-v3.js')) {
       html = html.includes('</body>')
         ? html.replace('</body>', `${marker}</body>`)
