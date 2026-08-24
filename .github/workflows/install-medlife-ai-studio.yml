@@ -1,34 +1,50 @@
-name: Install MedLife AI Studio
+name: Validate MedLife Article Studio
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - feat/article-management-reading-experience
+  pull_request:
+    branches:
+      - main
+
 permissions:
-  contents: write
+  contents: read
+
 jobs:
-  install:
-    if: ${{ !contains(github.event.head_commit.message, 'ci: install MedLife AI Studio') }}
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - name: Inject MedLife AI scripts
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate article admin integration
         shell: python
         run: |
           from pathlib import Path
-          p = Path('articles-admin.html')
-          s = p.read_text(encoding='utf-8')
-          for tag in [
-              '<script src="article-ai-upgrade.js"></script>',
-              '<script src="article-images-studio.js"></script>'
-          ]:
-              if tag not in s:
-                  if '</body>' not in s:
-                      raise SystemExit('articles-admin.html has no closing body tag')
-                  s = s.replace('</body>', tag + '</body>', 1)
-          p.write_text(s, encoding='utf-8')
-      - name: Commit injection
-        run: |
-          git config user.name 'MedLife AI Studio Bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add articles-admin.html
-          git diff --cached --quiet || git commit -m 'ci: install MedLife AI Studio'
-          git push
+
+          admin = Path('articles-admin.html').read_text(encoding='utf-8')
+          middleware = Path('functions/_middleware.js').read_text(encoding='utf-8')
+          visual = Path('article-management-v3.js').read_text(encoding='utf-8')
+
+          required = [
+              'articles-admin.html',
+              'functions/_middleware.js',
+              'article-management-v3.js',
+          ]
+          missing = [p for p in required if not Path(p).exists()]
+          if missing:
+              raise SystemExit(f'Missing required files: {missing}')
+
+          if '/article-management-v3.js' not in middleware:
+              raise SystemExit('Middleware does not inject article-management-v3.js')
+
+          for marker in ['إضافة مقالة جديدة', 'Visual Studio', 'no-storage']:
+              if marker not in visual:
+                  raise SystemExit(f'Missing integration marker: {marker}')
+
+          if '<script' not in admin:
+              raise SystemExit('articles-admin.html has no script tags')
+
+          print('MedLife article management integration validated successfully.')
