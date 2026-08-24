@@ -26,7 +26,7 @@ async function verifyAdmin(request, env) {
   try {
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
     const hash = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-    const row = await env.DB.prepare(`SELECT a.account_id, a.role, a.account_status FROM member_sessions s JOIN member_accounts a ON a.id=s.account_id WHERE s.token_hash=? AND datetime(s.expires_at)>datetime('now') LIMIT 1`).bind(hash).first();
+    const row = await env.DB.prepare(`SELECT a.id AS account_id, a.role, a.account_status FROM member_sessions s JOIN member_accounts a ON a.id=s.account_id WHERE s.token_hash=? AND datetime(s.expires_at)>datetime('now') LIMIT 1`).bind(hash).first();
     return !!row && row.account_status === 'active' && ['admin', 'editor', 'reviewer'].includes(String(row.role || '').toLowerCase());
   } catch { return false; }
 }
