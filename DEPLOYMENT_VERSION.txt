@@ -1,4 +1,4 @@
 MedLife production deployment trigger
-Commit: 2026-08-25
-Release: chatgpt-article-editor-fix
-Purpose: deploy the dedicated MedLife ChatGPT article formatter with robust Responses API parsing, diagnostics, and preview-first editorial workflow.
+Commit: 2026-08-25 01:50 Europe/Amsterdam
+Release: free-medlife-ai-editor-and-article-preview
+Purpose: deploy the free-first MedLife article formatter, Cloudflare AI binding, article preview, add-article flow, content-linked visual tools, and robust AI fallbacks.
