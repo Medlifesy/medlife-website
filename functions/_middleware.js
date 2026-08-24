@@ -11,18 +11,25 @@ export async function onRequest(context) {
     let html = await response.text();
 
     // Remove all legacy article tooling from the admin response.
+    // These guards intentionally cover every legacy AI/image integration named by the CI validation.
     const legacySectionClasses = ['ai-studio', 'images-studio'];
     for (const className of legacySectionClasses) {
       const sectionPattern = new RegExp(`<section\\s+class=[\"']${className}[\"'][\\s\\S]*?<\\/section>`, 'gi');
       html = html.replace(sectionPattern, '');
     }
-    html = html.replace(/<script\\s+src=[\"'][^\"']*article-ai-studio\\.js[^\"']*[\"'][^>]*><\\/script>/gi, '');
-    html = html.replace(/<script\\s+src=[\"'][^\"']*article-ai-upgrade\\.js[^\"']*[\"'][^>]*><\\/script>/gi, '');
-    html = html.replace(/<script\\s+src=[\"'][^\"']*article-images-studio\\.js[^\"']*[\"'][^>]*><\\/script>/gi, '');
-    html = html.replace(/<script\\s+src=[\"'][^\"']*article-ai-editorial-v2\\.js[^\"']*[\"'][^>]*><\\/script>/gi, '');
+    const legacyScripts = [
+      'article-ai-studio.js',
+      'article-ai-editorial-v2.js',
+      'article-images-studio.js',
+      'article-ai-upgrade.js'
+    ];
+    for (const scriptName of legacyScripts) {
+      const scriptPattern = new RegExp(`<script\\s+src=[\"'][^\"']*${scriptName.replace('.', '\\.') }[^\"']*[\"'][^>]*><\\/script>`, 'gi');
+      html = html.replace(scriptPattern, '');
+    }
 
     // Inject only the current no-storage article management experience.
-    const marker = '<script src="/article-management-v3.js?v=20260825-2" defer></script>';
+    const marker = '<script src="/article-management-v3.js?v=20260825-3" defer></script>';
     if (!html.includes('/article-management-v3.js')) {
       html = html.includes('</body>')
         ? html.replace('</body>', `${marker}</body>`)
