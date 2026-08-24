@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MedLife | لوحة الإدارة</title>
+<meta name="theme-color" content="#12203a">
+<link rel="icon" href="/logo.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/homepage-redesign.css">
+<style>
+:root{--red:#e51f45;--navy:#12203a;--muted:#667085;--line:#e7ebf1;--bg:#f6f8fb;--green:#087f5b;--gold:#b77900}
+*{box-sizing:border-box}body{margin:0;font-family:Cairo,system-ui,sans-serif;background:var(--bg);color:var(--navy)}
+a{text-decoration:none;color:inherit}.page{min-height:100vh}.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.topin{width:min(1180px,calc(100% - 28px));min-height:76px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:15px}.brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;object-fit:contain}.brand h1{font-size:18px;margin:0;font-weight:900}.brand p{font-size:10px;color:var(--muted);margin:2px 0 0}.toplinks{display:flex;gap:8px}.toplinks a,.toplinks button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 13px;font:800 11px Cairo;cursor:pointer}.toplinks a:hover,.toplinks button:hover{border-color:#ffd0d9;color:var(--red)}main{width:min(1180px,calc(100% - 28px));margin:auto;padding:46px 0 70px}.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;margin-bottom:25px}.eyebrow{display:inline-block;color:var(--red);font-size:11px;font-weight:900;background:#fff0f3;border:1px solid #ffd9e0;padding:6px 10px;border-radius:999px}.hero h2{font-size:clamp(28px,4vw,43px);margin:12px 0 6px;line-height:1.45}.hero p{color:var(--muted);font-size:13px;line-height:2;margin:0;max-width:680px}.secure{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 15px;font-size:11px;color:var(--muted);white-space:nowrap}.secure strong{color:var(--green)}.stats{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:24px}.stat{text-align:center;padding:20px 10px;position:relative}.stat+.stat:before{content:"";position:absolute;inset:25% auto 25% 0;border-left:1px solid var(--line)}.stat small{display:block;color:var(--muted);font-size:10px;font-weight:800}.stat strong{display:block;font-size:28px;margin-top:4px;color:var(--red)}.stat.warning strong{color:var(--gold)}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:25px;box-shadow:0 12px 35px rgba(18,32,58,.05);position:relative;overflow:hidden}.card:before{content:"";position:absolute;top:0;right:0;left:0;height:3px;background:linear-gradient(90deg,var(--red),transparent)}.icon{width:50px;height:50px;border-radius:15px;background:#fff0f3;color:var(--red);display:grid;place-items:center;font-size:23px;margin-bottom:14px}.card h3{margin:0 0 8px;font-size:20px}.card p{margin:0 0 18px;color:var(--muted);font-size:12px;line-height:2}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:9px 15px;border-radius:12px;font-size:11px;font-weight:900}.primary{background:var(--red);color:#fff}.secondary{background:#fff;border:1px solid var(--line)}.primary:hover{filter:brightness(.94);transform:translateY(-1px)}.secondary:hover{border-color:#ffd0d9;color:var(--red)}.status{margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px 15px;color:var(--muted);font-size:11px}.status.ok{background:#effaf5;color:var(--green);border-color:#d7f0e4}.status.error{background:#fff4f5;color:#b42318;border-color:#ffd6dc}.footer{background:#0b1220;color:#94a3b8;text-align:center;padding:25px;font-size:10px}.footer strong{display:block;color:#e2e8f0;margin-bottom:3px}@media(max-width:800px){.hero{display:block}.secure{display:inline-block;margin-top:15px}.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(3):before{display:none}.grid{grid-template-columns:1fr}}@media(max-width:460px){.topin{min-height:68px}.logo{width:42px;height:42px}.brand h1{font-size:15px}.brand p{font-size:8px}.toplinks a,.toplinks button{padding:8px;font-size:9px}.hero h2{font-size:29px}.stats{border-radius:16px}.stat strong{font-size:24px}}
+</style>
+</head>
+<body class="page">
+<header class="top"><div class="topin"><div class="brand"><img class="logo" src="/logo.PNG" alt="MedLife"><div><h1>MED-LIFE</h1><p>لوحة الإدارة المركزية</p></div></div><div class="toplinks"><a href="/">الموقع</a><a href="/admin-login.html">تسجيل الدخول</a></div></div></header>
+<main>
+<section class="hero"><div><span class="eyebrow">إدارة ميدلايف</span><h2>لوحة الإدارة المركزية</h2><p>مساحة موحدة لإدارة الأعضاء وطلبات الانضمام، ثم التوسع لاحقًا لإدارة الفرق والمحتوى والتقييمات وسجل العمليات.</p></div><div class="secure">🔐 <strong>منطقة إدارية</strong><br>الوصول يتطلب تسجيل الدخول</div></section>
+<section class="stats"><div class="stat"><small>الأعضاء النشطون</small><strong id="members">—</strong></div><div class="stat warning"><small>طلبات الانضمام</small><strong id="applications">—</strong></div><div class="stat"><small>الفرق / الخلايا</small><strong id="teams">—</strong></div><div class="stat"><small>حالة النظام</small><strong id="system">—</strong></div></section>
+<section class="grid">
+<article class="card"><div class="icon">♙</div><h3>إدارة الأعضاء</h3><p>مراجعة طلبات الانضمام، قبول أو رفض المتقدمين، ومتابعة الأعضاء وحالة حساباتهم وبياناتهم.</p><div class="actions"><a class="btn primary" href="/admin-members.html">فتح إدارة الأعضاء</a></div></article>
+<article class="card"><div class="icon">▣</div><h3>إدارة الفرق والخلايا</h3><p>المرحلة التالية ستكون لإدارة فرق المحتوى والتنسيق والتصميم، وتعيين الأعضاء والأدوار والمسؤولين.</p><div class="actions"><a class="btn secondary" href="/admin-members.html">البدء من الأعضاء</a></div></article>
+<article class="card"><div class="icon">✎</div><h3>إدارة المحتوى</h3><p>إدارة دورة البوست من الكتابة والمراجعة والتنسيق والتصميم وحتى الجدولة والنشر والتقييم.</p><div class="actions"><a class="btn secondary" href="/articles-admin.html">إدارة المقالات</a></div></article>
+<article class="card"><div class="icon">⚙</div><h3>الإعدادات والصلاحيات</h3><p>سنضيف هنا صلاحيات المدير والمشرف، إعدادات النظام، سجل العمليات، وإدارة حسابات المستخدمين.</p><div class="actions"><span class="btn secondary" aria-disabled="true">قريبًا</span></div></article>
+</section>
+<div id="status" class="status">جارٍ التحقق من اتصال لوحة الإدارة...</div>
+</main>
+<footer class="footer"><strong>MedLife Medical Charitable Organization</strong>لوحة الإدارة المركزية · إدارة آمنة لأعضاء وفريق ميدلايف</footer>
+<script>
+const $=id=>document.getElementById(id);
+async function load(){
+  try{
+    const r=await fetch('/api/admin/list-members',{credentials:'include',cache:'no-store'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.success) throw Error(d.error||'تسجيل الدخول مطلوب');
+    const members=d.members||[], apps=d.applications||[];
+    $('members').textContent=members.filter(x=>x.status==='active'||x.status==='approved').length;
+    $('applications').textContent=apps.filter(x=>x.status==='pending').length;
+    $('teams').textContent='—';
+    $('system').textContent='متصلة';
+    $('status').textContent='تم الاتصال بنظام إدارة الأعضاء بنجاح.';
+    $('status').className='status ok';
+  }catch(e){
+    $('system').textContent='—';
+    $('status').textContent='للوصول إلى بيانات الإدارة، سجّل الدخول أولًا ثم افتح إدارة الأعضاء.';
+    $('status').className='status';
+  }
+}
+load();
+</script>
+</body>
+</html>
