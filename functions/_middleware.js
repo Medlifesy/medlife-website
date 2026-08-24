@@ -10,14 +10,20 @@ export async function onRequest(context) {
 
     let html = await response.text();
 
-    // MedLife editorial UI cleanup: remove the embedded legacy studio from the HTML response.
+    // Remove the embedded legacy studio from the HTML response.
     html = html.replace(/<section\s+class=["']ai-studio["'][\s\S]*?<\/section>/gi, '');
     html = html.replace(/<script\s+src=["'][^"']*article-ai-studio\.js[^"']*["'][^>]*><\/script>/gi, '');
 
-    // Load only Editorial Studio V2.
-    if (!html.includes('/article-ai-editorial-v2.js')) {
-      const marker = '<script src="/article-ai-editorial-v2.js?v=20260820-5" defer></script>';
-      html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+    // Load the current editorial tools plus the new article/no-storage visual layer.
+    const markers = [
+      '<script src="/article-ai-editorial-v2.js?v=20260825-1" defer></script>',
+      '<script src="/article-management-v3.js?v=20260825-1" defer></script>'
+    ];
+    for (const marker of markers) {
+      const src = marker.match(/src="([^"]+)"/)?.[1];
+      if (src && !html.includes(src.split('?')[0])) {
+        html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+      }
     }
 
     const headers = new Headers(response.headers);
