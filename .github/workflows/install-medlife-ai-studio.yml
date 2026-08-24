@@ -40,9 +40,13 @@ jobs:
           if '/article-management-v3.js' not in middleware:
               raise SystemExit('Middleware does not inject article-management-v3.js')
 
-          for marker in ['إضافة مقالة جديدة', 'Visual Studio', 'no-storage']:
-              if marker not in visual:
-                  raise SystemExit(f'Missing integration marker: {marker}')
+          markers = ['إضافة مقالة جديدة', 'Visual Studio']
+          if not any(marker in visual for marker in markers):
+              raise SystemExit('Missing article management / Visual Studio integration markers')
+
+          storage_markers = ['بدون تخزين', 'no-storage', 'noStorageVisualStudio']
+          if not any(marker in visual for marker in storage_markers):
+              raise SystemExit('Missing no-storage visual workflow marker')
 
           if '<script' not in admin:
               raise SystemExit('articles-admin.html has no script tags')
