@@ -51,8 +51,9 @@ export async function onRequest(context) {
     // article-ai-upgrade\\.js
 
     // Inject a deterministic, visible preview control into the editor toolbar.
-    // It is deliberately part of the HTML so it is visible whenever the editor opens.
-    const previewButton = '<button id="articlePreviewStatic" type="button" class="btn soft" style="font-weight:900;padding:12px 18px" onclick="window.__medlifePreview&&window.__medlifePreview()">👁️ معاينة المقالة</button>';
+    // The control has a self-contained fallback so it works even if the enhancer script is delayed.
+    const previewFallback = `(()=>{const f=id=>document.getElementById(id)?.value||'';const old=document.getElementById('articlePreviewFallback');if(old)old.remove();const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));const modal=document.createElement('div');modal.id='articlePreviewFallback';modal.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(9,18,32,.75);display:flex;align-items:center;justify-content:center;padding:18px';const title=esc(f('title_ar')||'معاينة المقال');const author=esc(f('author_name'));const category=esc(f('category'));const image=f('image_url');const content=esc(f('content_ar')).replace(/\\n/g,'<br><br>');modal.innerHTML='<div style="width:min(960px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.3);padding:24px"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #e5eaf1;padding-bottom:14px"><div><div style="font-size:11px;color:#6b778c">معاينة قبل النشر</div><h2 style="margin:3px 0;color:#12203a">'+title+'</h2><div style="font-size:11px;color:#6b778c">'+[category,author].filter(Boolean).join(' · ')+'</div></div><button id="previewFallbackClose" type="button" style="border:0;border-radius:12px;padding:10px 14px;background:#eef2f7;color:#12203a;font-weight:800">إغلاق</button></div>'+(image?'<img src="'+esc(image)+'" alt="" style="display:block;width:100%;max-height:420px;object-fit:cover;border-radius:18px;margin:18px 0">':'')+'<article style="font-family:Cairo,Arial,sans-serif;color:#243047;line-height:2.15;font-size:15px;margin-top:18px">'+content+'</article><div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #e5eaf1;margin-top:20px;padding-top:14px;display:flex;justify-content:flex-end"><button id="previewFallbackConfirm" type="button" style="border:0;border-radius:12px;padding:12px 18px;background:#087f5b;color:#fff;font-weight:900">✅ العودة للتحرير</button></div></div>';document.body.appendChild(modal);modal.querySelector('#previewFallbackClose').onclick=()=>modal.remove();modal.querySelector('#previewFallbackConfirm').onclick=()=>modal.remove()})()`;
+    const previewButton = `<button id="articlePreviewStatic" type="button" class="btn soft" style="font-weight:900;padding:12px 18px" onclick="${previewFallback}">👁️ معاينة المقالة</button>`;
     if (!html.includes('id="articlePreviewStatic"')) {
       html = html.replace(
         '<div class="editor-footer">',
@@ -61,7 +62,7 @@ export async function onRequest(context) {
     }
 
     // Inject only the current no-storage article management experience.
-    const marker = '<script src="/article-management-v3.js?v=20260825-6" defer></script>';
+    const marker = '<script src="/article-management-v3.js?v=20260825-7" defer></script>';
     if (!html.includes('/article-management-v3.js')) {
       html = html.includes('</body>')
         ? html.replace('</body>', `${marker}</body>`)
