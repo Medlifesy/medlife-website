@@ -48,8 +48,6 @@ jobs:
           if not any(marker in visual for marker in storage_markers):
               raise SystemExit('Missing no-storage visual workflow marker')
 
-          # The middleware must actively remove legacy editor/image UI before the
-          # enhanced article-management script is injected.
           legacy_guards = [
               'ai-studio',
               'images-studio',
@@ -62,14 +60,19 @@ jobs:
           if missing_guards:
               raise SystemExit(f'Missing legacy UI removal guards: {missing_guards}')
 
-          if 'html = html.replace(/<section\\s+class=["\']ai-studio' not in middleware:
-              raise SystemExit('Legacy ai-studio section removal guard is missing')
-
-          if 'html = html.replace(/<script\\s+src=["\'][^"\']*article-ai-studio' not in middleware:
+          # Validate implementation semantics, not one exact JavaScript syntax.
+          if 'legacySectionClasses' not in middleware or 'className' not in middleware:
+              raise SystemExit('Legacy section removal implementation is missing')
+          if 'new RegExp' not in middleware or '<section\\\\s+class=' not in middleware:
+              raise SystemExit('Legacy section regex guard is missing')
+          if 'article-ai-studio\\\\.js' not in middleware:
               raise SystemExit('Legacy article AI script removal guard is missing')
-
-          if 'html = html.replace(/<script\\s+src=["\'][^"\']*article-ai-editorial-v2' not in middleware:
+          if 'article-ai-editorial-v2\\\\.js' not in middleware:
               raise SystemExit('Legacy editorial AI script removal guard is missing')
+          if 'article-images-studio\\\\.js' not in middleware:
+              raise SystemExit('Legacy image studio script removal guard is missing')
+          if 'article-ai-upgrade\\\\.js' not in middleware:
+              raise SystemExit('Legacy AI upgrade script removal guard is missing')
 
           if '<script' not in admin:
               raise SystemExit('articles-admin.html has no script tags')
