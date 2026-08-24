@@ -48,7 +48,13 @@ jobs:
           if not any(marker in visual for marker in storage_markers):
               raise SystemExit('Missing no-storage visual workflow marker')
 
+          legacy_markers = ['ai-studio', 'images-studio', 'article-images-studio.js', 'article-ai-upgrade.js']
+          for marker in legacy_markers:
+              if marker not in middleware:
+                  raise SystemExit(f'Middleware no longer guards legacy integration: {marker}')
+
           if '<script' not in admin:
               raise SystemExit('articles-admin.html has no script tags')
 
           print('MedLife article management integration validated successfully.')
+          print('Legacy AI/image UI removal is covered by middleware guards.')
