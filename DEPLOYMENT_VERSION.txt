@@ -1,4 +1,4 @@
 MedLife production deployment trigger
-Commit: 2026-08-16
-Release: homepage-production-fix
-Purpose: load the existing homepage redesign, gallery, story, navigation and support enhancements through the production Pages middleware so the deployed site matches the main branch.
+Commit: 2026-08-25
+Release: article-editor-final-polish
+Purpose: trigger production validation after article management, MedLife editorial AI formatting, visual suggestions, illustration, preview, and admin UX updates.
