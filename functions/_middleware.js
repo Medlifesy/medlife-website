@@ -10,15 +10,26 @@ export async function onRequest(context) {
 
     let html = await response.text();
 
-    // Remove legacy editor integrations from the admin response.
-    html = html.replace(/<section\s+class=["']ai-studio["'][\s\S]*?<\/section>/gi, '');
-    html = html.replace(/<script\s+src=["'][^"']*article-ai-studio\.js[^"']*["'][^>]*><\/script>/gi, '');
-    html = html.replace(/<script\s+src=["'][^"']*article-ai-editorial-v2\.js[^"']*["'][^>]*><\/script>/gi, '');
+    // Remove all legacy article tooling from the admin response.
+    const legacySectionClasses = [
+      'ai-studio',
+      'images-studio'
+    ];
+    for (const className of legacySectionClasses) {
+      const sectionPattern = new RegExp(`<section\\s+class=[\"']${className}[\"'][\\s\\S]*?<\\/section>`, 'gi');
+      html = html.replace(sectionPattern, '');
+    }
+    html = html.replace(/<script\\s+src=[\"'][^\"']*article-ai-studio\\.js[^\"']*[\"'][^>]*><\\/script>/gi, '');
+    html = html.replace(/<script\\s+src=[\"'][^\"']*article-ai-upgrade\\.js[^\"']*[\"'][^>]*><\\/script>/gi, '');
+    html = html.replace(/<script\\s+src=[\"'][^\"']*article-images-studio\\.js[^\"']*[\"'][^>]*><\\/script>/gi, '');
+    html = html.replace(/<script\\s+src=[\"'][^\"']*article-ai-editorial-v2\\.js[^\"']*[\"'][^>]*><\\/script>/gi, '');
 
-    // The current admin experience is injected as a lightweight no-storage enhancement.
-    const marker = '<script src="/article-management-v3.js?v=20260825-1" defer></script>';
+    // Inject only the current no-storage article management experience.
+    const marker = '<script src="/article-management-v3.js?v=20260825-2" defer></script>';
     if (!html.includes('/article-management-v3.js')) {
-      html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+      html = html.includes('</body>')
+        ? html.replace('</body>', `${marker}</body>`)
+        : `${html}${marker}`;
     }
 
     const headers = new Headers(response.headers);
