@@ -7,6 +7,8 @@
   function install(){
     const editor=$('editor');
     if(!editor||$('medlifeFastChat'))return;
+    const legacyPanel=$('medlifeEnhancementPanel');
+    if(legacyPanel)legacyPanel.style.display='none';
     const box=document.createElement('section');
     box.id='medlifeFastChat';
     box.style.cssText='margin:22px 0;padding:20px;border:1px solid #dbe4f0;border-radius:22px;background:linear-gradient(135deg,#f9fbff,#fff);box-shadow:0 14px 34px rgba(18,32,58,.06)';
@@ -14,7 +16,6 @@
     editor.insertBefore(box,editor.querySelector('.editor-footer')||null);
 
     const status=(text,type='ok')=>{const e=$('medlifeFastStatus');if(!e)return;e.className='msg '+type;e.innerHTML=esc(text)};
-    const signature=()=>[form().title_ar,form().category,form().content_ar].join('\n').trim();
 
     async function run(){
       const f=form();
