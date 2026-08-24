@@ -10,25 +10,37 @@ export async function onRequest(context) {
 
     let html = await response.text();
 
-    // MedLife editorial UI cleanup: remove the embedded legacy studio from the HTML response.
-    html = html.replace(/<section\s+class=["']ai-studio["'][\s\S]*?<\/section>/gi, '');
-    html = html.replace(/<script\s+src=["'][^"']*article-ai-studio\.js[^"']*["'][^>]*><\/script>/gi, '');
+    // Remove all legacy article tooling from the admin response.
+    // These guards intentionally cover every legacy AI/image integration named by the CI validation.
+    const legacySectionClasses = ['ai-studio', 'images-studio'];
+    for (const className of legacySectionClasses) {
+      const sectionPattern = new RegExp(`<section\\s+class=[\"']${className}[\"'][\\s\\S]*?<\\/section>`, 'gi');
+      html = html.replace(sectionPattern, '');
+    }
+    const legacyScripts = [
+      'article-ai-studio.js',
+      'article-ai-editorial-v2.js',
+      'article-images-studio.js',
+      'article-ai-upgrade.js'
+    ];
+    for (const scriptName of legacyScripts) {
+      const scriptPattern = new RegExp(`<script\\s+src=[\"'][^\"']*${scriptName.replace('.', '\\.') }[^\"']*[\"'][^>]*><\\/script>`, 'gi');
+      html = html.replace(scriptPattern, '');
+    }
 
-    // Load only Editorial Studio V2.
-    if (!html.includes('/article-ai-editorial-v2.js')) {
-      const marker = '<script src="/article-ai-editorial-v2.js?v=20260820-5" defer></script>';
-      html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+    // Inject only the current no-storage article management experience.
+    const marker = '<script src="/article-management-v3.js?v=20260825-3" defer></script>';
+    if (!html.includes('/article-management-v3.js')) {
+      html = html.includes('</body>')
+        ? html.replace('</body>', `${marker}</body>`)
+        : `${html}${marker}`;
     }
 
     const headers = new Headers(response.headers);
     headers.delete('content-length');
     headers.set('cache-control', 'no-store, no-cache, must-revalidate, max-age=0');
     headers.set('pragma', 'no-cache');
-    return new Response(html, {
-      status: response.status,
-      statusText: response.statusText,
-      headers
-    });
+    return new Response(html, { status: response.status, statusText: response.statusText, headers });
   } catch (error) {
     return response || new Response('Middleware error', { status: 500 });
   }
