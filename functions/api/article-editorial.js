@@ -25,7 +25,7 @@ export async function onRequest({ request, env }) {
     return json({success:false,error:'الإجراء غير صالح.'},400);
   } catch (error) {
     console.error('Editorial Studio error:', error);
-    return json({success:false,error:'تعذر تنفيذ العملية التحريرية حالياً.'},500);
+    return json({success:false,error:`تعذر تنفيذ العملية التحريرية حالياً: ${error?.message || 'Unknown error'}`},500);
   }
 }
 
@@ -69,21 +69,54 @@ async function runEditorialReview(env, articleId, body) {
 
 async function aiReview(env, article, references) {
   const prompt = `You are the MedLife medical editorial quality reviewer. Review the Arabic medical article below against the references explicitly supplied by the author. Do not invent references, medical facts, doses, recommendations, statistics, or citations. Your job is to identify issues, not silently rewrite the article. Return ONLY JSON with: overall_score (0-100), readiness ('ready','needs_revision','high_risk'), language_issues (array of concise strings), structure_issues (array), unsupported_claims (array of objects with claim, severity, reason), reference_gaps (array of objects with claim, reason), contradictions (array), safety_flags (array), style_suggestions (array), recommended_actions (array). Score should reflect the evidence available in the provided references, not generic medical knowledge. Treat absence of evidence as a review flag, not proof that the claim is false.\n\nARTICLE:\n${JSON.stringify({title_ar:article.title_ar,title_en:article.title_en,excerpt_ar:article.excerpt_ar,excerpt_en:article.excerpt_en,content_ar:String(article.content_ar||'').slice(0,24000),category:article.category,author_name:article.author_name})}\n\nAUTHOR REFERENCES:\n${JSON.stringify(references).slice(0,18000)}`;
+
   if (env?.AI?.run) {
-    const result = await Promise.race([
-      env.AI.run(REVIEW_MODEL,{prompt,max_tokens:2600,temperature:0.1}),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error('AI review timeout')),25000))
-    ]);
-    const text = String(result?.response || result?.result || result?.text || '').trim();
-    if (!text) throw new Error('لم تُرجع خدمة AI نتيجة مراجعة.');
-    return parseJson(text);
+    try {
+      const result = await Promise.race([
+        env.AI.run(REVIEW_MODEL,{prompt,max_tokens:2600,temperature:0.1}),
+        new Promise((_,reject)=>setTimeout(()=>reject(new Error('AI review timeout')),25000))
+      ]);
+      const text = String(result?.response || result?.result || result?.text || '').trim();
+      if (!text) throw new Error('لم تُرجع خدمة AI نتيجة مراجعة.');
+      return parseJson(text);
+    } catch (error) {
+      return deterministicReview(article, references, `Workers AI unavailable: ${error?.message || 'failed'}`);
+    }
   }
+  return deterministicReview(article, references, 'Workers AI binding AI غير مفعّل.');
+}
+
+function deterministicReview(article, references, reason) {
+  const content = String(article.content_ar || '').trim();
+  const blocks = content.split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
+  const languageIssues = [];
+  const structureIssues = [];
+  const referenceGaps = [];
+  const safetyFlags = ['المراجعة البشرية الطبية مطلوبة قبل النشر.'];
+  if (!references.length) referenceGaps.push({claim:'المقال ككل',reason:'لا توجد مراجع قدمها الكاتب للمقارنة.'});
+  if (blocks.length < 3) structureIssues.push('المقال قصير أو يحتاج تقسيمًا أوضح إلى مقدمة وأقسام.');
+  if (blocks.some(x=>x.length > 900)) structureIssues.push('توجد فقرة طويلة يفضّل تقسيمها إلى فقرات أقصر.');
+  if (/\s{2,}/.test(content)) languageIssues.push('توجد مسافات متكررة يمكن تنظيفها.');
+  const medicalTerms = ['جرعة','mg','ملغ','دواء','مضاد','حامل','الحمل','طفل','طوارئ','نزف','ضغط الدم'];
+  const sensitive = medicalTerms.some(term=>content.toLowerCase().includes(term.toLowerCase()));
+  if (sensitive) safetyFlags.push('يحتوي المقال على محتوى طبي/دوائي حساس يحتاج تحققًا بشريًا من المراجع قبل النشر.');
+  let score = 55;
+  if (references.length) score += 15;
+  if (blocks.length >= 3) score += 10;
+  if (!languageIssues.length) score += 5;
+  if (!structureIssues.length) score += 5;
+  score = Math.min(90, score);
   return {
-    overall_score: references.length ? 70 : 45,
-    readiness: references.length ? 'needs_revision' : 'high_risk',
-    language_issues: [], structure_issues: ['لم يتم تشغيل محرك المراجعة الذكي لأن Workers AI غير مفعّل.'],
-    unsupported_claims: [], reference_gaps: references.length ? [] : [{claim:'المقال يحتاج مراجع معتمدة.',reason:'لم يتم إدخال مراجع مرتبطة بالمقال.'}],
-    contradictions: [], safety_flags: ['المراجعة البشرية الطبية مطلوبة قبل النشر.'], style_suggestions: [], recommended_actions:['أضف المراجع المعتمدة ثم أعد المراجعة.']
+    overall_score: score,
+    readiness: sensitive || !references.length ? 'needs_revision' : 'ready',
+    language_issues: languageIssues,
+    structure_issues: structureIssues,
+    unsupported_claims: [],
+    reference_gaps: referenceGaps,
+    contradictions: [],
+    safety_flags: [...safetyFlags, `ملاحظة تقنية: ${reason}`],
+    style_suggestions: ['استخدم عناوين فرعية واضحة وفقرات قصيرة ونقاط عند الحاجة.'],
+    recommended_actions: references.length ? ['تحقق من الادعاءات الطبية المهمة مقابل المراجع المعتمدة.', 'راجع التقرير البشري النهائي قبل النشر.'] : ['أضف المراجع المعتمدة ثم أعد المراجعة.', 'راجع المحتوى طبيًا قبل النشر.']
   };
 }
 
