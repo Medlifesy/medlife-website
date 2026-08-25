@@ -1,9 +1,9 @@
 import { json } from '../_auth.js';
 import { authenticateAdmin } from '../_admin-auth.js';
 
-const clean = (v,max=300)=>String(v??'').trim().slice(0,max);
+const clean=(v,max=300)=>String(v??'').trim().slice(0,max);
 const SLUG=/^[a-z0-9_\-]+$/;
-const MANAGEMENT_ROLES=new Set(['general_team_supervisor','advisor','medical_director','general_cell_supervisor','cell_supervisor','assistant_supervisor']);
+const MANAGEMENT_ROLES=new Set(['member','general_team_supervisor','advisor','medical_director','general_cell_supervisor','cell_supervisor','assistant_supervisor']);
 const ADMIN_CREATOR_ROLES=new Set(['general_team_supervisor','advisor','medical_director']);
 
 export async function onRequest({request,env}){
@@ -12,11 +12,11 @@ export async function onRequest({request,env}){
     const admin=await authenticateAdmin(request,env.MEMBERS_DB);
     if(!admin) return json({success:false,error:'غير مصرح.'},401);
     await ensureOrgTables(env.MEMBERS_DB);
-    if(request.method==='GET') return listOrganization(env.MEMBERS_DB);
+    const actor=normalizeAdminRole(admin);
+    if(request.method==='GET') return listOrganization(env.MEMBERS_DB,actor);
     if(request.method==='POST'){
       const body=await request.json().catch(()=>({}));
       const action=clean(body.action,40);
-      const actor=normalizeAdminRole(admin);
       if(action==='create_section') return createSection(env.MEMBERS_DB,body,actor);
       if(action==='create_cell') return createCell(env.MEMBERS_DB,body,actor);
       if(action==='assign_role') return assignRole(env.MEMBERS_DB,body,actor);
@@ -44,11 +44,12 @@ function normalizeAdminRole(admin){
 }
 function canCreate(actor){return ADMIN_CREATOR_ROLES.has(actor)}
 
-async function listOrganization(db){
+async function listOrganization(db,actor){
   const sections=(await db.prepare(`SELECT id,code,name_ar,name_en,section_type,is_system,is_active,sort_order FROM medlife_org_sections WHERE is_active=1 ORDER BY sort_order,id`).all()).results||[];
   const cells=(await db.prepare(`SELECT c.id,c.section_id,c.code,c.name_ar,c.name_en,c.is_system,c.is_active,c.sort_order FROM medlife_org_cells c JOIN medlife_org_sections s ON s.id=c.section_id WHERE c.is_active=1 AND s.is_active=1 ORDER BY c.section_id,c.sort_order,c.id`).all()).results||[];
   const assignments=(await db.prepare(`SELECT o.id,o.member_id,o.role_key,o.section_id,o.cell_id,o.notes,m.full_name,m.member_code,m.email,sec.name_ar AS section_name,cell.name_ar AS cell_name FROM medlife_org_assignments o JOIN members m ON m.id=o.member_id LEFT JOIN medlife_org_sections sec ON sec.id=o.section_id LEFT JOIN medlife_org_cells cell ON cell.id=o.cell_id WHERE o.is_active=1 AND m.status IN ('active','approved') ORDER BY o.role_key,m.full_name`).all()).results||[];
-  return json({success:true,sections,cells,assignments});
+  const members=(await db.prepare(`SELECT id,full_name,member_code,email,account_email,phone,status,medlife_role FROM members WHERE status IN ('active','approved') ORDER BY full_name`).all()).results||[];
+  return json({success:true,actor_role:actor,can_manage_structure:canCreate(actor),sections,cells,assignments,members});
 }
 
 async function createSection(db,b,actor){
@@ -68,15 +69,15 @@ async function createCell(db,b,actor){
 
 async function assignRole(db,b,actor){
   const memberId=Number(b.member_id),role=clean(b.role_key,60),sectionId=b.section_id?Number(b.section_id):null,cellId=b.cell_id?Number(b.cell_id):null,notes=clean(b.notes,500);
-  if(!Number.isInteger(memberId)||memberId<1||!MANAGEMENT_ROLES.has(role))return json({success:false,error:'بيانات التكليف الإداري غير صالحة.'},400);
-  if(role==='general_cell_supervisor'&&!cellId)return json({success:false,error:'المشرف العام للخلايا يجب تحديد الخلايا التابعة له.'},400);
-  if(['cell_supervisor','assistant_supervisor'].includes(role)&&!cellId)return json({success:false,error:'يجب تحديد الخلية لهذا الدور.'},400);
+  if(!Number.isInteger(memberId)||memberId<1||!MANAGEMENT_ROLES.has(role))return json({success:false,error:'بيانات التكليف غير صالحة.'},400);
+  if(!['member','general_team_supervisor','advisor','medical_director'].includes(role) && !cellId)return json({success:false,error:'يجب تحديد الخلية لهذا الدور.'},400);
   if(['general_team_supervisor','advisor','medical_director'].includes(role)&&(cellId||sectionId))return json({success:false,error:'هذا الدور إداري عام ولا يحتاج اختيار خلية.'},400);
   if(sectionId){const s=await db.prepare('SELECT id FROM medlife_org_sections WHERE id=? AND is_active=1').bind(sectionId).first();if(!s)return json({success:false,error:'القسم غير موجود.'},404)}
   if(cellId){const c=await db.prepare('SELECT id,section_id FROM medlife_org_cells WHERE id=? AND is_active=1').bind(cellId).first();if(!c)return json({success:false,error:'الخلية غير موجودة.'},404)}
+  if(role==='member' && !cellId)return json({success:false,error:'يجب تحديد خلية للعضو.'},400);
   await db.prepare(`UPDATE medlife_org_assignments SET is_active=0,updated_at=CURRENT_TIMESTAMP WHERE member_id=? AND role_key=? AND COALESCE(section_id,0)=COALESCE(?,0) AND COALESCE(cell_id,0)=COALESCE(?,0)`).bind(memberId,role,sectionId,cellId).run();
   const r=await db.prepare(`INSERT INTO medlife_org_assignments(member_id,role_key,section_id,cell_id,notes,is_active) VALUES(?,?,?,?,?,1)`).bind(memberId,role,sectionId,cellId,notes).run();
-  return json({success:true,id:r.meta?.last_row_id??null,message:'تم حفظ التكليف الإداري.'});
+  return json({success:true,id:r.meta?.last_row_id??null,message:'تم حفظ التكليف.'});
 }
 
-async function removeRole(db,b){const id=Number(b.id);if(!Number.isInteger(id)||id<1)return json({success:false,error:'التكليف غير صالح.'},400);await db.prepare('UPDATE medlife_org_assignments SET is_active=0,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(id).run();return json({success:true,message:'تم إلغاء التكليف الإداري.'})}
+async function removeRole(db,b){const id=Number(b.id);if(!Number.isInteger(id)||id<1)return json({success:false,error:'التكليف غير صالح.'},400);await db.prepare('UPDATE medlife_org_assignments SET is_active=0,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(id).run();return json({success:true,message:'تم إلغاء التكليف.'})}
