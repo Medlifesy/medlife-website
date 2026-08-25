@@ -1,0 +1,27 @@
+/* MedLife Article Reading — calm editorial layer */
+:root{--read-max:840px;--read-navy:#18223b;--read-red:#e92550;--read-text:#273244;--read-muted:#667085;--read-border:#e8edf3;--read-soft:#f7f9fc}
+body{background:#fafbfc;color:var(--read-text);line-height:2.08}
+.container{width:min(1120px,calc(100% - 32px))}
+header{background:rgba(255,255,255,.94);border-bottom:1px solid #eef1f5;box-shadow:none}
+.hero{padding:58px 0 42px;background:#fff;border-bottom:1px solid #f0f2f5}
+.hero h1{max-width:900px;margin:10px auto 18px;color:var(--read-navy);font-size:clamp(30px,4.2vw,48px);line-height:1.4;letter-spacing:-.2px}
+.tag{font-size:12px;color:var(--read-red);letter-spacing:.2px}
+.excerpt{max-width:790px;color:var(--read-muted);font-size:16px;line-height:2}
+.meta{color:#8a95a5;font-size:11px}
+.hero-image{width:min(100%,900px);max-height:420px;border:0;box-shadow:0 12px 30px rgba(16,24,40,.07);border-radius:18px}
+.layout{grid-template-columns:minmax(0,var(--read-max)) 250px;gap:42px;justify-content:center;margin:34px auto 75px}
+.article{border:0;border-radius:0;box-shadow:none;padding:0;background:transparent;overflow:visible}
+.intro{background:#f5f8fc;border:0;border-right:3px solid #dbe6f3;border-radius:12px;padding:18px 20px;margin:0 0 34px;color:#435064}
+.article h2{color:var(--read-navy);font-size:26px;line-height:1.55;margin:48px 0 18px;padding:0 0 0 0;border-right:0;position:relative}
+.article h2:after{content:"";display:block;width:44px;height:3px;background:var(--read-red);border-radius:8px;margin-top:10px}
+.article h3{color:var(--read-navy);font-size:20px;margin:34px 0 12px}
+.article p{font-size:16px;line-height:2.18;margin:0 0 22px;color:#303b4d}
+.article ul,.article ol{padding-right:26px;margin:8px 0 28px}.article li{margin-bottom:9px;line-height:2.05}
+.warning,.good{margin:28px 0;padding:17px 19px;border-radius:12px;box-shadow:none}.warning{background:#fff9fa;border:1px solid #f4dce2}.good{background:#f5fbf8;border:1px solid #d9eee4}
+.toc{position:sticky;top:92px;background:#fff;border:1px solid var(--read-border);border-radius:14px;padding:14px;box-shadow:none}
+.toc strong{font-size:13px;margin-bottom:7px}.toc a{font-size:11px;padding:7px 8px;color:#697586}.toc a:hover{background:#faf4f6;color:var(--read-red)}
+.refs{border-top:1px solid var(--read-border);margin-top:46px;padding-top:28px}.refs h2{margin-top:0}.refs li{margin-bottom:12px}.refs a{color:#2f65d9}
+.state{padding:64px 20px;color:var(--read-muted)}
+footer{background:#121a2d;padding:30px 20px;font-size:11px}
+@media(max-width:900px){.layout{grid-template-columns:1fr;gap:20px}.toc{position:static;order:-1}.toc a{display:inline-block;margin:2px 0}}
+@media(max-width:600px){.container{width:min(100% - 24px,1120px)}.hero{padding:46px 0 34px}.hero h1{font-size:30px}.excerpt{font-size:15px}.article h2{font-size:23px;margin-top:40px}.article p{font-size:15.5px;line-height:2.12}.article{padding:0 4px}.intro{padding:16px}.hero-image{border-radius:14px}}
