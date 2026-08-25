@@ -12,34 +12,82 @@ export async function onRequest({ request, env }) {
   try {
     const url = new URL(request.url), isAdmin = url.searchParams.get('admin') === '1';
     if (method === 'GET') {
-      if (isAdmin) { const user = await authenticateArticleAdmin(request, env.DB); if (!user) return json({ success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.' },401); return listAllArticles(env.DB,user); }
+      if (isAdmin) {
+        const user = await authenticateArticleAdmin(request, env.DB);
+        if (!user) return json({ success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.' },401);
+        return listAllArticles(env.DB,user);
+      }
       return listPublishedArticles(env.DB);
     }
-    if (method === 'POST') { const user=await authenticateArticleAdmin(request,env.DB); if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401); return createArticle(request,env.DB,user); }
-    if (method === 'PUT') { const user=await authenticateArticleAdmin(request,env.DB); if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401); return updateArticle(request,env.DB,user); }
-    if (method === 'DELETE') { const user=await authenticateArticleAdmin(request,env.DB); if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401); if(user.role!=='admin')return json({success:false,error:'حذف المقالات متاح لمدير النظام فقط.'},403); return deleteArticle(request,env.DB); }
+    if (method === 'POST') {
+      const user=await authenticateArticleAdmin(request,env.DB);
+      if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401);
+      return createArticle(request,env.DB,user);
+    }
+    if (method === 'PUT') {
+      const user=await authenticateArticleAdmin(request,env.DB);
+      if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401);
+      return updateArticle(request,env.DB,user);
+    }
+    if (method === 'DELETE') {
+      const user=await authenticateArticleAdmin(request,env.DB);
+      if(!user)return json({success:false,error:'غير مصرح بالدخول إلى إدارة المقالات.'},401);
+      if(user.role!=='admin')return json({success:false,error:'حذف المقالات متاح لمدير النظام فقط.'},403);
+      return deleteArticle(request,env.DB);
+    }
     return json({success:false,error:'Method not allowed.'},405);
-  } catch (error) { console.error('Articles API error:',error); return json({success:false,error:'تعذر تنفيذ طلب المقالات حالياً.'},500); }
+  } catch (error) {
+    console.error('Articles API error:',error);
+    return json({success:false,error:'تعذر تنفيذ طلب المقالات حالياً.'},500);
+  }
 }
 
 async function listPublishedArticles(db){
   const result=await db.prepare(`SELECT id,title_ar,title_en,excerpt_ar,excerpt_en,author_member_id,author_name,author_email,category,image_url,status,rejection_reason,published_at,created_at,updated_at FROM articles WHERE status='published' ORDER BY COALESCE(published_at,created_at) DESC,id DESC`).all();
-  const seen=new Set(),articles=[]; for(const article of result.results||[]){const key=normalizeTitle(article.title_ar)||normalizeTitle(article.title_en);if(!key||!seen.has(key)){articles.push(article);if(key)seen.add(key);}}
+  const seen=new Set(),articles=[];
+  for(const article of result.results||[]){
+    const key=normalizeTitle(article.title_ar)||normalizeTitle(article.title_en);
+    if(!key||!seen.has(key)){
+      articles.push(article);
+      if(key)seen.add(key);
+    }
+  }
   return json({success:true,articles,count:articles.length});
 }
+
 async function listAllArticles(db,user){
   const result=await db.prepare(`SELECT id,title_ar,title_en,content_ar,content_en,excerpt_ar,excerpt_en,author_member_id,author_name,author_email,category,image_url,status,rejection_reason,published_at,created_at,updated_at FROM articles ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'draft' THEN 1 WHEN 'published' THEN 2 WHEN 'rejected' THEN 3 ELSE 4 END,datetime(created_at) DESC,id DESC`).all();
-  const articles=result.results||[]; return json({success:true,admin:{member_id:user.member_id,account_id:user.account_id,username:user.username,role:user.role,display_name:user.display_name||user.username},articles,summary:{total:articles.length,pending:articles.filter(a=>a.status==='pending').length,published:articles.filter(a=>a.status==='published').length,rejected:articles.filter(a=>a.status==='rejected').length,draft:articles.filter(a=>a.status==='draft').length}});
+  const articles=result.results||[];
+  return json({success:true,admin:{member_id:user.member_id,account_id:user.account_id,username:user.username,role:user.role,display_name:user.display_name||user.username},articles,summary:{total:articles.length,pending:articles.filter(a=>a.status==='pending').length,published:articles.filter(a=>a.status==='published').length,rejected:articles.filter(a=>a.status==='rejected').length,draft:articles.filter(a=>a.status==='draft').length}});
 }
+
 async function createArticle(request,db,user){
   const b=await request.json(),titleAr=clean(b.title_ar,500),titleEn=clean(b.title_en,500),contentAr=clean(b.content_ar,100000),contentEn=clean(b.content_en,100000),excerptAr=clean(b.excerpt_ar,2000),excerptEn=clean(b.excerpt_en,2000),authorName=clean(b.author_name||user.display_name||user.username,200),authorEmail=clean(b.author_email,200),category=clean(b.category,100),imageUrl=clean(b.image_url,2000),requestedMemberId=Number(b.author_member_id);
   if(!titleAr||!contentAr||!authorName)return json({success:false,error:'العنوان العربي والمحتوى العربي واسم الكاتب حقول مطلوبة.'},400);
   const duplicate=await db.prepare(`SELECT id,status FROM articles WHERE lower(trim(title_ar))=lower(trim(?)) AND status IN ('published','pending','draft') ORDER BY id DESC LIMIT 1`).bind(titleAr).first();
   if(duplicate)return json({success:false,error:'يوجد مقال آخر بالعنوان نفسه بالفعل.',duplicate_id:duplicate.id,duplicate_status:duplicate.status},409);
-  let authorMemberId=user.member_id; if(Number.isInteger(requestedMemberId)&&requestedMemberId>0){if(user.role!=='admin'&&requestedMemberId!==user.member_id)return json({success:false,error:'لا يمكنك إنشاء مقال باسم عضو آخر.'},403);const member=await db.prepare('SELECT id FROM members WHERE id=? LIMIT 1').bind(requestedMemberId).first();if(!member)return json({success:false,error:'عضو MedLife غير موجود.'},400);authorMemberId=member.id;}
+  let authorMemberId=user.member_id;
+  if(Number.isInteger(requestedMemberId)&&requestedMemberId>0){
+    if(user.role!=='admin'&&requestedMemberId!==user.member_id)return json({success:false,error:'لا يمكنك إنشاء مقال باسم عضو آخر.'},403);
+    const member=await db.prepare('SELECT id FROM members WHERE id=? LIMIT 1').bind(requestedMemberId).first();
+    if(!member)return json({success:false,error:'عضو MedLife غير موجود.'},400);
+    authorMemberId=member.id;
+  }
   const result=await db.prepare(`INSERT INTO articles(title_ar,title_en,content_ar,content_en,excerpt_ar,excerpt_en,author_member_id,author_name,author_email,category,image_url,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,'pending',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(titleAr,titleEn,contentAr,contentEn,excerptAr,excerptEn,authorMemberId,authorName,authorEmail,category,imageUrl).run();
-  return json({success:true,message:'تم إرسال المقال للمراجعة بنجاح.',id:result.meta?.last_row_id??null,status:'pending'},201);
+  const articleId=result.meta?.last_row_id??null;
+  const references=Array.isArray(b.references)?b.references.slice(0,15):[];
+  if(articleId&&references.length){
+    for(const item of references){
+      const title=clean(item?.title,500);
+      if(!title)continue;
+      const year=Number(item?.year);
+      await db.prepare(`INSERT INTO article_references(article_id,title,organization,reference_type,year,url,doi,citation_text,is_primary,verified_status,verification_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`)
+        .bind(articleId,title,clean(item.organization,300),clean(item.reference_type,80),Number.isInteger(year)&&year>0?year:null,clean(item.url,2000),clean(item.doi,300),clean(item.citation_text,2000),item.is_primary?1:0,'unverified','').run();
+    }
+  }
+  return json({success:true,message:'تم إرسال المقال للمراجعة بنجاح.',id:articleId,status:'pending'},201);
 }
+
 async function updateArticle(request,db,user){
   const b=await request.json(),id=Number(b.id),status=clean(b.status,30),rejectionReason=clean(b.rejection_reason,2000);
   if(!Number.isInteger(id)||id<=0)return json({success:false,error:'معرّف المقال غير صالح.'},400);
@@ -49,7 +97,10 @@ async function updateArticle(request,db,user){
   if(status==='rejected'&&!rejectionReason)return json({success:false,error:'يرجى كتابة سبب رفض المقال.'},400);
   const titleAr=clean(b.title_ar??article.title_ar,500),titleEn=clean(b.title_en??article.title_en,500),contentAr=clean(b.content_ar??article.content_ar,100000),contentEn=clean(b.content_en??article.content_en,100000),excerptAr=clean(b.excerpt_ar??article.excerpt_ar,2000),excerptEn=clean(b.excerpt_en??article.excerpt_en,2000),authorName=clean(b.author_name??article.author_name,200),authorEmail=clean(b.author_email??article.author_email,200),category=clean(b.category??article.category,100),imageUrl=clean(b.image_url??article.image_url,2000);
   if(!titleAr||!contentAr||!authorName)return json({success:false,error:'العنوان العربي والمحتوى العربي واسم الكاتب حقول مطلوبة.'},400);
-  if(status!=='rejected'){const duplicate=await db.prepare(`SELECT id FROM articles WHERE id<>? AND lower(trim(title_ar))=lower(trim(?)) AND status IN ('published','pending','draft') LIMIT 1`).bind(id,titleAr).first();if(duplicate)return json({success:false,error:'يوجد مقال آخر بالعنوان نفسه بالفعل.',duplicate_id:duplicate.id},409);}
+  if(status!=='rejected'){
+    const duplicate=await db.prepare(`SELECT id FROM articles WHERE id<>? AND lower(trim(title_ar))=lower(trim(?)) AND status IN ('published','pending','draft') LIMIT 1`).bind(id,titleAr).first();
+    if(duplicate)return json({success:false,error:'يوجد مقال آخر بالعنوان نفسه بالفعل.',duplicate_id:duplicate.id},409);
+  }
   const publishedAt=status==='published'?(article.published_at||new Date().toISOString()):null;
   await db.prepare(`UPDATE articles SET title_ar=?,title_en=?,content_ar=?,content_en=?,excerpt_ar=?,excerpt_en=?,author_name=?,author_email=?,category=?,image_url=?,status=?,rejection_reason=?,published_at=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).bind(titleAr,titleEn,contentAr,contentEn,excerptAr,excerptEn,authorName,authorEmail,category,imageUrl,status,status==='rejected'?rejectionReason:null,publishedAt,id).run();
   return json({success:true,message:status==='published'?'تم حفظ التعديلات ونشر المقال.':status==='rejected'?'تم رفض المقال وحفظ سبب الرفض.':'تم حفظ تعديلات المقال.',id,status});
