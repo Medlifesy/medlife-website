@@ -1,7 +1,7 @@
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const FALLBACK_WORKER = 'https://medlife-articles-api.broad-frog-3978.workers.dev/api/article-ai';
 const MODEL = 'gpt-4.1-mini';
-const CF_MODEL = '@cf/meta/llama-3.1-8b-instruct';
+const CF_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast';
 const TIMEOUT_MS = 25000;
 const FALLBACK_TIMEOUT_MS = 15000;
 
