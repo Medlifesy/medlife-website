@@ -11,6 +11,11 @@
       "binding": "DB",
       "database_name": "medlife-articles",
       "database_id": "036972c6-162c-47d9-9fea-d011cb451da7"
+    },
+    {
+      "binding": "MEMBERS_DB",
+      "database_name": "medlife-articles",
+      "database_id": "036972c6-162c-47d9-9fea-d011cb451da7"
     }
   ]
 }
