@@ -1,3 +1,5 @@
+/submit-article-v3 /submit-article-v4.html 301
+/submit-article-v3.html /submit-article-v4.html 301
 /articles/tension-headache /articles/tension-headache.html 200
 /articles/endometriosis-endotest-endosure /articles/endometriosis-endotest-endosure.html 200
 /articles/* /article-reader-v5.html?slug=:splat 200
