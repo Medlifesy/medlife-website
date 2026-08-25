@@ -1,8 +1,7 @@
 MedLife Editorial Studio Pro deployment trigger
 
 Official editor path: /admin/editorial-studio.html
-
+Submission form: /submit-article-final.html
 Build source: main
-
-Release: 2026-08-26T00:15:00Z
-Legacy article submission routes now redirect to V4.
+Release: 2026-08-26T20:32:00Z
+Final submission form published; legacy routes redirect to the final version.
