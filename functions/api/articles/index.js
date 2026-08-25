@@ -62,7 +62,7 @@ async function listAllArticles(db,user){
 }
 
 async function createArticle(request,db,user){
-  const b=await request.json(),titleAr=clean(b.title_ar,500),titleEn=clean(b.title_en,500),contentAr=clean(b.content_ar,100000),contentEn=clean(b.content_en,100000),excerptAr=clean(b.excerpt_ar,2000),excerptEn=clean(b.excerpt_en,2000),authorName=clean(b.author_name||user.display_name||user.username,200),authorEmail=clean(b.author_email,200),category=clean(b.category,100),imageUrl=clean(b.image_url,2000),requestedMemberId=Number(b.author_member_id);
+  const b=await request.json(),titleAr=clean(b.title_ar,500),titleEn=clean(b.title_en,500),contentAr=clean(b.content_ar,100000),contentEn=clean(b.content_en,100000),excerptAr=clean(b.excerpt_ar,2000),excerptEn=clean(b.excerpt_en,2000),authorName=clean(b.author_name||user.display_name||user.username,200),authorEmail=clean(b.author_email,200),category=clean(b.category,100),imageUrl=clean(b.image_url,2000),requestedMemberId=Number(b.author_member_id),requestedStatus=clean(b.status,30);
   if(!titleAr||!contentAr||!authorName)return json({success:false,error:'العنوان العربي والمحتوى العربي واسم الكاتب حقول مطلوبة.'},400);
   const duplicate=await db.prepare(`SELECT id,status FROM articles WHERE lower(trim(title_ar))=lower(trim(?)) AND status IN ('published','pending','draft') ORDER BY id DESC LIMIT 1`).bind(titleAr).first();
   if(duplicate)return json({success:false,error:'يوجد مقال آخر بالعنوان نفسه بالفعل.',duplicate_id:duplicate.id,duplicate_status:duplicate.status},409);
@@ -73,7 +73,8 @@ async function createArticle(request,db,user){
     if(!member)return json({success:false,error:'عضو MedLife غير موجود.'},400);
     authorMemberId=member.id;
   }
-  const result=await db.prepare(`INSERT INTO articles(title_ar,title_en,content_ar,content_en,excerpt_ar,excerpt_en,author_member_id,author_name,author_email,category,image_url,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,'pending',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(titleAr,titleEn,contentAr,contentEn,excerptAr,excerptEn,authorMemberId,authorName,authorEmail,category,imageUrl).run();
+  const status=['draft','published'].includes(requestedStatus)&&['admin','reviewer'].includes(String(user.role||'').toLowerCase())?requestedStatus:'pending';
+  const result=await db.prepare(`INSERT INTO articles(title_ar,title_en,content_ar,content_en,excerpt_ar,excerpt_en,author_member_id,author_name,author_email,category,image_url,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?, ?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(titleAr,titleEn,contentAr,contentEn,excerptAr,excerptEn,authorMemberId,authorName,authorEmail,category,imageUrl,status).run();
   const articleId=result.meta?.last_row_id??null;
   const references=Array.isArray(b.references)?b.references.slice(0,15):[];
   if(articleId&&references.length){
@@ -85,7 +86,7 @@ async function createArticle(request,db,user){
         .bind(articleId,title,clean(item.organization,300),clean(item.reference_type,80),Number.isInteger(year)&&year>0?year:null,clean(item.url,2000),clean(item.doi,300),clean(item.citation_text,2000),item.is_primary?1:0,'unverified','').run();
     }
   }
-  return json({success:true,message:'تم إرسال المقال للمراجعة بنجاح.',id:articleId,status:'pending'},201);
+  return json({success:true,message:status==='published'?'تم إنشاء المقال ونشره.':status==='draft'?'تم إنشاء المقال كمسودة.':'تم إرسال المقال للمراجعة بنجاح.',id:articleId,status},201);
 }
 
 async function updateArticle(request,db,user){
