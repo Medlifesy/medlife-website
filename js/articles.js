@@ -80,8 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         ...article,
                         source: "api",
                         // Database-backed articles ALWAYS use their own numeric ID.
-                        // Never inherit a stale/static URL from older article records.
-                        url: `article.html?id=${encodeURIComponent(article.id)}`
+                        // Route them to the premium dynamic reader so every published
+                        // article gets the same MedLife editorial experience.
+                        url: `article-reader-v2.html?id=${encodeURIComponent(article.id)}`
                     }))
                 : [];
 
@@ -124,10 +125,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const image = article.image_url ? escapeAttribute(article.image_url) : "";
 
         // Static legacy articles keep their handcrafted URL.
-        // API/database articles are always routed by ID.
+        // API/database articles are always routed by ID to the dynamic reader.
         const url = article.source === "api"
-            ? `article.html?id=${encodeURIComponent(article.id)}`
-            : (article.url || `article.html?id=${encodeURIComponent(article.id)}`);
+            ? `article-reader-v2.html?id=${encodeURIComponent(article.id)}`
+            : (article.url || `article-reader-v2.html?id=${encodeURIComponent(article.id)}`);
 
         const icon = escapeAttribute(article.icon || "fa-book-medical");
         const imageHTML = image
