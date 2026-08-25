@@ -6,122 +6,37 @@ const TIMEOUT_MS = 25000;
 const FALLBACK_TIMEOUT_MS = 15000;
 
 const SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  properties: {
-    title: { type: 'string' },
-    excerpt: { type: 'string' },
-    introduction: { type: 'string' },
-    sections: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { heading: { type: 'string' }, content: { type: 'string' } }, required: ['heading', 'content'] } },
-    conclusion: { type: 'string' },
-    editor_notes: { type: 'array', items: { type: 'string' } }
-  },
-  required: ['title', 'excerpt', 'introduction', 'sections', 'conclusion', 'editor_notes']
+  type:'object', additionalProperties:false,
+  properties:{title:{type:'string'},excerpt:{type:'string'},introduction:{type:'string'},sections:{type:'array',items:{type:'object',additionalProperties:false,properties:{heading:{type:'string'},content:{type:'string'},kind:{type:'string'},items:{type:'array',items:{type:'object',additionalProperties:false,properties:{question:{type:'string'},answer:{type:'string'},label:{type:'string'},body:{type:'string'},pros:{type:'string'},cons:{type:'string'}},required:[]}}},required:['heading','content']}},conclusion:{type:'string'},editor_notes:{type:'array',items:{type:'string'}}},
+  required:['title','excerpt','introduction','sections','conclusion','editor_notes']
 };
-
-function json(body, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json; charset=UTF-8', 'Cache-Control': 'no-store' } });
-}
-function getCookie(request, name) {
-  const raw = request.headers.get('Cookie') || '';
-  for (const part of raw.split(';')) { const item = part.trim(); if (item.startsWith(name + '=')) return decodeURIComponent(item.slice(name.length + 1)); }
-  return '';
-}
-async function verifyAdmin(request, env) {
-  if (!env?.DB) return false;
-  const token = getCookie(request, 'medlife_articles_session');
-  if (!token) return false;
-  try {
-    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
-    const hash = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-    const row = await env.DB.prepare(`SELECT a.id AS account_id,a.role,a.account_status FROM member_sessions s JOIN member_accounts a ON a.id=s.account_id WHERE s.token_hash=? AND datetime(s.expires_at)>datetime('now') LIMIT 1`).bind(hash).first();
-    return !!row && row.account_status === 'active' && ['admin','editor','reviewer'].includes(String(row.role || '').toLowerCase());
-  } catch { return false; }
-}
-async function fetchTimed(url, options, ms) {
-  const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), ms);
-  try { return await fetch(url, { ...options, signal: controller.signal }); } finally { clearTimeout(timer); }
-}
-function extractText(data) {
-  if (typeof data?.output_text === 'string' && data.output_text.trim()) return data.output_text.trim();
-  const chunks=[]; for (const item of Array.isArray(data?.output) ? data.output : []) for (const part of Array.isArray(item?.content) ? item.content : []) if (typeof part?.text === 'string') chunks.push(part.text);
-  return chunks.join('\n').trim();
-}
-function extractModelText(data) { if (typeof data === 'string') return data.trim(); if (typeof data?.response === 'string') return data.response.trim(); if (typeof data?.result === 'string') return data.result.trim(); if (typeof data?.text === 'string') return data.text.trim(); return ''; }
-function buildDeveloperInstruction(extra = '') {
-  return `You are the dedicated MedLife Arabic medical editorial formatter.
-Match the structure of MedLife's published Arabic medical articles: strong title/excerpt, one clean introduction, a clean table of contents when present, real section headings taken from the author's own numbered headings, short readable paragraphs, useful lists, and a final references section when references are supplied.
-Never create generic headings such as "القسم 1". Use the author's real heading. Never turn a table of contents into article sections. Keep references intact. Preserve medical meaning. Never invent diagnoses, doses, contraindications, statistics, recommendations, references, or claims. Do not output HTML or Markdown. Return only the requested JSON.${extra ? `\nAdditional editor instruction: ${extra}` : ''}`;
-}
-function extractJsonObject(text) {
-  const clean = String(text || '').trim().replace(/^```(?:json)?/i,'').replace(/```$/i,'').trim();
-  try { return JSON.parse(clean); } catch {}
-  const start=clean.indexOf('{'), end=clean.lastIndexOf('}'); if(start>=0&&end>start) return JSON.parse(clean.slice(start,end+1));
-  throw new Error('لم يرجع نموذج الذكاء الاصطناعي JSON صالحاً.');
-}
-const AR_DIGITS='٠١٢٣٤٥٦٧٨٩';
-function normalizeDigits(value){return String(value||'').replace(/[٠-٩]/g,d=>String(AR_DIGITS.indexOf(d)));}
-function normalizeText(value){return String(value||'').replace(/\u00a0/g,' ').replace(/\u200b|\u200c|\u200d/g,'').replace(/[ \t]+/g,' ').replace(/\n[ \t]+/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();}
-function isTocBlock(block){
-  const lines=normalizeText(block).split('\n').map(x=>x.trim()).filter(Boolean);
-  if(lines.length<5)return false;
-  const numbered=lines.filter(line=>/^(?:\d{1,2}|[١-٩٠-٩]{1,2})\s*[-.)ـ:]/.test(line));
-  return numbered.length>=Math.max(5,Math.floor(lines.length*0.6));
-}
-function cleanHeading(raw){let h=normalizeText(raw).replace(/^[*•–—\-]+\s*/,'').trim();h=h.replace(/^[-–—]+\s*/,'').trim();return h.replace(/\s+[؟?]+$/,'؟');}
-function headingFromLine(line){
-  const raw=normalizeText(line); const match=raw.match(/^(?:(\d{1,2})|([١-٩٠-٩]{1,2}))\s*(?:[-.)ـ:]|\s*[ـ-]\s*)\s*(.+)$/);
-  if(!match)return null; const heading=cleanHeading(match[3]); if(!heading||heading.length<4)return null;
-  return {number:Number(match[1]||normalizeDigits(match[2])),heading};
-}
-function splitStructuredBlocks(raw){
-  const blocks=normalizeText(raw).split(/\n\s*\n+/).map(normalizeText).filter(Boolean); const out=[];
-  for(const block of blocks){
-    if(isTocBlock(block))continue;
-    const lines=block.split('\n').map(x=>x.trim()).filter(Boolean); let current=null; let parts=[];
-    const flush=()=>{if(current)out.push({heading:current.heading,content:normalizeText(parts.join('\n\n')),order:current.number});else if(parts.length)out.push({heading:'',content:normalizeText(parts.join('\n\n')),order:null});current=null;parts=[];};
-    for(const line of lines){const heading=headingFromLine(line);if(heading){flush();current=heading;}else parts.push(line);} flush();
-  }
-  return out;
-}
-// Keep the source intact here. Table-of-contents blocks are filtered safely by splitStructuredBlocks,
-// while real numbered headings followed by prose are preserved.
-function removeEmbeddedToc(content){return normalizeText(content);}
-function extractReferencesBlock(content){
-  const normalized=normalizeText(content); const match=normalized.match(/(?:^|\n)(المصادر العلمية|المصادر والمراجع|المراجع العلمية|المراجع)\s*$/m);
-  if(!match)return {body:normalized,references:''}; const index=match.index+(match[0].startsWith('\n')?1:0);
-  return {body:normalizeText(normalized.slice(0,index)),references:normalizeText(normalized.slice(index))};
-}
-function deterministicFormat(article){
-  const title=normalizeText(article.title), excerpt=normalizeText(article.excerpt); let raw=removeEmbeddedToc(article.content); const refSplit=extractReferencesBlock(raw); raw=refSplit.body;
-  const structured=splitStructuredBlocks(raw); const notes=[]; let introduction=''; const sections=[]; const pending=[];
-  for(const item of structured){
-    if(!item.heading){
-      if(sections.length===0)pending.push(item.content); else sections[sections.length-1].content=normalizeText([sections[sections.length-1].content,item.content].filter(Boolean).join('\n\n'));
-      continue;
-    }
-    const cleanH=cleanHeading(item.heading); if(!cleanH||/^(المصادر العلمية|المصادر والمراجع|المراجع العلمية|المراجع)$/i.test(cleanH))continue;
-    sections.push({heading:cleanH,content:item.content||''});
-  }
-  if(pending.length)introduction=normalizeText(pending.join('\n\n'));
-  if(!sections.length&&raw){introduction=introduction||raw;notes.push('لم توجد عناوين مرقمة واضحة في النص الأصلي؛ تم الحفاظ على المحتوى بدل اختراع عناوين.');}
-  for(const section of sections){section.content=normalizeText(section.content).replace(/^\s*\*\s+/gm,'• ').replace(/^\s*[-–—]\s+/gm,'• ').replace(/\n{3,}/g,'\n\n');}
-  if(refSplit.references){
-    sections.push({heading:'المصادر والمراجع',content:refSplit.references.replace(/^المصادر العلمية\s*/i,'').replace(/^المصادر والمراجع\s*/i,'').replace(/^المراجع العلمية\s*/i,'').replace(/^المراجع\s*/i,'').trim()});
-  }
-  if(article.author_name)notes.push(`إعداد المحتوى: ${normalizeText(article.author_name)}.`);
-  notes.push('تم الحفاظ على الحقائق والمراجع الأصلية دون اختراع معلومات طبية جديدة.');
-  return {title,excerpt,introduction,sections,conclusion:'',editor_notes:notes};
-}
-export async function onRequestPost({request,env}){
-  if(!(await verifyAdmin(request,env)))return json({success:false,error:'غير مصرح.'},401);
-  let input;try{input=await request.json();}catch{return json({success:false,error:'بيانات الطلب غير صالحة.'},400);}
-  const article=input?.article||{};const content=String(article.content||'').trim();if(!content)return json({success:false,error:'محتوى المقال فارغ.'},400);
-  const payload={title:String(article.title||'').slice(0,300),category:String(article.category||'').slice(0,160),excerpt:String(article.excerpt||'').slice(0,1200),author_name:String(article.author_name||'').slice(0,300),content:content.slice(0,20000),instruction:String(input?.instruction||'').trim().slice(0,1200)};
-  const developer=buildDeveloperInstruction(payload.instruction),failures=[];
-  if(env?.AI?.run){try{const prompt=`${developer}\n\nReturn EXACTLY one JSON object matching this shape:\n{"title":"","excerpt":"","introduction":"","sections":[{"heading":"","content":""}],"conclusion":"","editor_notes":[]}\n\nARTICLE:\n${JSON.stringify(payload)}`;const result=await Promise.race([env.AI.run(CF_MODEL,{prompt,max_tokens:3200,temperature:0.15}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Cloudflare AI timeout')),25000))]);const formatted=extractJsonObject(extractModelText(result));if(Array.isArray(formatted.sections)&&formatted.sections.some(s=>/^القسم\s+\d+$/i.test(String(s?.heading||'').trim())))throw new Error('نتيجة AI استخدمت عناوين عامة غير مقبولة.');return json({success:true,provider:'cloudflare-workers-ai',model:CF_MODEL,article:formatted});}catch(error){failures.push(`workers-ai: ${error?.message||'failed'}`);}}else failures.push('workers-ai: binding AI غير مفعّل');
-  if(env?.OPENAI_API_KEY){try{const response=await fetchTimed(OPENAI_URL,{method:'POST',headers:{Authorization:`Bearer ${env.OPENAI_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({model:env.MEDLIFE_FORMAT_MODEL||MODEL,store:false,input:[{role:'developer',content:developer},{role:'user',content:JSON.stringify(payload)}],text:{format:{type:'json_schema',name:'medlife_article_format',strict:true,schema:SCHEMA}}})},TIMEOUT_MS);const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data?.error?.message||`OpenAI HTTP ${response.status}`);const formatted=extractJsonObject(extractText(data));if(Array.isArray(formatted.sections)&&formatted.sections.some(s=>/^القسم\s+\d+$/i.test(String(s?.heading||'').trim())))throw new Error('نتيجة OpenAI استخدمت عناوين عامة غير مقبولة.');return json({success:true,provider:'openai',model:env.MEDLIFE_FORMAT_MODEL||MODEL,article:formatted});}catch(error){failures.push(`openai: ${error?.message||'failed'}`);}}
-  else failures.push('openai: OPENAI_API_KEY غير مفعّل');
-  try{const headers=new Headers({'Content-Type':'application/json','Accept':'application/json'});const cookie=request.headers.get('Cookie');if(cookie)headers.set('Cookie',cookie);const response=await fetchTimed(FALLBACK_WORKER,{method:'POST',headers,body:JSON.stringify({action:'full_edit',language:'ar',article:{title:payload.title,category:payload.category,content:payload.content,requirements:developer}})},FALLBACK_TIMEOUT_MS);const data=await response.json().catch(()=>({}));if(!response.ok||!data?.success)throw new Error(data?.error||`HTTP ${response.status}`);const formatted=data.article||{};if(Array.isArray(formatted.sections)&&formatted.sections.some(s=>/^القسم\s+\d+$/i.test(String(s?.heading||'').trim())))throw new Error('مسار MedLife الاحتياطي استخدم عناوين عامة غير مقبولة.');return json({success:true,provider:'medlife-worker',article:formatted});}catch(error){failures.push(`medlife-worker: ${error?.message||'failed'}`);}
-  return json({success:true,provider:'medlife-deterministic-editorial',degraded:true,warnings:failures,article:deterministicFormat(payload)});
+function json(body,status=200){return new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store'}})}
+function getCookie(request,name){const raw=request.headers.get('Cookie')||'';for(const part of raw.split(';')){const item=part.trim();if(item.startsWith(name+'='))return decodeURIComponent(item.slice(name.length+1))}return ''}
+async function verifyAdmin(request,env){if(!env?.DB)return false;const token=getCookie(request,'medlife_articles_session');if(!token)return false;try{const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(token));const hash=Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');const row=await env.DB.prepare(`SELECT a.id AS account_id,a.role,a.account_status FROM member_sessions s JOIN member_accounts a ON a.id=s.account_id WHERE s.token_hash=? AND datetime(s.expires_at)>datetime('now') LIMIT 1`).bind(hash).first();return !!row&&row.account_status==='active'&&['admin','editor','reviewer'].includes(String(row.role||'').toLowerCase())}catch{return false}}
+async function fetchTimed(url,options,ms){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),ms);try{return await fetch(url,{...options,signal:controller.signal})}finally{clearTimeout(timer)}}
+function extractText(data){if(typeof data?.output_text==='string'&&data.output_text.trim())return data.output_text.trim();const chunks=[];for(const item of Array.isArray(data?.output)?data.output:[])for(const part of Array.isArray(item?.content)?item.content:[])if(typeof part?.text==='string')chunks.push(part.text);return chunks.join('\n').trim()}
+function extractModelText(data){if(typeof data==='string')return data.trim();if(typeof data?.response==='string')return data.response.trim();if(typeof data?.result==='string')return data.result.trim();if(typeof data?.text==='string')return data.text.trim();return ''}
+function buildDeveloperInstruction(extra=''){return `You are the MedLife Arabic medical editorial formatter. Build a polished article, not a mechanical text dump. Use the author's actual section headings and hierarchy. Never create generic headings such as "القسم 1". Ignore table-of-contents lines as content; do not turn FAQ questions into top-level sections. Preserve references and author attribution. Detect semantic structures: FAQ sections should contain question/answer items; comparison sections such as "مزايا ومساوئ" should be represented as a comparison table or clearly separated pros/cons; safety-critical material can be presented as a warning/callout; lists should be real lists. Keep paragraphs short and readable. Keep the author's facts and meaning. Never invent diagnoses, doses, contraindications, statistics, recommendations, references, or claims. Do not output HTML or Markdown. Return only JSON.${extra?`\nAdditional editor instruction: ${extra}`:''}`}
+function extractJsonObject(text){const clean=String(text||'').trim().replace(/^```(?:json)?/i,'').replace(/```$/i,'').trim();try{return JSON.parse(clean)}catch{}const start=clean.indexOf('{'),end=clean.lastIndexOf('}');if(start>=0&&end>start)return JSON.parse(clean.slice(start,end+1));throw new Error('لم يرجع نموذج الذكاء الاصطناعي JSON صالحاً.')}
+function normalize(v){return String(v||'').replace(/\u00a0/g,' ').replace(/\u200b|\u200c|\u200d/g,'').replace(/[ \t]+/g,' ').replace(/\n[ \t]+/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
+function normalizeDigits(v){const map='٠١٢٣٤٥٦٧٨٩';return String(v||'').replace(/[٠-٩]/g,d=>String(map.indexOf(d)))}
+function isTocLine(line){return /^\s*(?:\d{1,2}|[٠-٩]{1,2})\s*[-.)ـ:]/.test(line)}
+function isTocBlock(block){const lines=normalize(block).split('\n').map(x=>x.trim()).filter(Boolean);if(lines.length<5)return false;const numbered=lines.filter(isTocLine);return numbered.length>=Math.max(5,Math.floor(lines.length*.6))}
+function parseHeading(line){const m=normalize(line).match(/^\s*(?:\d{1,2}|[٠-٩]{1,2})\s*[-.)ـ:]\s*(.+)$/);if(!m)return null;const number=Number(normalizeDigits((line.match(/^\s*([٠-٩0-9]{1,2})/)||[])[1]||''));const heading=normalize(m[1]).replace(/^[-*•ـ]+\s*/,'').trim();if(!heading)return null;return {number,heading}}
+function isReferencesHeading(h){return /^(المصادر العلمية|المصادر والمراجع|المراجع العلمية|المراجع)$/i.test(normalize(h))}
+function isFaqHeading(h){return /^(أسئلة أكثر شيوعاً|أسئلة اكثر شيوعة|الأسئلة الشائعة|الأسئلة الأكثر شيوعاً)$/i.test(normalize(h))}
+function isComparisonHeading(h){return /(مزايا ومساوئ|مزايا وعيوب|مقارنة|إيجابيات وسلبيات)/i.test(normalize(h))}
+function extractReferences(content){const n=normalize(content);const lines=n.split('\n');const idx=lines.findIndex(x=>isReferencesHeading(x.trim()));if(idx<0)return {body:n,references:''};return {body:normalize(lines.slice(0,idx).join('\n')),references:normalize(lines.slice(idx+1).join('\n'))}}
+function extractAuthor(content,title){const lines=normalize(content).split('\n').map(x=>x.trim()).filter(Boolean);let author='';for(const line of lines){if(/^(✍|إعداد|اعداد|بقلم)/i.test(line)){author=line;break}}return author}
+function parseSections(raw){const blocks=normalize(raw).split(/\n\s*\n+/).map(normalize).filter(Boolean);let introParts=[];const sections=[];let current=null;for(const block of blocks){if(isTocBlock(block))continue;const lines=block.split('\n').map(x=>x.trim()).filter(Boolean);for(const line of lines){const heading=parseHeading(line);if(heading){if(current)sections.push(current);current={heading:heading.heading,content:'',kind:'section',items:[]};continue}if(!current)introParts.push(line);else current.content=normalize([current.content,line].filter(Boolean).join('\n\n'))}}if(current)sections.push(current);return {introduction:normalize(introParts.join('\n\n')),sections}}
+function parseFaqItems(content){const lines=normalize(content).split(/\n+/).map(x=>x.trim()).filter(Boolean);const items=[];let q=null;for(const line of lines){const qm=line.match(/^(?:\d+\.|[-*•])?\s*(هل|ما|كيف|متى|لماذا|يمكن|هل يمكن|ما هي|ما هو)\s+(.+\?)$/i);if(qm){if(q)items.push(q);q={question:normalize((qm[1]+' '+qm[2]).trim()),answer:''}}else if(q){q.answer=normalize([q.answer,line].filter(Boolean).join('\n\n'))}}if(q)items.push(q);return items}
+function parseComparison(content){const lines=normalize(content).split(/\n+/).map(x=>x.trim()).filter(Boolean);const rows=[];let current=null;for(const line of lines){if(/^(وسيلة منع الحمل)\s+(إيجابيات|الايجابيات)\s+(سلبيات|السلبيات)$/i.test(line))continue;const start=line.match(/^([^\-–—]{2,80})\s*[-–—]\s*(.+)$/);if(start){if(current)rows.push(current);current={label:normalize(start[1]),pros:'',cons:''};continue}if(current){const t=line.replace(/^[-•]/,'').trim();if(/^(سلبي|سلبيات|العيوب|عيوب)/i.test(t))current.cons=normalize(t.replace(/^[^:：]*[:：]/,''));else current.pros=normalize([current.pros,t].filter(Boolean).join(' '))}}if(current)rows.push(current);return rows.filter(r=>r.label&& (r.pros||r.cons))}
+function enrichSections(parsed){for(const s of parsed.sections){if(isFaqHeading(s.heading)){s.kind='faq';s.items=parseFaqItems(s.content);s.content=''}else if(isComparisonHeading(s.heading)){s.kind='comparison';const rows=parseComparison(s.content);if(rows.length)s.items=rows}else if(/^(5\.\s*)?الحالات التي يمنع فيها الحمل|الحالات الخاصة التي يمنع فيها الحمل/i.test(s.heading)){s.kind='warning'}else if(/منع الحمل الإسعافي|موانع الحمل الإسعافية/i.test(s.heading)){s.kind='highlight'}}return parsed}
+function deterministicFormat(article){const refs=extractReferences(article.content);const parsed=enrichSections(parseSections(refs.body));const sections=parsed.sections.map(s=>({heading:s.heading,content:s.content||'',kind:s.kind||'section',items:s.items||[]}));if(refs.references)sections.push({heading:'المصادر والمراجع',content:refs.references,kind:'references',items:[]});return {title:normalize(article.title),excerpt:normalize(article.excerpt),introduction:parsed.introduction,sections,conclusion:'',editor_notes:[extractAuthor(article.content,article.title)||'','تم الحفاظ على المحتوى والمراجع الأصلية، مع تحسين البنية والقراءة فقط.']}}
+function rejectBadStructure(article){const sections=Array.isArray(article?.sections)?article.sections:[];if(sections.some(s=>/^القسم\s*\d+$/i.test(normalize(s?.heading))))return true;const refs=sections.find(s=>isReferencesHeading(s?.heading));if(refs&&refs.kind!=='references')return true;return false}
+export async function onRequestPost({request,env}){if(!(await verifyAdmin(request,env)))return json({success:false,error:'غير مصرح.'},401);let input;try{input=await request.json()}catch{return json({success:false,error:'بيانات الطلب غير صالحة.'},400)}const a=input?.article||{};const content=String(a.content||'').trim();if(!content)return json({success:false,error:'محتوى المقال فارغ.'},400);const payload={title:String(a.title||'').slice(0,300),category:String(a.category||'').slice(0,160),excerpt:String(a.excerpt||'').slice(0,1200),author_name:String(a.author_name||'').slice(0,300),content:content.slice(0,22000),instruction:String(input?.instruction||'').slice(0,1400)};const developer=buildDeveloperInstruction(payload.instruction);const failures=[];
+if(env?.AI?.run){try{const prompt=`${developer}\n\nReturn EXACTLY one JSON object:\n{"title":"","excerpt":"","introduction":"","sections":[{"heading":"","content":"","kind":"section","items":[]}],"conclusion":"","editor_notes":[]}\n\nARTICLE:\n${JSON.stringify(payload)}`;const result=await Promise.race([env.AI.run(CF_MODEL,{prompt,max_tokens:4200,temperature:.15}),new Promise((_,r)=>setTimeout(()=>r(new Error('Cloudflare AI timeout')),25000))]);const formatted=extractJsonObject(extractModelText(result));if(!rejectBadStructure(formatted))return json({success:true,provider:'cloudflare-workers-ai',model:CF_MODEL,article:formatted});failures.push('workers-ai: rejected non-semantic structure')}catch(e){failures.push(`workers-ai: ${e?.message||'failed'}`)}}else failures.push('workers-ai: binding AI غير مفعّل');
+if(env?.OPENAI_API_KEY){try{const r=await fetchTimed(OPENAI_URL,{method:'POST',headers:{Authorization:`Bearer ${env.OPENAI_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({model:env.MEDLIFE_FORMAT_MODEL||MODEL,store:false,input:[{role:'developer',content:developer},{role:'user',content:JSON.stringify(payload)}],text:{format:{type:'json_schema',name:'medlife_article_format',strict:true,schema:SCHEMA}}})},TIMEOUT_MS);const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d?.error?.message||`OpenAI HTTP ${r.status}`);const formatted=extractJsonObject(extractText(d));if(!rejectBadStructure(formatted))return json({success:true,provider:'openai',model:env.MEDLIFE_FORMAT_MODEL||MODEL,article:formatted});failures.push('openai: rejected non-semantic structure')}catch(e){failures.push(`openai: ${e?.message||'failed'}`)}}else failures.push('openai: OPENAI_API_KEY غير مفعّل');
+try{const headers=new Headers({'Content-Type':'application/json','Accept':'application/json'});const cookie=request.headers.get('Cookie');if(cookie)headers.set('Cookie',cookie);const r=await fetchTimed(FALLBACK_WORKER,{method:'POST',headers,body:JSON.stringify({action:'full_edit',language:'ar',article:{title:payload.title,category:payload.category,content:payload.content,requirements:developer}})},FALLBACK_TIMEOUT_MS);const d=await r.json().catch(()=>({}));if(!r.ok||!d?.success)throw new Error(d?.error||`HTTP ${r.status}`);if(!rejectBadStructure(d.article||{}))return json({success:true,provider:'medlife-worker',article:d.article}) ;failures.push('medlife-worker: rejected non-semantic structure')}catch(e){failures.push(`medlife-worker: ${e?.message||'failed'}`)}
+return json({success:true,provider:'medlife-semantic-deterministic',degraded:true,warnings:failures,article:deterministicFormat(payload)});
 }
