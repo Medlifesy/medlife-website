@@ -1,6 +1,6 @@
 import { authenticateArticleAdmin, json } from './article-admin-session.js';
 
-const REVIEW_MODEL='@cf/meta/llama-3.1-8b-instruct';
+const REVIEW_MODEL='@cf/zai-org/glm-4.7-flash';
 
 export async function onRequest({request,env}){
   if(!env?.DB)return json({success:false,error:'Database binding DB is not configured.'},500);
@@ -83,9 +83,9 @@ async function runEditorialReview(env,articleId){
 
 async function aiReview(env,article,references){
   if(env?.AI?.run){
-    const prompt=`You are the MedLife medical editorial quality reviewer. Review the Arabic medical article against ONLY the references supplied by the author. Do not invent facts, references, doses, recommendations, statistics, or citations. Return ONLY JSON with keys: overall_score,readiness,language_issues,structure_issues,unsupported_claims,reference_gaps,contradictions,safety_flags,style_suggestions,recommended_actions. unsupported_claims and reference_gaps must be arrays of objects. Score evidence availability, not generic medical knowledge.\nARTICLE:\n${JSON.stringify({title_ar:article.title_ar,title_en:article.title_en,excerpt_ar:article.excerpt_ar,content_ar:String(article.content_ar||'').slice(0,24000),category:article.category})}\nAUTHOR REFERENCES:\n${JSON.stringify(references).slice(0,18000)}`;
+    const prompt=`You are the MedLife medical editorial quality reviewer for Arabic health education content. Review the article against the references supplied by the author. Do not invent facts, references, doses, recommendations, statistics, or citations. Distinguish clearly between: supported by supplied reference, unsupported by supplied references, internally contradictory, medically safety-sensitive, and language/structure issues. Return ONLY valid JSON with keys: overall_score,readiness,language_issues,structure_issues,unsupported_claims,reference_gaps,contradictions,safety_flags,style_suggestions,recommended_actions. unsupported_claims and reference_gaps must be arrays of objects with claim, reason, and suggested_reference fields when available. Score evidence availability and editorial quality, not generic medical plausibility.\nARTICLE:\n${JSON.stringify({title_ar:article.title_ar,title_en:article.title_en,excerpt_ar:article.excerpt_ar,content_ar:String(article.content_ar||'').slice(0,30000),category:article.category})}\nAUTHOR REFERENCES:\n${JSON.stringify(references).slice(0,22000)}`;
     try{
-      const result=await Promise.race([env.AI.run(REVIEW_MODEL,{prompt,max_tokens:2600,temperature:0.1}),new Promise((_,rej)=>setTimeout(()=>rej(new Error('AI review timeout')),25000))]);
+      const result=await Promise.race([env.AI.run(REVIEW_MODEL,{prompt,max_tokens:3200,temperature:0.1}),new Promise((_,rej)=>setTimeout(()=>rej(new Error('AI review timeout')),25000))]);
       const text=String(result?.response||result?.result||result?.text||'').trim();if(!text)throw new Error('AI returned no result');
       return parseJson(text);
     }catch(error){return deterministicReview(article,references,`Workers AI unavailable: ${error?.message||'failed'}`);}
@@ -95,13 +95,13 @@ async function aiReview(env,article,references){
 
 function deterministicReview(article,references,reason){
   const content=String(article.content_ar||'').trim(),blocks=content.split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean),language=[],structure=[],gaps=[],safety=['المراجعة البشرية الطبية مطلوبة قبل النشر.'];
-  if(!references.length)gaps.push({claim:'المقال ككل',reason:'لا توجد مراجع قدمها الكاتب للمقارنة.'});
+  if(!references.length)gaps.push({claim:'المقال ككل',reason:'لا توجد مراجع منظمة قدمها الكاتب للمقارنة داخل سجل المراجع. إذا كانت المراجع موجودة داخل النص، أضفها أيضًا إلى حقل المراجع المعتمدة حتى يمكن فحصها.',suggested_reference:'أضف المصادر الأصلية وروابطها.'});
   if(blocks.length<3)structure.push('المقال يحتاج تقسيمًا أوضح إلى مقدمة وأقسام.');
   if(blocks.some(x=>x.length>900))structure.push('توجد فقرة طويلة يفضّل تقسيمها.');
   if(/\s{2,}/.test(content))language.push('توجد مسافات متكررة يمكن تنظيفها.');
   if(['جرعة','mg','ملغ','دواء','مضاد','حامل','الحمل','طفل','طوارئ','نزف','ضغط الدم'].some(t=>content.toLowerCase().includes(t.toLowerCase())))safety.push('يوجد محتوى طبي/دوائي حساس يحتاج تحققًا بشريًا من المراجع.');
   let score=55;if(references.length)score+=15;if(blocks.length>=3)score+=10;if(!language.length)score+=5;if(!structure.length)score+=5;
-  return {overall_score:Math.min(90,score),readiness:(!references.length||safety.length>1)?'needs_revision':'ready',language_issues:language,structure_issues:structure,unsupported_claims:[],reference_gaps:gaps,contradictions:[],safety_flags:[...safety,`ملاحظة تقنية: ${reason}`],style_suggestions:['استخدم عناوين فرعية واضحة وفقرات قصيرة ونقاط عند الحاجة.'],recommended_actions:references.length?['تحقق من الادعاءات الطبية المهمة مقابل المراجع المعتمدة.','راجع التقرير البشري النهائي قبل النشر.']:['أضف المراجع المعتمدة ثم أعد المراجعة.','راجع المحتوى طبيًا قبل النشر.']};
+  return {overall_score:Math.min(90,score),readiness:(!references.length||safety.length>1)?'needs_revision':'ready',language_issues:language,structure_issues:structure,unsupported_claims:[],reference_gaps:gaps,contradictions:[],safety_flags:[...safety,`ملاحظة تقنية: ${reason}`],style_suggestions:['استخدم عناوين فرعية واضحة وفقرات قصيرة ونقاط عند الحاجة.'],recommended_actions:references.length?['تحقق من الادعاءات الطبية المهمة مقابل المراجع المعتمدة.','راجع التقرير البشري النهائي قبل النشر.']:['أضف المراجع المعتمدة إلى سجل المراجع ثم أعد المراجعة.','راجع المحتوى طبيًا قبل النشر.']};
 }
 
 function parseJson(text){const s=String(text).replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();try{return JSON.parse(s);}catch{}const a=s.indexOf('{'),b=s.lastIndexOf('}');if(a>=0&&b>a)return JSON.parse(s.slice(a,b+1));throw new Error('نتيجة المراجعة ليست JSON صالحاً.');}
