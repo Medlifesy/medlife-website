@@ -1,0 +1,11 @@
+name = "medlife-website"
+pages_build_output_dir = "."
+compatibility_date = "2026-08-25"
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "medlife-articles"
+database_id = "036972c6-162c-47d9-9fea-d011cb451da7"
