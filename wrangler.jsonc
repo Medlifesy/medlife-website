@@ -18,6 +18,12 @@
       "database_id": "036972c6-162c-47d9-9fea-d011cb451da7"
     }
   ],
+  "services": [
+    {
+      "binding": "TEAM_API",
+      "service": "medlife-team-api"
+    }
+  ],
   "vars": {
     "TEAM_RECOVERY_API_URL": "https://medlife-team-api.broad-frog-3978.workers.dev"
   }
