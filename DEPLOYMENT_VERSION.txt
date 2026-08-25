@@ -4,4 +4,5 @@ Official editor path: /admin/editorial-studio.html
 
 Build source: main
 
-Release: 2026-08-25T21:01:00Z
+Release: 2026-08-26T00:15:00Z
+Legacy article submission routes now redirect to V4.
