@@ -76,9 +76,44 @@ async function saveRevision(db,articleId,user,body){
 async function runEditorialReview(env,articleId){
   const article=await env.DB.prepare(`SELECT id,title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,category,image_url,status FROM articles WHERE id=? LIMIT 1`).bind(articleId).first();
   if(!article)return json({success:false,error:'المقال غير موجود.'},404);
-  const refs=await env.DB.prepare(`SELECT title,organization,reference_type,year,url,doi,citation_text,verified_status FROM article_references WHERE article_id=? ORDER BY year DESC,id ASC`).bind(articleId).all();
-  const references=refs.results||[];
+  const stored=await env.DB.prepare(`SELECT title,organization,reference_type,year,url,doi,citation_text,verified_status FROM article_references WHERE article_id=? ORDER BY year DESC,id ASC`).bind(articleId).all();
+  let references=stored.results||[];
+  if(!references.length){
+    const embedded=extractEmbeddedReferences(article.content_ar||'');
+    if(embedded.length){
+      await replaceReferenceRecords(env.DB,articleId,embedded);
+      references=embedded;
+    }
+  }
   return json({success:true,article_id:articleId,review:await aiReview(env,article,references),references});
+}
+
+async function replaceReferenceRecords(db,articleId,refs){
+  for(const item of refs){
+    const title=clean(item.title,500);if(!title)continue;
+    await db.prepare(`INSERT INTO article_references(article_id,title,organization,reference_type,year,url,doi,citation_text,is_primary,verified_status,verification_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`)
+      .bind(articleId,title,clean(item.organization,300),'',Number.isInteger(Number(item.year))?Number(item.year):null,clean(item.url,2000),'',clean(item.citation_text,2000),0,'unverified','Imported automatically from article text').run();
+  }
+}
+
+function extractEmbeddedReferences(content){
+  const raw=String(content||'').replace(/\r/g,'');
+  const marker=raw.match(/(?:^|\n)\s*(المصادر العلمية|المصادر والمراجع|المراجع العلمية|المراجع)\s*\n/i);
+  if(!marker)return [];
+  const section=raw.slice((marker.index||0)+marker[0].length);
+  const lines=section.split(/\n+/).map(x=>x.trim()).filter(Boolean).filter(x=>!/^✍/.test(x));
+  const refs=[];
+  for(const line of lines){
+    const cleanLine=line.replace(/^\s*(?:\d+|[٠-٩]+)\s*[.)-]?\s*/,'').trim();
+    if(!cleanLine)continue;
+    const urls=cleanLine.match(/https?:\/\/[^\s\]]+/g)||[];
+    const url=urls[0]||'';
+    const title=cleanLine.replace(/https?:\/\/[^\s\]]+/g,'').replace(/[\[\]]/g,'').replace(/\s{2,}/g,' ').trim()||url;
+    const org=/WHO|منظمة الصحة|NICE|ACOG|RCOG|CDC|UNFPA|صندوق الأمم المتحدة|وزارة الصحة|PMC|PubMed/i.test(title)?title.match(/WHO|منظمة الصحة العالمية|NICE|ACOG|RCOG|CDC|UNFPA|صندوق الأمم المتحدة للسكان|وزارة الصحة[^|,]*/i)?.[0]||'':' ';
+    refs.push({title,organization:org.trim(),url,citation_text:cleanLine,year:(cleanLine.match(/\b20\d{2}\b/)||[])[0]||null});
+    if(refs.length>=30)break;
+  }
+  return refs;
 }
 
 async function aiReview(env,article,references){
@@ -95,7 +130,7 @@ async function aiReview(env,article,references){
 
 function deterministicReview(article,references,reason){
   const content=String(article.content_ar||'').trim(),blocks=content.split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean),language=[],structure=[],gaps=[],safety=['المراجعة البشرية الطبية مطلوبة قبل النشر.'];
-  if(!references.length)gaps.push({claim:'المقال ككل',reason:'لا توجد مراجع منظمة قدمها الكاتب للمقارنة داخل سجل المراجع. إذا كانت المراجع موجودة داخل النص، أضفها أيضًا إلى حقل المراجع المعتمدة حتى يمكن فحصها.',suggested_reference:'أضف المصادر الأصلية وروابطها.'});
+  if(!references.length)gaps.push({claim:'المقال ككل',reason:'لم يتم العثور على مراجع منظمة أو مراجع قابلة للاستخراج من النص.',suggested_reference:'أضف المصادر الأصلية وروابطها.'});
   if(blocks.length<3)structure.push('المقال يحتاج تقسيمًا أوضح إلى مقدمة وأقسام.');
   if(blocks.some(x=>x.length>900))structure.push('توجد فقرة طويلة يفضّل تقسيمها.');
   if(/\s{2,}/.test(content))language.push('توجد مسافات متكررة يمكن تنظيفها.');
