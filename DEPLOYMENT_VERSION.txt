@@ -1,4 +1,7 @@
-MedLife production deployment trigger
-Commit: 2026-08-25 01:50 Europe/Amsterdam
-Release: free-medlife-ai-editor-and-article-preview
-Purpose: deploy the free-first MedLife article formatter, Cloudflare AI binding, article preview, add-article flow, content-linked visual tools, and robust AI fallbacks.
+MedLife Editorial Studio Pro deployment trigger
+
+Official editor path: /admin/editorial-studio.html
+
+Build source: main
+
+Release: 2026-08-25T21:01:00Z
