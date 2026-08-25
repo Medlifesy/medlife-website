@@ -20,5 +20,11 @@
       "database_name": "medlife-team-db",
       "database_id": "f7f8674c-50ca-4efe-9a1e-690de2413e77"
     }
+  ],
+  "services": [
+    {
+      "binding": "TEAM_API",
+      "service": "medlife-team-api"
+    }
   ]
 }
