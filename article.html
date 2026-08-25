@@ -11,14 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<style>
-:root{--red:#FF2A54;--navy:#151D36;--white:#fff;--light:#F7F9FC;--text:#1E293B;--muted:#64748B;--border:#E2E8F0;--shadow:0 18px 45px rgba(21,29,54,.10)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--light);color:var(--text);font-family:Cairo,Arial,sans-serif;line-height:1.9}a{color:inherit;text-decoration:none}.container{width:min(1120px,calc(100% - 32px));margin:auto}
-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(21,29,54,.08)}.nav{min-height:78px;display:flex;align-items:center;justify-content:space-between}.logo{height:52px}.back{color:var(--red);font-weight:900}
-.hero{padding:72px 0 55px;text-align:center;background:radial-gradient(circle at 90% 10%,rgba(255,42,84,.11),transparent 30%),linear-gradient(135deg,#fff,#F7F9FC)}.tag{color:var(--red);font-weight:900;font-size:13px}.hero h1{font-size:clamp(32px,5vw,54px);line-height:1.35;color:var(--navy);margin:12px 0 18px}.excerpt{max-width:850px;margin:auto;color:var(--muted);font-size:16px}.meta{margin-top:20px;color:#7C8A99;font-size:12px}.hero-image{display:block;width:min(100%,950px);max-height:430px;object-fit:cover;border-radius:22px;margin:28px auto 0;border:1px solid var(--border);box-shadow:var(--shadow)}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:22px;margin:38px auto 80px;align-items:start}.article{background:#fff;border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow);padding:clamp(24px,5vw,68px)}.intro{background:#EEF4FF;border:1px solid #D8E4FF;border-radius:18px;padding:20px;margin-bottom:28px}.article h2{color:var(--navy);font-size:28px;margin:42px 0 18px;padding-right:14px;border-right:4px solid var(--red);scroll-margin-top:95px}.article h3{color:var(--navy);font-size:21px;margin:30px 0 12px}.article p{font-size:16px;line-height:2.15;margin:0 0 20px}.article ul,.article ol{padding-right:28px;margin:10px 0 25px}.article li{margin-bottom:9px}.warning{background:#FFF6F7;border:1px solid #FFD6DE;border-radius:16px;padding:18px 20px;margin:22px 0}.good{background:#ECFDF5;border:1px solid #BFE9D6;border-radius:16px;padding:18px 20px;margin:22px 0}.toc{position:sticky;top:96px;background:#fff;border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 10px 28px rgba(21,29,54,.06)}.toc strong{display:block;color:var(--navy);margin-bottom:8px}.toc a{display:block;padding:7px 8px;color:var(--muted);font-size:12px;border-radius:9px}.toc a:hover{background:#FFF4F6;color:var(--red)}.refs{border-top:1px solid var(--border);margin-top:40px;padding-top:28px}.refs a{color:#2563EB;word-break:break-word}.state{text-align:center;padding:80px 20px;color:var(--muted)}.state i{font-size:38px;color:var(--red);margin-bottom:12px}footer{background:#0D1222;color:#fff;text-align:center;padding:34px 20px;font-size:12px}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.toc{position:static;order:-1}}@media(max-width:600px){.article p{font-size:15.5px}.article h2{font-size:24px}.logo{height:46px}}
-</style>
+<link rel="stylesheet" href="article-reading.css">
 </head>
 <body>
 <header><div class="container nav"><a class="back" href="articles.html"><i class="fa-solid fa-arrow-right"></i> العودة إلى المقالات</a><a href="index.html"><img class="logo" src="logo.PNG" alt="MedLife Syria"></a></div></header>
@@ -27,29 +20,55 @@ header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdr
 <footer>MedLife Syria — مؤسسة ميدلايف الطبية الخيرية التطوعية<br>We save life, we are med.life</footer>
 <script>
 (function(){
+'use strict';
 const id=new URLSearchParams(location.search).get('id');
-const $=id=>document.getElementById(id);
+const $=x=>document.getElementById(x);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const safeUrl=v=>{try{const u=new URL(String(v||''),location.origin);return ['http:','https:'].includes(u.protocol)?u.href:''}catch{return ''}};
 const date=v=>{if(!v)return '';const d=new Date(v);return Number.isNaN(d.getTime())?'':d.toLocaleDateString('ar-SY',{year:'numeric',month:'long',day:'numeric'});};
-function refs(text){const m=String(text||'').match(/(?:^|\n)\s*(?:المصادر والمراجع|المصادر العلمية|المراجع العلمية|المراجع)\s*\n([\s\S]*)$/i);if(!m)return {main:text,items:[]};const items=m[1].split(/\n(?=\s*\d+[.)])/).map(x=>x.trim()).filter(Boolean);return {main:String(text).slice(0,m.index).trim(),items};}
-function inline(v){return esc(v).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');}
-function render(raw){const parsed=refs(raw);const lines=parsed.main.replace(/\r/g,'').split('\n');let html='',heads=[],i=0,inUl=false,inOl=false;const close=()=>{if(inUl){html+='</ul>';inUl=false}if(inOl){html+='</ol>';inOl=false}};for(const rawLine of lines){const line=rawLine.trim();if(!line){close();continue}let m=line.match(/^#{1,4}\s*(.+)$/)||line.match(/^(\d{1,2}|[٠-٩]{1,2})[.)ـ:-]\s*(.+)$/);if(m){close();const title=m[2]||m[1];const hid='sec-'+i++;heads.push({id:hid,title});html+='<h2 id="'+hid+'">'+inline(title)+'</h2>';continue}m=line.match(/^[-*•]\s+(.+)$/);if(m){if(inOl){html+='</ol>';inOl=false}if(!inUl){html+='<ul>';inUl=true}html+='<li>'+inline(m[1])+'</li>';continue}m=line.match(/^\d+[.)]\s+(.+)$/);if(m){if(inUl){html+='</ul>';inUl=false}if(!inOl){html+='<ol>';inOl=true}html+='<li>'+inline(m[1])+'</li>';continue}close();if(/علامات الخطر|تحذير طبي|تستدعي تقييماً طبياً عاجلاً|الحالات التي يمنع/.test(line))html+='<div class="warning"><p>'+inline(line)+'</p></div>';else if(/كلمة ميدلايف|الخلاصة|نصيحة ميدلايف/.test(line))html+='<div class="good"><p>'+inline(line)+'</p></div>';else html+='<p>'+inline(line)+'</p>';}close();let toc=heads.length?heads.map((h,n)=>'<a href="#'+h.id+'">'+String(n+1).padStart(2,'0')+' · '+esc(h.title)+'</a>').join(''):'<span style="font-size:12px;color:#64748b">لا توجد أقسام معنونة.</span>';let refHtml='';if(parsed.items.length){refHtml='<h2>📚 المصادر والمراجع</h2><ol>'+parsed.items.map(x=>'<li>'+inline(x)+'</li>').join('')+'</ol>';}$('refs').innerHTML=refHtml;if(refHtml)$('refs').style.display='block';return {html,toc};}
+const inline=v=>esc(v).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+function splitRefs(text){const m=String(text||'').match(/(?:^|\n)\s*(?:المصادر والمراجع|المصادر العلمية|المراجع العلمية|المراجع)\s*\n([\s\S]*)$/i);if(!m)return {main:String(text||''),items:[]};return {main:String(text).slice(0,m.index).trim(),items:m[1].split(/\n(?=\s*\d+[.)])/).map(x=>x.trim()).filter(Boolean)};}
+function render(raw){
+ const p=splitRefs(raw),lines=p.main.replace(/\r/g,'').split('\n');let html='',heads=[],n=0,inUl=false,inOl=false;
+ const close=()=>{if(inUl){html+='</ul>';inUl=false}if(inOl){html+='</ol>';inOl=false}};
+ for(const rawLine of lines){
+  const line=rawLine.trim();if(!line){close();continue;}
+  let m=line.match(/^#{1,4}\s*(.+)$/)||line.match(/^(\d{1,2}|[٠-٩]{1,2})[.)ـ:-]\s*(.+)$/);
+  if(m){close();const title=m[2]||m[1],hid='sec-'+n++;heads.push({id:hid,title});html+='<h2 id="'+hid+'">'+inline(title)+'</h2>';continue;}
+  m=line.match(/^[-*•]\s+(.+)$/);if(m){if(inOl){html+='</ol>';inOl=false}if(!inUl){html+='<ul>';inUl=true}html+='<li>'+inline(m[1])+'</li>';continue;}
+  m=line.match(/^\d+[.)]\s+(.+)$/);if(m){if(inUl){html+='</ul>';inUl=false}if(!inOl){html+='<ol>';inOl=true}html+='<li>'+inline(m[1])+'</li>';continue;}
+  close();
+  const warning=/علامات الخطر|تحذير طبي|تستدعي تقييماً طبياً عاجلاً|الحالات التي يمنع/.test(line);
+  const good=/كلمة ميدلايف|الخلاصة|نصيحة ميدلايف/.test(line);
+  if(warning) html+='<div class="warning"><p>'+inline(line)+'</p></div>';
+  else if(good) html+='<div class="good"><p>'+inline(line)+'</p></div>';
+  else html+='<p>'+inline(line)+'</p>';
+ }
+ close();
+ const toc=heads.length?heads.map((h,i)=>'<a href="#'+h.id+'">'+String(i+1).padStart(2,'0')+' · '+esc(h.title)+'</a>').join(''):'<span style="font-size:12px;color:#667085">لا توجد أقسام معنونة.</span>';
+ const refs=p.items.length?'<h2>📚 المصادر والمراجع</h2><ol>'+p.items.map(x=>'<li>'+inline(x)+'</li>').join('')+'</ol>':'';
+ return {html,toc,refs};
+}
 async function load(){
  if(!id){location.replace('articles/tension-headache.html');return;}
  try{
-   const r=await fetch('/api/article-public?id='+encodeURIComponent(id),{headers:{Accept:'application/json'},cache:'no-store'});
-   const data=await r.json();
-   if(!r.ok||!data.success||!data.article)throw new Error(data.error||'تعذر تحميل المقال');
-   const a=data.article;const title=a.title_ar||a.title_en||'مقال MedLife';
-   document.title=title+' | MedLife Syria';
-   document.querySelector('meta[name="description"]').setAttribute('content',(a.excerpt_ar||a.excerpt_en||'').slice(0,160));
-   const img=safeUrl(a.image_url);
-   $('hero').innerHTML='<div class="tag">♥ MedLife Knowledge</div><h1>'+esc(title)+'</h1><p class="excerpt">'+esc(a.excerpt_ar||a.excerpt_en||'')+'</p><div class="meta"><i class="fa-solid fa-user"></i> '+esc(a.author_name||'MedLife')+' &nbsp; • &nbsp; '+esc(date(a.published_at||a.created_at))+' &nbsp; • &nbsp; '+esc(a.category||'Medical Knowledge')+'</div>'+(img?'<img class="hero-image" src="'+esc(img)+'" alt="'+esc(title)+'">':'');
-   const out=render(a.content_ar||a.content_en||'');$('body').innerHTML=(a.excerpt_ar?'<div class="intro"><strong>مقدمة</strong><br>'+esc(a.excerpt_ar)+'</div>':'')+out.html+'<div class="meta" style="margin-top:35px">ID: '+esc(a.id)+' · '+esc(a.category||'Medical Knowledge')+'</div>';
-   $('tocLinks').innerHTML=out.toc;$('loading').style.display='none';$('layout').style.display='grid';
- }catch(e){$('loading').style.display='none';$('error').style.display='block';$('error').innerHTML='<i class="fa-solid fa-circle-exclamation"></i><h2 style="color:#151D36">تعذر تحميل المقال</h2><p>'+esc(e.message||'حدث خطأ أثناء جلب المقال.')+'</p><p><a class="back" href="articles.html">العودة إلى المقالات</a></p>';}}
-load();})();
+  const r=await fetch('/api/article-public?id='+encodeURIComponent(id),{headers:{Accept:'application/json'},cache:'no-store'});
+  const data=await r.json();
+  if(!r.ok||!data.success||!data.article)throw new Error(data.error||'تعذر تحميل المقال');
+  const a=data.article,title=a.title_ar||a.title_en||'مقال MedLife',excerpt=a.excerpt_ar||a.excerpt_en||'';
+  document.title=title+' | MedLife Syria';
+  document.querySelector('meta[name="description"]').setAttribute('content',excerpt.slice(0,160));
+  const img=safeUrl(a.image_url);
+  $('hero').innerHTML='<div class="tag">♥ MedLife Knowledge</div><h1>'+esc(title)+'</h1><p class="excerpt">'+esc(excerpt)+'</p><div class="meta"><i class="fa-solid fa-user"></i> '+esc(a.author_name||'MedLife')+' &nbsp; • &nbsp; '+esc(date(a.published_at||a.created_at))+' &nbsp; • &nbsp; '+esc(a.category||'Medical Knowledge')+'</div>'+(img?'<img class="hero-image" src="'+esc(img)+'" alt="'+esc(title)+'">':'');
+  const out=render(a.content_ar||a.content_en||'');
+  $('body').innerHTML=(excerpt?'<div class="intro"><strong>مقدمة</strong><br>'+esc(excerpt)+'</div>':'')+out.html+'<div class="meta" style="margin-top:35px">'+esc(a.category||'Medical Knowledge')+'</div>';
+  if(out.refs){$('refs').innerHTML=out.refs;$('refs').style.display='block';}
+  $('tocLinks').innerHTML=out.toc;
+  $('loading').style.display='none';$('layout').style.display='grid';
+ }catch(e){$('loading').style.display='none';$('error').style.display='block';$('error').innerHTML='<i class="fa-solid fa-circle-exclamation"></i><h2 style="color:#18223b">تعذر تحميل المقال</h2><p>'+esc(e.message||'حدث خطأ أثناء جلب المقال.')+'</p><p><a class="back" href="articles.html">العودة إلى المقالات</a></p>';}
+}
+load();
+})();
 </script>
 </body>
 </html>
