@@ -25,7 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
             status: "published",
             created_at: "2026-08-14T00:00:00",
             url: "articles/tension-headache.html",
-            icon: "fa-head-side-virus"
+            icon: "fa-head-side-virus",
+            source: "static"
         },
         {
             id: "endometriosis-endotest-endosure",
@@ -38,7 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
             status: "published",
             created_at: "2026-08-14T00:00:00",
             url: "articles/endometriosis-endotest-endosure.html",
-            icon: "fa-microscope"
+            icon: "fa-microscope",
+            source: "static"
         }
     ];
 
@@ -47,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function addSubmissionCTA() {
         const hero = document.querySelector(".hero-content");
-        const area = document.querySelector(".articles-area");
         if (!hero || document.getElementById("submitArticleCTA")) return;
         const wrapper = document.createElement("div");
         wrapper.id = "submitArticleCTA";
@@ -64,10 +65,26 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadArticles() {
         showLoading();
         try {
-            const response = await fetch("/api/articles", {method:"GET",headers:{Accept:"application/json"},cache:"no-store"});
+            const response = await fetch("/api/articles", {
+                method: "GET",
+                headers: {Accept: "application/json"},
+                cache: "no-store"
+            });
             const data = await response.json();
             if (!response.ok || !data.success) throw new Error(data.error || "Unable to load articles.");
-            const remoteArticles = Array.isArray(data.articles) ? data.articles.filter(article => String(article.status || "").toLowerCase() === "published") : [];
+
+            const remoteArticles = Array.isArray(data.articles)
+                ? data.articles
+                    .filter(article => String(article.status || "").toLowerCase() === "published")
+                    .map(article => ({
+                        ...article,
+                        source: "api",
+                        // Database-backed articles ALWAYS use their own numeric ID.
+                        // Never inherit a stale/static URL from older article records.
+                        url: `article.html?id=${encodeURIComponent(article.id)}`
+                    }))
+                : [];
+
             const remoteIds = new Set(remoteArticles.map(article => String(article.id)));
             const staticsToAdd = staticArticles.filter(article => !remoteIds.has(String(article.id)));
             articles = [...staticsToAdd, ...remoteArticles];
@@ -105,9 +122,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const author = escapeHTML(article.author_name || "MedLife");
         const date = formatDate(article.created_at);
         const image = article.image_url ? escapeAttribute(article.image_url) : "";
-        const url = article.url || `article.html?id=${encodeURIComponent(article.id)}`;
+
+        // Static legacy articles keep their handcrafted URL.
+        // API/database articles are always routed by ID.
+        const url = article.source === "api"
+            ? `article.html?id=${encodeURIComponent(article.id)}`
+            : (article.url || `article.html?id=${encodeURIComponent(article.id)}`);
+
         const icon = escapeAttribute(article.icon || "fa-book-medical");
-        const imageHTML = image ? `<img src="${image}" alt="${title}" loading="lazy">` : `<div class="article-placeholder"><i class="fa-solid ${icon}"></i></div>`;
+        const imageHTML = image
+            ? `<img src="${image}" alt="${title}" loading="lazy">`
+            : `<div class="article-placeholder"><i class="fa-solid ${icon}"></i></div>`;
+
         return `<article class="public-article-card"><a href="${url}" class="article-image">${imageHTML}</a><div class="public-article-content"><div class="public-article-category">${category}</div><h3><a href="${url}">${title}</a></h3><p>${excerpt}</p><div class="public-article-meta"><span><i class="fa-solid fa-user"></i>${author}</span><span><i class="fa-regular fa-calendar"></i>${date}</span></div><a href="${url}" class="public-article-link">اقرأ المقال <i class="fa-solid fa-arrow-left"></i></a></div></article>`;
     }
 
@@ -119,9 +145,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (searchInput) searchInput.addEventListener("input", renderArticles);
     if (categoryFilter) categoryFilter.addEventListener("change", renderArticles);
-    function showLoading(){if(articlesLoading)articlesLoading.style.display="flex";if(articlesEmpty)articlesEmpty.style.display="none";if(articlesError)articlesError.style.display="none"}
-    function hideLoading(){if(articlesLoading)articlesLoading.style.display="none"}
-    function formatDate(value){if(!value)return"";const date=new Date(value);if(Number.isNaN(date.getTime()))return"";return date.toLocaleDateString("ar-SY",{year:"numeric",month:"long",day:"numeric"})}
-    function escapeHTML(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;")}
-    function escapeAttribute(value){return String(value??"").replace(/&/g,"&amp;").replace(/\"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+    function showLoading() {
+        if (articlesLoading) articlesLoading.style.display = "flex";
+        if (articlesEmpty) articlesEmpty.style.display = "none";
+        if (articlesError) articlesError.style.display = "none";
+    }
+
+    function hideLoading() {
+        if (articlesLoading) articlesLoading.style.display = "none";
+    }
+
+    function formatDate(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        return date.toLocaleDateString("ar-SY", {year: "numeric", month: "long", day: "numeric"});
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function escapeAttribute(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/\"/g, "&quot;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
 });
