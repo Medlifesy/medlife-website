@@ -28,6 +28,24 @@ function setupImageUpload(){
 }
 setupImageUpload();
 
+// Add a reliable download control for images already inserted in the editor.
+// It uses the Pages Function proxy so the browser receives Content-Disposition: attachment
+// even when the original image is hosted on raw.githubusercontent.com.
+function setupImageDownloads(){
+  const editor=$('editor');if(!editor||editor.dataset.medlifeDownloadControls==='1')return;
+  editor.dataset.medlifeDownloadControls='1';
+  const enhance=()=>editor.querySelectorAll('figure.article-image img').forEach(img=>{
+    const figure=img.closest('figure');if(!figure||figure.querySelector('.article-image-download'))return;
+    const wrap=figure.ownerDocument.createElement('div');wrap.style.cssText='display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px';
+    const btn=figure.ownerDocument.createElement('button');btn.type='button';btn.className='tool article-image-download';btn.textContent='⬇️ تحميل الصورة';btn.title='تحميل الصورة إلى جهازك';
+    btn.onclick=async()=>{try{btn.disabled=true;btn.textContent='⏳ جاري التحميل…';const src=img.getAttribute('src')||'';const r=await fetch('/api/article-image-download?url='+encodeURIComponent(src),{credentials:'include'});if(!r.ok)throw Error('تعذر تحميل الصورة.');const blob=await r.blob();const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=(img.alt||'medlife-article-image').replace(/[^\p{L}\p{N}_-]+/gu,'-').slice(0,80)+'.'+((blob.type.split('/')[1]||'jpg').replace('jpeg','jpg'));document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)}catch(e){alert(e.message||'تعذر تحميل الصورة.')}finally{btn.disabled=false;btn.textContent='⬇️ تحميل الصورة'}};
+    wrap.appendChild(btn);figure.appendChild(wrap);
+  });
+  enhance();
+  new MutationObserver(enhance).observe(editor,{subtree:true,childList:true});
+}
+setupImageDownloads();
+
 function addRef(){const r=document.createElement('div');r.className='ref';r.innerHTML='<input class="r-title" placeholder="عنوان المرجع"><input class="r-org" placeholder="الجهة / المجلة"><input class="r-year" type="number" placeholder="السنة"><input class="r-url" placeholder="الرابط أو DOI"><button type="button" class="btn">حذف</button>';r.querySelector('button').onclick=()=>r.remove();$('refs').appendChild(r)}
 function refs(){return [...document.querySelectorAll('.ref')].map(r=>({title:r.querySelector('.r-title').value.trim(),organization:r.querySelector('.r-org').value.trim(),year:r.querySelector('.r-year').value.trim(),url:r.querySelector('.r-url').value.trim()})).filter(x=>x.title)}addRef();$('addRef').onclick=addRef;
 function brief(){return {article_type:$('article_type').value,intended_audience:$('audience').value,goal:$('goal').value,suggested_sections:$('sections').value,key_questions:$('questions').value,desired_tone:$('tone').value,visual_preferences:$('presentation').value,source_types:[...document.querySelectorAll('.source input:checked')].map(x=>x.value),required_sources:$('required_sources').value,medical_safety:$('medical_safety').value,safety_focus:$('safety_focus').value,notes:$('notes').value}}
