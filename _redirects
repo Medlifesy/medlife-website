@@ -12,10 +12,12 @@
 /submit-article-final/ /submit-article-v6 301
 /submit-article-v5 /submit-article-v6 301
 /submit-article-v5.html /submit-article-v6 301
-/articles/tension-headache /articles/tension-headache.html 200
-/articles/tension-headache/ /articles/tension-headache.html 200
 /articles/tension-headache.html /articles/tension-headache.html 200
-/articles/endometriosis-endotest-endosure /articles/endometriosis-endotest-endosure.html 200
-/articles/endometriosis-endotest-endosure/ /articles/endometriosis-endotest-endosure.html 200
 /articles/endometriosis-endotest-endosure.html /articles/endometriosis-endotest-endosure.html 200
-/articles/* /article-reader-v5.html?slug=:splat 200
+/articles/tension-headache /article-reader-unified.html?slug=tension-headache 200
+/articles/tension-headache/ /article-reader-unified.html?slug=tension-headache 200
+/articles/endometriosis-endotest-endosure /article-reader-unified.html?slug=endometriosis-endotest-endosure 200
+/articles/endometriosis-endotest-endosure/ /article-reader-unified.html?slug=endometriosis-endotest-endosure 200
+/articles/family-planning /article-reader-unified.html?slug=family-planning 200
+/articles/family-planning/ /article-reader-unified.html?slug=family-planning 200
+/articles/* /article-reader-unified.html?slug=:splat 200
