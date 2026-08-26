@@ -1,0 +1,5 @@
+/articles.html
+  Cache-Control: no-store
+
+/js/articles.js
+  Cache-Control: no-store
