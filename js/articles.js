@@ -12,9 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addSubmissionCTA();
 
-    // Public article URLs must always use /articles/<slug>.
-    // Cloudflare Pages _redirects internally rewrites these URLs to the v5 reader
-    // while preserving the slug as ?slug=<slug>.
+    // Keep the established routes that were already working before the merge.
     const staticArticles = [
         {
             id: "tension-headache",
@@ -54,9 +52,10 @@ document.addEventListener("DOMContentLoaded", () => {
             image_url: "/images/family-planning-cover.jpg",
             status: "published",
             created_at: "2026-08-14T00:00:00",
-            url: "/articles/family-planning",
+            // Legacy route used by this article before the reader-v5 merge.
+            url: "/article-reader-v3?id=3",
             icon: "fa-people-roof",
-            source: "static"
+            source: "legacy"
         }
     ];
 
@@ -93,8 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
             .slice(0, 90);
     }
 
-    // IMPORTANT: this returns the PUBLIC URL only.
-    // Never link cards directly to /article-reader-v5.html.
     function buildDynamicArticleUrl(article) {
         const slug = slugify(article.title_ar || article.title_en || article.id);
         return `/articles/${encodeURIComponent(slug)}`;
@@ -174,10 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const date = formatDate(article.created_at);
         const image = article.image_url ? escapeAttribute(article.image_url) : "";
 
-        // ALL article cards use their public /articles/<slug> URL.
+        // Explicit static/legacy routes are preserved; dynamic articles use public slug URLs.
         const url = article.source === "api"
             ? buildDynamicArticleUrl(article)
-            : (article.url || `/articles/${encodeURIComponent(slugify(article.title_ar || article.title_en))}`);
+            : (article.url || buildDynamicArticleUrl(article));
 
         const icon = escapeAttribute(article.icon || "fa-book-medical");
         const imageHTML = image
