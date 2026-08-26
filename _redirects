@@ -1,5 +1,3 @@
-/submit-article-v6 /submit-article-v6.html 200
-/submit-article-v6/ /submit-article-v6.html 200
 /submit-article-v4 /submit-article-v6 301
 /submit-article-v4/ /submit-article-v6 301
 /submit-article-v4.html /submit-article-v6 301
@@ -11,6 +9,7 @@
 /submit-article-v3.html /submit-article-v6 301
 /submit-article-final /submit-article-v6 301
 /submit-article-final.html /submit-article-v6 301
+/submit-article-final/ /submit-article-v6 301
 /submit-article-v5 /submit-article-v6 301
 /submit-article-v5.html /submit-article-v6 301
 /articles/tension-headache /articles/tension-headache.html 200
