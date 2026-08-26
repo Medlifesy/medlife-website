@@ -12,7 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addSubmissionCTA();
 
-    // These two articles already have dedicated static HTML pages.
+    // Public article URLs must always use /articles/<slug>.
+    // Cloudflare Pages _redirects internally rewrites these URLs to the v5 reader
+    // while preserving the slug as ?slug=<slug>.
     const staticArticles = [
         {
             id: "tension-headache",
@@ -24,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
             image_url: "",
             status: "published",
             created_at: "2026-08-14T00:00:00",
-            url: "/articles/tension-headache.html",
+            url: "/articles/tension-headache",
             icon: "fa-head-side-virus",
             source: "static"
         },
@@ -38,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
             image_url: "",
             status: "published",
             created_at: "2026-08-14T00:00:00",
-            url: "/articles/endometriosis-endotest-endosure.html",
+            url: "/articles/endometriosis-endotest-endosure",
             icon: "fa-microscope",
             source: "static"
         }
@@ -77,12 +79,11 @@ document.addEventListener("DOMContentLoaded", () => {
             .slice(0, 90);
     }
 
-    // Dynamic/database articles use the standalone reader directly.
-    // This avoids relying on Cloudflare Pages wildcard rewrites and guarantees
-    // that clicking a card actually navigates to a unique article URL.
+    // IMPORTANT: this returns the PUBLIC URL only.
+    // Never link cards directly to /article-reader-v5.html.
     function buildDynamicArticleUrl(article) {
         const slug = slugify(article.title_ar || article.title_en || article.id);
-        return `/article-reader-v5.html?slug=${encodeURIComponent(slug)}`;
+        return `/articles/${encodeURIComponent(slug)}`;
     }
 
     async function loadArticles() {
@@ -159,11 +160,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const date = formatDate(article.created_at);
         const image = article.image_url ? escapeAttribute(article.image_url) : "";
 
-        // Static articles -> their actual dedicated HTML page.
-        // API articles -> dedicated reader URL with this article's unique slug.
+        // ALL article cards use their public /articles/<slug> URL.
         const url = article.source === "api"
             ? buildDynamicArticleUrl(article)
-            : (article.url || `/articles/${slugify(article.title_ar || article.title_en)}.html`);
+            : (article.url || `/articles/${encodeURIComponent(slugify(article.title_ar || article.title_en))}`);
 
         const icon = escapeAttribute(article.icon || "fa-book-medical");
         const imageHTML = image
