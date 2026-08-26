@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addSubmissionCTA();
 
+    // Keep the three established public article entries stable.
     const staticArticles = [
         {
             id: "tension-headache",
@@ -86,11 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .slice(0, 90);
     }
 
-    // Use the extensionless reader route. Cloudflare Pages can normalize .html
-    // URLs and drop the query string; the extensionless route keeps ?slug intact.
     function buildDynamicArticleUrl(article) {
         const slug = slugify(article.title_ar || article.title_en || article.id);
-        return `/article-reader-v5?slug=${encodeURIComponent(slug)}`;
+        return `/articles/${encodeURIComponent(slug)}`;
     }
 
     async function loadArticles() {
@@ -115,16 +114,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     }))
                 : [];
 
-            const protectedSlugs = new Set([
-                "tension-headache",
-                "endometriosis-endotest-endosure",
-                "family-planning"
+            // The legacy family-planning article is already represented above by id=3.
+            // Do not render the same submitted record twice in the public list.
+            const protectedIds = new Set(["3"]);
+            const protectedTitles = new Set([
+                "صداع التوتر: رحلتك نحو الراحة",
+                "الاختبارات التشخيصية الحديثة وغير الباضعة للانتباذ البطاني الرحمي",
+                "وسائل تنظيم الأسرة: التخطيط الواعي لحياة أسرية متوازنة"
             ]);
 
-            articles = [
-                ...staticArticles,
-                ...remoteArticles.filter(article => !protectedSlugs.has(slugify(article.title_ar || article.title_en || article.id)))
-            ];
+            const additionalRemote = remoteArticles.filter(article => {
+                if (protectedIds.has(String(article.id))) return false;
+                const title = String(article.title_ar || article.title_en || "").trim();
+                return !protectedTitles.has(title);
+            });
+
+            articles = [...staticArticles, ...additionalRemote];
             populateCategories();
             renderArticles();
         } catch (error) {
