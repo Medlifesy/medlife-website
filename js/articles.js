@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.getElementById("articleSearch");
     const categoryFilter = document.getElementById("categoryFilter");
 
-    addSubmissionCTA();
+    let articles = [];
 
     const staticArticles = [
         {
@@ -57,39 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     ];
 
-    let articles = [];
     loadArticles();
-
-    function addSubmissionCTA() {
-        const hero = document.querySelector(".hero-content");
-        if (!hero || document.getElementById("submitArticleCTA")) return;
-        const wrapper = document.createElement("div");
-        wrapper.id = "submitArticleCTA";
-        wrapper.style.cssText = "display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px";
-        wrapper.innerHTML = `<a href="submit-article-v2.html" style="display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:13px;background:#FF2A54;color:#fff;font-weight:800;text-decoration:none"><i class="fa-solid fa-pen-to-square"></i> أرسل مقالتك للنشر</a>`;
-        hero.appendChild(wrapper);
-    }
-
-    function slugify(value) {
-        return String(value || "")
-            .normalize("NFKC")
-            .toLowerCase()
-            .trim()
-            .replace(/[\u064B-\u065F\u0670]/g, "")
-            .replace(/[إأآٱ]/g, "ا")
-            .replace(/[ى]/g, "ي")
-            .replace(/[ؤ]/g, "و")
-            .replace(/[ئ]/g, "ي")
-            .replace(/[ـ]/g, "")
-            .replace(/[^\p{L}\p{N}]+/gu, "-")
-            .replace(/^-+|-+$/g, "")
-            .slice(0, 90);
-    }
-
-    function buildDynamicArticleUrl(article) {
-        const slug = slugify(article.title_ar || article.title_en || article.id);
-        return `/articles/${encodeURIComponent(slug)}`;
-    }
 
     async function loadArticles() {
         showLoading();
@@ -108,8 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     .map(article => ({
                         ...article,
                         source: "api",
-                        slug: slugify(article.title_ar || article.title_en || article.id),
-                        url: buildDynamicArticleUrl(article)
+                        url: `/article-reader-v5?slug=${encodeURIComponent(slugify(article.title_ar || article.title_en || article.id))}`
                     }))
                 : [];
 
@@ -137,6 +104,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function slugify(value) {
+        return String(value || "")
+            .normalize("NFKC")
+            .toLowerCase()
+            .trim()
+            .replace(/[\u064B-\u065F\u0670]/g, "")
+            .replace(/[إأآٱ]/g, "ا")
+            .replace(/[ى]/g, "ي")
+            .replace(/[ؤ]/g, "و")
+            .replace(/[ئ]/g, "ي")
+            .replace(/[ـ]/g, "")
+            .replace(/[^\p{L}\p{N}]+/gu, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 90);
+    }
+
     function renderArticles() {
         if (!articlesContainer) return;
         const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
@@ -161,10 +144,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const author = escapeHTML(article.author_name || "MedLife");
         const date = formatDate(article.created_at);
         const image = article.image_url ? escapeAttribute(article.image_url) : "";
-        const url = article.source === "api" ? buildDynamicArticleUrl(article) : (article.url || buildDynamicArticleUrl(article));
+        const url = article.url || `/article-reader-v5?slug=${encodeURIComponent(slugify(article.title_ar || article.title_en || article.id))}`;
         const icon = escapeAttribute(article.icon || "fa-book-medical");
         const imageHTML = image ? `<img src="${image}" alt="${title}" loading="lazy">` : `<div class="article-placeholder"><i class="fa-solid ${icon}"></i></div>`;
         return `<article class="public-article-card"><a href="${url}" class="article-image" aria-label="${title}">${imageHTML}</a><div class="public-article-content"><div class="public-article-category">${category}</div><h3><a href="${url}">${title}</a></h3><p>${excerpt}</p><div class="public-article-meta"><span><i class="fa-solid fa-user"></i>${author}</span><span><i class="fa-regular fa-calendar"></i>${date}</span></div><a href="${url}" class="public-article-link">اقرأ المقال <i class="fa-solid fa-arrow-left"></i></a></div></article>`;
+    }
+
+    function addSubmissionCTA() {
+        const hero = document.querySelector(".hero-content");
+        if (!hero || document.getElementById("submitArticleCTA")) return;
+        const wrapper = document.createElement("div");
+        wrapper.id = "submitArticleCTA";
+        wrapper.style.cssText = "display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px";
+        wrapper.innerHTML = `<a href="submit-article-v2.html" style="display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:13px;background:#FF2A54;color:#fff;font-weight:800;text-decoration:none"><i class="fa-solid fa-pen-to-square"></i> أرسل مقالتك للنشر</a>`;
+        hero.appendChild(wrapper);
     }
 
     function populateCategories() {
