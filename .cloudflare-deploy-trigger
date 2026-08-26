@@ -1,0 +1,3 @@
+Production deployment trigger for the MedLife article submission image-upload flow.
+
+The implementation is already present in submit-article-v6.js and uses GitHub-backed image storage without Cloudflare R2.
