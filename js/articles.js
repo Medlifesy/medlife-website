@@ -38,7 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
             image_url: "",
             status: "published",
             created_at: "2026-08-14T00:00:00",
-            url: "/articles/endometriosis-endotest-endosure",
+            // Keep the exact established public URL used before the merge.
+            url: "/articles/endometriosis-endosure.html",
             icon: "fa-microscope",
             source: "static"
         },
@@ -52,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
             image_url: "/images/family-planning-cover.jpg",
             status: "published",
             created_at: "2026-08-14T00:00:00",
-            // Legacy route used by this article before the reader-v5 merge.
+            // Keep the exact legacy reader route used before the merge.
             url: "/article-reader-v3?id=3",
             icon: "fa-people-roof",
             source: "legacy"
