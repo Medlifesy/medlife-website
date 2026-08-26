@@ -12,9 +12,8 @@
 /submit-article-final/ /submit-article-v6 301
 /submit-article-v5 /submit-article-v6 301
 /submit-article-v5.html /submit-article-v6 301
-/articles/endometriosis-endosure /articles/endometriosis-endosure.html 200
-/articles/endometriosis-endosure/ /articles/endometriosis-endosure.html 200
-/articles/endometriosis-endosure.html /articles/endometriosis-endosure.html 200
+/articles/tension-headache.html /articles/tension-headache.html 200
+/articles/endometriosis-endotest-endosure.html /articles/endometriosis-endosure.html 200
 /articles/family-planning /article-reader-v3?id=3 302
 /articles/family-planning/ /article-reader-v3?id=3 302
 /articles/* /article-reader-v5.html?slug=:splat 200
