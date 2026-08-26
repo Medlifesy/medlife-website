@@ -14,8 +14,9 @@ function setupImageUpload(){
   const status=document.createElement('span');status.id='articleImageStatus';status.style.cssText='font-size:11px;color:#64748b;align-self:center';
   btn.onclick=()=>input.click();
   input.onchange=async()=>{const files=[...input.files||[]];if(!files.length)return;if(files.length>5){status.textContent='يمكن رفع 5 صور كحد أقصى.';input.value='';return}
+    if(!$('title_ar').value.trim()||!$('author_name').value.trim()){status.textContent='اكتب عنوان المقال واسم الكاتب أولاً.';input.value='';return}
     for(const file of files){if(file.size>8*1024*1024){status.textContent=`الصورة ${file.name} أكبر من 8MB.`;input.value='';return}}
-    const form=new FormData();files.forEach(f=>form.append('images',f));
+    const form=new FormData();files.forEach(f=>form.append('images',f));form.append('title_ar',$('title_ar').value.trim());form.append('author_name',$('author_name').value.trim());
     status.textContent='جاري رفع الصور…';btn.disabled=true;
     try{const r=await fetch('/api/article-images',{method:'POST',body:form,credentials:'include'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw Error(d.error||'تعذر رفع الصور.');
       const images=d.images||[];$('editor').focus();
