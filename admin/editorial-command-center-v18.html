@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MedLife | Editorial Command Center</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f5f7fb}
+#studio{display:block;width:100%;height:100%;border:0}
+</style>
+</head>
+<body>
+<iframe id="studio" src="/admin/editorial-command-center-v17.html" title="MedLife Editorial Command Center"></iframe>
+<script>
+(()=>{
+ const frame=document.getElementById('studio');
+ const mobileCss=`
+  *{box-sizing:border-box}
+  html,body{overflow-x:hidden!important}
+  .top{padding:8px 10px!important}
+  .topin{display:block!important}
+  .brand{gap:8px!important;margin-bottom:7px!important}
+  .brand img{width:34px!important;height:34px!important}
+  .brand h1{font-size:14px!important;line-height:1.35!important}
+  .brand p{font-size:8px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .actions{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;gap:6px!important;padding:2px 0 5px!important;scrollbar-width:none}
+  .actions::-webkit-scrollbar{display:none}
+  .actions button{flex:0 0 auto!important;min-width:92px!important;min-height:42px!important;padding:9px 10px!important;font-size:10px!important}
+  .dashboard{padding:8px!important}
+  .stats{display:flex!important;overflow-x:auto!important;gap:7px!important;margin-bottom:8px!important;scrollbar-width:none}
+  .stats::-webkit-scrollbar{display:none}
+  .stat{flex:0 0 132px!important;padding:9px 10px!important;border-radius:12px!important}
+  .stat b{font-size:18px!important}
+  .layout{display:flex!important;flex-direction:column!important;gap:8px!important}
+  .layout>section{order:1!important;width:100%!important}
+  .layout>.panel:first-child{order:2!important}
+  .layout>.panel:last-child{order:3!important}
+  .frame{height:64vh!important;min-height:520px!important;border-radius:13px!important}
+  .panel{border-radius:13px!important}
+  .head{padding:10px!important}
+  .body{padding:10px!important}
+  .ring{width:105px!important;height:105px!important}
+  .ringin{width:87px!important;height:87px!important}
+  .ringin b{font-size:23px!important}
+  .checks{grid-template-columns:1fr 1fr!important}
+  .check{font-size:8px!important;padding:6px!important}
+  .hero{padding:10px!important}
+  .metric{padding:7px 0!important}
+  .modal{padding:8px!important}
+  .modalbox{max-height:94vh!important;border-radius:15px!important;padding:12px!important}
+ `;
+ function apply(){
+   try{
+    const d=frame.contentDocument;if(!d)return;
+    let s=d.getElementById('mobile-command-center-css');
+    if(!s){s=d.createElement('style');s.id='mobile-command-center-css';d.head.appendChild(s)}
+    s.textContent='@media(max-width:800px){'+mobileCss+'}'
+   }catch(e){}
+ }
+ frame.addEventListener('load',()=>{apply();setTimeout(apply,300);setTimeout(apply,1000);setTimeout(apply,2500)});
+ window.addEventListener('resize',apply);
+})();
+</script>
+</body>
+</html>
