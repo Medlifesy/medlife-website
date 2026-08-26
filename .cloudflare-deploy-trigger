@@ -2,4 +2,4 @@ Production deployment trigger for the MedLife article submission image-upload fl
 
 The implementation is present in submit-article-v6.js and functions/api/article-images.js, using GitHub-backed image storage without Cloudflare R2.
 
-Deployment refresh: 2026-08-26
+Deployment refresh: 2026-08-26 article-routing-fix-2
