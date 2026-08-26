@@ -17,21 +17,23 @@ function bytesToBase64(bytes) {
   for (let i=0; i<bytes.length; i+=chunk) binary += String.fromCharCode(...bytes.subarray(i, Math.min(i+chunk, bytes.length)));
   return btoa(binary);
 }
-function randomId() {
-  return crypto.randomUUID().replace(/-/g, '').slice(0, 20);
-}
+function randomId() { return crypto.randomUUID().replace(/-/g, '').slice(0, 20); }
+function clean(value,max){return String(value??'').trim().slice(0,max)}
 
 export async function onRequestPost({ request, env }) {
   try {
     if (!env.DB) return json({ success:false, error:"Database binding 'DB' is not configured." }, 500);
-    const admin = await authenticateArticleAdmin(request, env.DB);
-    if (!admin) return json({ success:false, error:'يجب تسجيل الدخول إلى لوحة الإدارة أولاً.' }, 401);
-    if (!['admin','editor'].includes(String(admin.role).toLowerCase())) return json({ success:false, error:'لا تملك صلاحية رفع صور المقالات.' }, 403);
-
     const token = env.GITHUB_CONTENTS_TOKEN;
-    if (!token) return json({ success:false, error:'تخزين الصور على GitHub غير مهيأ. أضف Secret باسم GITHUB_CONTENTS_TOKEN إلى Cloudflare.' }, 500);
+    if (!token) return json({ success:false, error:'تخزين الصور غير مهيأ. أضف GITHUB_CONTENTS_TOKEN كـ Secret/Variable متاح للـPages Functions.' }, 500);
 
+    // Admins/editors may upload normally. Public article writers may also upload,
+    // but the upload is deliberately constrained and is never published by itself.
+    const admin = await authenticateArticleAdmin(request, env.DB);
     const form = await request.formData();
+    const title = clean(form.get('title_ar'), 180);
+    const author = clean(form.get('author_name'), 120);
+    if (!admin && (!title || !author)) return json({success:false,error:'يرجى إدخال عنوان المقال واسم الكاتب قبل رفع الصور.'},400);
+
     const files = form.getAll('images').filter(x => x && typeof x.arrayBuffer === 'function');
     if (!files.length) return json({ success:false, error:'لم يتم اختيار أي صورة.' }, 400);
     if (files.length > MAX_IMAGES) return json({ success:false, error:'يمكن رفع 5 صور كحد أقصى للمقالة.' }, 400);
@@ -50,7 +52,8 @@ export async function onRequestPost({ request, env }) {
           'Authorization':`Bearer ${token}`,
           'Accept':'application/vnd.github+json',
           'X-GitHub-Api-Version':'2022-11-28',
-          'Content-Type':'application/json'
+          'Content-Type':'application/json',
+          'User-Agent':'MedLife-Article-Submission'
         },
         body:JSON.stringify({message:`content: upload article image ${path.split('/').pop()}`,content:bytesToBase64(bytes),branch:BRANCH})
       });
@@ -61,7 +64,7 @@ export async function onRequestPost({ request, env }) {
       }
       results.push({name:file.name || path.split('/').pop(),path,url:`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${path}`,size:file.size,type:file.type});
     }
-    return json({success:true,storage:'github',images:results,uploaded_by:admin.username});
+    return json({success:true,storage:'github',images:results,uploaded_by:admin?.username||author});
   } catch (error) {
     console.error('article-images error:', error);
     return json({success:false,error:'تعذر رفع الصور إلى GitHub حالياً.'},500);
