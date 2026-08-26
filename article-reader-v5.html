@@ -10,7 +10,10 @@
 <main class="container"><div id="loading" class="state">جاري تحميل المحتوى…</div><div id="error" style="display:none"></div><article id="article" class="card" style="display:none"></article></main>
 <script>
 (()=>{
-const params=new URLSearchParams(location.search);const requestedSlug=(params.get('slug')||'').trim();const requestedId=params.get('id');
+const params=new URLSearchParams(location.search);
+const rawSlug=(params.get('slug')||'').trim();
+const requestedId=params.get('id');
+const requestedSlug=decodeURIComponent(rawSlug).replace(/\.html\/?$/i,'');
 const $=id=>document.getElementById(id);const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const slugify=v=>String(v||'').normalize('NFKC').toLowerCase().trim().replace(/[\u064B-\u065F\u0670]/g,'').replace(/[إأآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/ـ/g,'').replace(/[^\p{L}\p{N}]+/gu,'-').replace(/^-+|-+$/g,'').slice(0,90);
 const staticFiles={'tension-headache':'/articles/tension-headache.html','endometriosis-endotest-endosure':'/articles/endometriosis-endosure.html'};
