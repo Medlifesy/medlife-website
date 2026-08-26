@@ -1,7 +1,6 @@
 export async function onRequest(context) {
-  const url = new URL(context.request.url);
-  url.pathname = '/submit-article-v6.html';
-
-  const request = new Request(url.toString(), context.request);
-  return context.env.ASSETS.fetch(request);
+  // Let Cloudflare Pages resolve the clean URL to the existing static HTML asset.
+  // Do not fetch the .html path manually: Pages may normalize .html back to
+  // the clean URL, which can create a redirect loop.
+  return context.next();
 }
