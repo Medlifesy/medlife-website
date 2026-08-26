@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addSubmissionCTA();
 
-    // Keep the three established public article entries stable.
     const staticArticles = [
         {
             id: "tension-headache",
@@ -24,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
             image_url: "",
             status: "published",
             created_at: "2026-08-14T00:00:00",
-            url: "/articles/tension-headache",
+            url: "/articles/tension-headache.html",
             icon: "fa-head-side-virus",
             source: "static"
         },
@@ -114,8 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     }))
                 : [];
 
-            // The legacy family-planning article is already represented above by id=3.
-            // Do not render the same submitted record twice in the public list.
             const protectedIds = new Set(["3"]);
             const protectedTitles = new Set([
                 "صداع التوتر: رحلتك نحو الراحة",
