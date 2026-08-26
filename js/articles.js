@@ -12,7 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addSubmissionCTA();
 
-    // These two articles already have dedicated static HTML pages.
+    // These articles have dedicated static HTML pages.
+    // Keep them independent from the API so the public articles page
+    // continues to work even when the database/API is temporarily unavailable.
     const staticArticles = [
         {
             id: "tension-headache",
@@ -40,6 +42,20 @@ document.addEventListener("DOMContentLoaded", () => {
             created_at: "2026-08-14T00:00:00",
             url: "/articles/endometriosis-endotest-endosure.html",
             icon: "fa-microscope",
+            source: "static"
+        },
+        {
+            id: "family-planning",
+            title_ar: "وسائل تنظيم الأسرة: التخطيط الواعي لحياة أسرية متوازنة",
+            title_en: "Family Planning Methods: Informed Planning for a Balanced Family Life",
+            excerpt_ar: "دليل شامل حول وسائل تنظيم الأسرة الهرمونية وغير الهرمونية ومزايا وعيوب كل وسيلة.",
+            author_name: "MedLife",
+            category: "توعية صحية",
+            image_url: "",
+            status: "published",
+            created_at: "2026-08-14T00:00:00",
+            url: "/articles/family-planning.html",
+            icon: "fa-people-roof",
             source: "static"
         }
     ];
@@ -77,16 +93,14 @@ document.addEventListener("DOMContentLoaded", () => {
             .slice(0, 90);
     }
 
-    // Dynamic/database articles use the standalone reader directly.
-    // This avoids relying on Cloudflare Pages wildcard rewrites and guarantees
-    // that clicking a card actually navigates to a unique article URL.
-    function buildDynamicArticleUrl(article) {
-        const slug = slugify(article.title_ar || article.title_en || article.id);
-        return `/article-reader-v5.html?slug=${encodeURIComponent(slug)}`;
-    }
-
     async function loadArticles() {
         showLoading();
+
+        // Start from the known static articles immediately. This prevents a
+        // failed/slow API from blocking the public articles page.
+        articles = [...staticArticles];
+        populateCategories();
+        renderArticles();
 
         try {
             const response = await fetch("/api/articles", {
@@ -95,33 +109,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 cache: "no-store"
             });
 
+            if (!response.ok) throw new Error(`Articles API returned ${response.status}`);
+
             const data = await response.json();
-            if (!response.ok || !data.success) {
+            if (!data.success || !Array.isArray(data.articles)) {
                 throw new Error(data.error || "Unable to load articles.");
             }
 
-            const remoteArticles = Array.isArray(data.articles)
-                ? data.articles
-                    .filter(article => String(article.status || "").toLowerCase() === "published")
-                    .map(article => ({
-                        ...article,
-                        source: "api",
-                        slug: slugify(article.title_ar || article.title_en || article.id),
-                        url: buildDynamicArticleUrl(article)
-                    }))
-                : [];
+            const remoteArticles = data.articles
+                .filter(article => String(article.status || "").toLowerCase() === "published")
+                .map(article => ({
+                    ...article,
+                    source: "api",
+                    slug: slugify(article.title_ar || article.title_en || article.id)
+                }));
 
-            const remoteIds = new Set(remoteArticles.map(article => String(article.id)));
-            const staticsToAdd = staticArticles.filter(article => !remoteIds.has(String(article.id)));
+            // Keep the three static articles as the canonical entries.
+            // Only append published database articles that are not one of them.
+            const staticIds = new Set(staticArticles.map(article => String(article.id)));
+            const staticSlugs = new Set(staticArticles.map(article => String(article.id)));
+            const extraArticles = remoteArticles.filter(article => {
+                const id = String(article.id);
+                const slug = String(article.slug || "");
+                return !staticIds.has(id) && !staticSlugs.has(slug);
+            });
 
-            articles = [...staticsToAdd, ...remoteArticles];
+            articles = [...staticArticles, ...extraArticles];
             populateCategories();
             renderArticles();
         } catch (error) {
-            console.error("MedLife articles error:", error);
-            articles = [...staticArticles];
-            populateCategories();
-            renderArticles();
+            console.warn("MedLife articles API unavailable; showing static articles:", error);
+            // The static list is already rendered, so no error state is shown.
         }
     }
 
@@ -159,11 +177,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const date = formatDate(article.created_at);
         const image = article.image_url ? escapeAttribute(article.image_url) : "";
 
-        // Static articles -> their actual dedicated HTML page.
-        // API articles -> dedicated reader URL with this article's unique slug.
-        const url = article.source === "api"
-            ? buildDynamicArticleUrl(article)
-            : (article.url || `/articles/${slugify(article.title_ar || article.title_en)}.html`);
+        // Static articles always use their real, dedicated HTML file.
+        // Database articles continue to use the dynamic reader.
+        const url = article.source === "static"
+            ? article.url
+            : `/article-reader-v5.html?slug=${encodeURIComponent(article.slug || slugify(article.title_ar || article.title_en || article.id))}`;
 
         const icon = escapeAttribute(article.icon || "fa-book-medical");
         const imageHTML = image
