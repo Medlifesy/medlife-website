@@ -1,7 +1,8 @@
-/submit-article-v4 /submit-article-v6.html 200
-/submit-article-v4.html /submit-article-v6.html 200
-/submit-article-v6 /submit-article-v6.html 200
-/submit-article-v6/ /submit-article-v6.html 200
+/submit-article-v4 /submit-article-v6.html 302
+/submit-article-v4/ /submit-article-v6.html 302
+/submit-article-v4.html /submit-article-v6.html 302
+/submit-article-v6 /submit-article-v6.html 302
+/submit-article-v6/ /submit-article-v6.html 302
 /submit-article /submit-article-v4 301
 /submit-article.html /submit-article-v4 301
 /submit-article-v2 /submit-article-v4 301
