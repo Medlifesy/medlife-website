@@ -1,5 +1,7 @@
-Production deployment trigger for the MedLife article submission image-upload flow.
+MedLife website deployment trigger
 
-The implementation is present in submit-article-v6.js and functions/api/article-images.js, using GitHub-backed image storage without Cloudflare R2.
+Release: Telegram central integration
+Timestamp: 2026-08-27T21:00:00+03:00
+Source: main
 
-Deployment refresh: 2026-08-26 article-routing-direct-reader-3
+Deploy current main branch so /admin-telegram.html and its Pages Function are refreshed.
