@@ -43,6 +43,20 @@ document.addEventListener("DOMContentLoaded", () => {
             url: "/articles/endometriosis-endotest-endosure",
             icon: "fa-microscope",
             source: "static"
+        },
+        {
+            id: "family-planning",
+            title_ar: "وسائل تنظيم الأسرة: التخطيط الواعي لحياة أسرية متوازنة",
+            title_en: "Family Planning Methods: A Conscious Approach to Balanced Family Life",
+            excerpt_ar: "دليل شامل حول وسائل تنظيم الأسرة الهرمونية وغير الهرمونية ومزايا وعيوب كل وسيلة.",
+            author_name: "الممرضة: صفا علاء الدين الحكيم",
+            category: "التثقيف الصحي",
+            image_url: "/images/family-planning-cover.jpg",
+            status: "published",
+            created_at: "2026-08-14T00:00:00",
+            url: "/articles/family-planning",
+            icon: "fa-people-roof",
+            source: "static"
         }
     ];
 
