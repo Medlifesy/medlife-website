@@ -1,4 +1,4 @@
-import { authenticateArticleAdmin, json } from './article-admin-session.js';
+import { json } from './article-admin-session.js';
 
 const MAX_IMAGES = 5;
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -25,15 +25,12 @@ export async function onRequestPost({ request, env }) {
     const token = env.GITHUB_CONTENTS_TOKEN;
     if (!token) return json({ success:false, error:'تخزين الصور غير مهيأ. أضف GITHUB_CONTENTS_TOKEN كـ Secret/Variable متاح للـPages Functions.' }, 500);
 
-    // Public writers can upload without an admin session. If DB is available,
-    // an existing admin/editor/reviewer session is still recognized for auditing.
-    let admin = null;
-    if (env.DB) admin = await authenticateArticleAdmin(request, env.DB);
-
+    // Public article submissions intentionally do not depend on the admin session or DB.
+    // This keeps image uploads available to public writers even when the DB/session layer is unavailable.
     const form = await request.formData();
     const title = clean(form.get('title_ar'), 180);
     const author = clean(form.get('author_name'), 120);
-    if (!admin && (!title || !author)) return json({success:false,error:'يرجى إدخال عنوان المقال واسم الكاتب قبل رفع الصور.'},400);
+    if (!title || !author) return json({success:false,error:'يرجى إدخال عنوان المقال واسم الكاتب قبل رفع الصور.'},400);
 
     const files = form.getAll('images').filter(x => x && typeof x.arrayBuffer === 'function');
     if (!files.length) return json({ success:false, error:'لم يتم اختيار أي صورة.' }, 400);
@@ -83,9 +80,9 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
-    return json({success:true,storage:'github',images:results,uploaded_by:admin?.username||author});
+    return json({success:true,storage:'github',images:results,uploaded_by:author});
   } catch (error) {
     console.error('article-images error:', error);
-    return json({success:false,error:'تعذر رفع الصور إلى GitHub حالياً.'},500);
+    return json({success:false,error:`تعذر رفع الصور إلى GitHub حالياً. ${clean(error?.message,180)}`},500);
   }
 }
