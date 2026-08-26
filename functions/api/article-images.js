@@ -22,13 +22,14 @@ function clean(value,max){return String(value??'').trim().slice(0,max)}
 
 export async function onRequestPost({ request, env }) {
   try {
-    if (!env.DB) return json({ success:false, error:"Database binding 'DB' is not configured." }, 500);
     const token = env.GITHUB_CONTENTS_TOKEN;
     if (!token) return json({ success:false, error:'تخزين الصور غير مهيأ. أضف GITHUB_CONTENTS_TOKEN كـ Secret/Variable متاح للـPages Functions.' }, 500);
 
-    // Admins/editors may upload normally. Public article writers may also upload,
-    // but the upload is deliberately constrained and is never published by itself.
-    const admin = await authenticateArticleAdmin(request, env.DB);
+    // Public writers can upload without an admin session. If DB is available,
+    // an existing admin/editor/reviewer session is still recognized for auditing.
+    let admin = null;
+    if (env.DB) admin = await authenticateArticleAdmin(request, env.DB);
+
     const form = await request.formData();
     const title = clean(form.get('title_ar'), 180);
     const author = clean(form.get('author_name'), 120);
@@ -42,6 +43,7 @@ export async function onRequestPost({ request, env }) {
     for (const file of files) {
       if (!String(file.type || '').startsWith('image/')) return json({ success:false, error:`الملف ${file.name || ''} ليس صورة.` }, 400);
       if (file.size > MAX_BYTES) return json({ success:false, error:`الصورة ${file.name || ''} أكبر من 8MB.` }, 400);
+
       const ext = safeName(file.name);
       const path = `${FOLDER}/${new Date().toISOString().slice(0,10)}/${randomId()}.${ext}`;
       const bytes = new Uint8Array(await file.arrayBuffer());
@@ -58,12 +60,29 @@ export async function onRequestPost({ request, env }) {
         body:JSON.stringify({message:`content: upload article image ${path.split('/').pop()}`,content:bytesToBase64(bytes),branch:BRANCH})
       });
       const data = await r.json().catch(()=>({}));
+
       if (!r.ok) {
         console.error('GitHub image upload failed:', r.status, data);
-        return json({success:false,error:'تعذر رفع الصور إلى GitHub. تحقق من صلاحيات GITHUB_CONTENTS_TOKEN.'},502);
+        const githubMessage = clean(data?.message, 220);
+        const detail = r.status === 401
+          ? 'رمز GitHub غير صالح أو منتهي الصلاحية.'
+          : r.status === 403
+            ? 'رمز GitHub لا يملك صلاحية الكتابة إلى المستودع.'
+            : r.status === 404
+              ? 'لم يتمكن GitHub من الوصول إلى المستودع أو المسار.'
+              : 'رفض GitHub عملية رفع الصورة.';
+        return json({success:false,error:`${detail}${githubMessage ? ` (${githubMessage})` : ''}`},502);
       }
-      results.push({name:file.name || path.split('/').pop(),path,url:`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${path}`,size:file.size,type:file.type});
+
+      results.push({
+        name:file.name || path.split('/').pop(),
+        path,
+        url:`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${path}`,
+        size:file.size,
+        type:file.type
+      });
     }
+
     return json({success:true,storage:'github',images:results,uploaded_by:admin?.username||author});
   } catch (error) {
     console.error('article-images error:', error);
