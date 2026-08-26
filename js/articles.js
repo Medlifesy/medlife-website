@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
             image_url: "",
             status: "published",
             created_at: "2026-08-14T00:00:00",
-            url: "/articles/endometriosis-endosure.html",
+            url: "/articles/endometriosis-endosure",
             icon: "fa-microscope",
             source: "static"
         },
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
             image_url: "/images/family-planning-cover.jpg",
             status: "published",
             created_at: "2026-08-14T00:00:00",
-            url: "/article-reader-v3?id=3",
+            url: "/articles/family-planning",
             icon: "fa-people-roof",
             source: "legacy"
         }
@@ -86,11 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .slice(0, 90);
     }
 
-    // Use the extensionless reader route. Cloudflare Pages can normalize .html
-    // URLs and drop the query string; the extensionless route keeps ?slug intact.
     function buildDynamicArticleUrl(article) {
         const slug = slugify(article.title_ar || article.title_en || article.id);
-        return `/article-reader-v5?slug=${encodeURIComponent(slug)}`;
+        return `/articles/${encodeURIComponent(slug)}`;
     }
 
     async function loadArticles() {
@@ -159,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const author = escapeHTML(article.author_name || "MedLife");
         const date = formatDate(article.created_at);
         const image = article.image_url ? escapeAttribute(article.image_url) : "";
-        const url = article.source === "api" ? buildDynamicArticleUrl(article) : (article.url || buildDynamicArticleUrl(article));
+        const url = article.url || buildDynamicArticleUrl(article);
         const icon = escapeAttribute(article.icon || "fa-book-medical");
         const imageHTML = image ? `<img src="${image}" alt="${title}" loading="lazy">` : `<div class="article-placeholder"><i class="fa-solid ${icon}"></i></div>`;
         return `<article class="public-article-card"><a href="${url}" class="article-image" aria-label="${title}">${imageHTML}</a><div class="public-article-content"><div class="public-article-category">${category}</div><h3><a href="${url}">${title}</a></h3><p>${excerpt}</p><div class="public-article-meta"><span><i class="fa-solid fa-user"></i>${author}</span><span><i class="fa-regular fa-calendar"></i>${date}</span></div><a href="${url}" class="public-article-link">اقرأ المقال <i class="fa-solid fa-arrow-left"></i></a></div></article>`;
