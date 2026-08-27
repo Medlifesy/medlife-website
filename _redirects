@@ -11,6 +11,7 @@
 /submit-article-final.html /submit-article-v6 301
 /submit-article-final/ /submit-article-v6 301
 /submit-article-v5 /submit-article-v6 301
+/articles/family-planning-conscious-choice /article-reader-v5.html?id=10 200
 /articles/* /article-reader-v5.html?slug=:splat 200
 /admin/editorial-command-center-v23.html /admin/ 301
 /admin/editorial-command-center-v24.html /admin/ 301
