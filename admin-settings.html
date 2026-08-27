@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#12203a"><title>MedLife | إدارة حسابات الإدارة</title>
+<link rel="icon" href="./logo.PNG"><link rel="stylesheet" href="/homepage-redesign.css">
+<style>
+body{margin:0;background:#f5f7fb;color:#12203a;font-family:Cairo,Arial,sans-serif}.wrap{max-width:1050px;margin:auto;padding:24px 16px 50px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:10px}.brand img{width:48px;height:48px;object-fit:contain;background:#fff;border-radius:12px;padding:4px}.brand b{display:block}.brand small{color:#66748b}.btn{border:0;border-radius:12px;padding:10px 14px;background:#e51f45;color:#fff;font:inherit;font-weight:800;cursor:pointer}.btn.secondary{background:#fff;color:#12203a;border:1px solid #e5eaf1}.card{background:#fff;border:1px solid #e5eaf1;border-radius:20px;padding:20px;box-shadow:0 14px 36px rgba(18,32,58,.08);margin-bottom:15px}.h{display:flex;justify-content:space-between;align-items:center;gap:10px}.muted{color:#66748b;font-size:12px;line-height:1.8}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin-bottom:12px}.field label{display:block;font-size:11px;font-weight:800;margin-bottom:5px}.field input{width:100%;box-sizing:border-box;padding:11px;border:1px solid #e5eaf1;border-radius:11px;background:#fbfcfd;font:inherit}.checks{display:grid;gap:8px}.check{display:flex;align-items:center;gap:8px;font-size:12px;padding:8px;border:1px solid #e5eaf1;border-radius:10px}.notice{padding:11px;border-radius:11px;background:#fff5f7;color:#c9183b;font-size:11px;margin-bottom:13px}.table{width:100%;border-collapse:collapse;font-size:11px}.table th,.table td{text-align:right;padding:10px;border-bottom:1px solid #e5eaf1}.pill{display:inline-block;padding:3px 8px;border-radius:20px;background:#f7f8fa;color:#66748b;font-size:9px}.danger{color:#c9183b}.disabled{opacity:.55}@media(max-width:720px){.grid{grid-template-columns:1fr}.top{align-items:flex-start}.table{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div class="brand"><img src="./logo.PNG" alt="MedLife"><div><b>إدارة حسابات الإدارة</b><small>MedLife Administration</small></div></div><div><button class="btn secondary" id="logout">تسجيل الخروج</button> <a class="btn" href="/admin.html">لوحة الإدارة</a></div></header>
+<div class="card"><div class="h"><div><h2 style="margin:0 0 5px">👑 حسابات الإدارة</h2><p class="muted" style="margin:0">هذه الصفحة مخصصة للمدير الكامل. حسابك الرئيسي يبقى مستقلاً ولا يمكن تعطيله من هنا.</p></div></div></div>
+<div class="grid">
+<section class="card"><h3>➕ إنشاء حساب إداري</h3><p class="muted">حالياً نضيف عضواً إدارياً جديداً مباشرة. خيار ربط عضو موجود سيبقى للمستقبل عندما تصبح قاعدة بيانات الأعضاء جاهزة.</p>
+<div class="notice">⚠️ إنشاء الحساب لا يغيّر حساب الـAdmin الرئيسي ولا يعدّل بيانات أعضاء MedLife.</div>
+<form id="form">
+<div class="field"><label>الاسم الكامل</label><input id="fullName" required></div>
+<div class="field"><label>اسم المستخدم</label><input id="username" required pattern="[A-Za-z0-9._-]{3,40}" placeholder="مثال: content.admin"></div>
+<div class="field"><label>البريد الإلكتروني (اختياري)</label><input id="email" type="email"></div>
+<div class="field"><label>كلمة المرور</label><input id="password" type="password" minlength="12" required></div>
+<label class="check"><input id="fullAdmin" type="checkbox"> 👑 مدير كامل الصلاحية</label>
+<div id="permissions" class="checks" style="margin-top:10px"><label class="check"><input value="members" type="checkbox"> 👥 إدارة الأعضاء</label><label class="check"><input value="articles" type="checkbox"> 📰 إدارة المقالات</label><label class="check"><input value="teams" type="checkbox"> 🏢 الهيكل التنظيمي</label><label class="check"><input value="telegram" type="checkbox"> 🤖 Telegram</label><label class="check"><input value="data" type="checkbox"> 📊 إدارة البيانات</label></div>
+<div style="margin-top:14px"><button class="btn" type="submit">إنشاء الحساب</button><span id="msg" class="muted" style="margin-right:10px"></span></div>
+</form></section>
+<section class="card"><h3>👥 ربط عضو موجود</h3><p class="muted">الخيار محفوظ ضمن التصميم، لكنه غير مفعّل حالياً لأن قاعدة بيانات أعضاء MedLife التي نريد اعتمادها كمصدر رسمي لم تُجهّز بعد.</p><button class="btn secondary" disabled>قريباً — اختيار عضو من قاعدة البيانات</button></section>
+</div>
+<section class="card"><div class="h"><h3>الحسابات الإدارية</h3><span class="pill" id="count">0</span></div><div style="overflow:auto"><table class="table"><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الدور</th><th>الحالة</th><th></th></tr></thead><tbody id="rows"><tr><td colspan="5" class="muted">جاري التحميل...</td></tr></tbody></table></div></section>
+</div>
+<script>
+const $=id=>document.getElementById(id);let accounts=[];
+async function api(action,options={}){const r=await fetch('/api/admin-subaccounts?action='+action,{credentials:'include',...options});const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||'تعذر تنفيذ الطلب.');return j;}
+async function load(){try{const j=await api('list');accounts=j.accounts||[];$('count').textContent=accounts.length;$('rows').innerHTML=accounts.length?accounts.map(a=>`<tr><td>${esc(a.full_name)}</td><td>${esc(a.username)}</td><td>${a.full_admin?'👑 مدير كامل':(a.permissions||[]).join('، ')}</td><td>${a.account_status==='active'?'نشط':'معطل'}</td><td><button class="btn secondary" data-id="${a.id}">${a.account_status==='active'?'تعطيل':'تفعيل'}</button></td></tr>`).join(''):'<tr><td colspan="5" class="muted">لا توجد حسابات فرعية بعد.</td></tr>';}catch(e){$('rows').innerHTML='<tr><td colspan="5" class="danger">'+esc(e.message)+'</td></tr>';}}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+$('fullAdmin').onchange=e=>{$('permissions').classList.toggle('disabled',e.target.checked);$('permissions').querySelectorAll('input').forEach(x=>x.disabled=e.target.checked)};
+$('form').onsubmit=async e=>{e.preventDefault();$('msg').textContent='جارٍ الإنشاء...';const fullAdmin=$('fullAdmin').checked;const permissions=[...$('permissions').querySelectorAll('input:checked')].map(x=>x.value);try{const j=await api('create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fullName:$('fullName').value,username:$('username').value,email:$('email').value,password:$('password').value,fullAdmin,permissions})});$('msg').textContent=j.message||'تم الإنشاء.';e.target.reset();$('permissions').querySelectorAll('input').forEach(x=>x.disabled=false);$('permissions').classList.remove('disabled');await load();}catch(err){$('msg').textContent=err.message;}};
+$('rows').onclick=async e=>{const b=e.target.closest('button[data-id]');if(!b)return;try{await api('toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:Number(b.dataset.id)})});await load();}catch(err){alert(err.message)}};
+$('logout').onclick=async()=>{try{await fetch('/api/admin-session?action=logout',{method:'POST',credentials:'include'});}finally{location.href='/admin-login.html'}};
+load();
+</script>
+</body></html>
