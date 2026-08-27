@@ -21,3 +21,4 @@
 /admin/editorial-studio-v13.html /admin/ 301
 /api/admin/telegram https://medlife-team-api.broad-frog-3978.workers.dev/internal/admin/telegram 200
 /api/admin/telegram/ https://medlife-team-api.broad-frog-3978.workers.dev/internal/admin/telegram 200
+/admin.html /admin-v2.html 302
