@@ -2883,6 +2883,30 @@
 <script src="js/articles.js"></script>
 
 
+<script id="medlife-articles-v25-cleanup">
+(() => {
+  const familySlug = '/articles/family-planning-conscious-choice';
+  const legacy = '/article-reader-v3?id=3';
+  const normalize = (a) => {
+    const href = a.getAttribute('href') || '';
+    if (href === legacy || href.includes('article-reader-v3?id=3')) {
+      const text = (a.textContent || '').replace(/\\s+/g,' ').trim();
+      if (/وسائل تنظيم الأسرة/.test(text)) a.setAttribute('href', familySlug);
+    }
+    if (/family-planning\.html/i.test(href)) a.setAttribute('href', familySlug);
+  };
+  const dedupe = () => {
+    const seen = new Set();
+    document.querySelectorAll('a[href*="/articles/"],a[href*="article-reader-v3"]').forEach(normalize);
+    document.querySelectorAll('a[href="'+familySlug+'"]').forEach(a => {
+      const card = a.closest('.public-article-card,article,.article-card,.card');
+      const key = (card || a).textContent.replace(/\\s+/g,' ').trim().slice(0,300);
+      if (seen.has(key) && card) card.remove(); else seen.add(key);
+    });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', dedupe); else dedupe();
+})();
+</script>
 </body>
 
 </html>
