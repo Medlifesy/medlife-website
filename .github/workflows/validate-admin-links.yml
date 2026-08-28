@@ -5,12 +5,20 @@ on:
     paths:
       - 'admin.html'
       - 'admin-v2.html'
+      - 'admin-members-v3.html'
+      - 'articles-admin.html'
+      - 'admin-teams.html'
+      - 'admin-telegram.html'
       - '_redirects'
       - '.github/workflows/validate-admin-links.yml'
   pull_request:
     paths:
       - 'admin.html'
       - 'admin-v2.html'
+      - 'admin-members-v3.html'
+      - 'articles-admin.html'
+      - 'admin-teams.html'
+      - 'admin-telegram.html'
       - '_redirects'
       - '.github/workflows/validate-admin-links.yml'
 
@@ -26,7 +34,6 @@ jobs:
           python3 - <<'PY'
           import re
           from pathlib import Path
-          from urllib.parse import urlparse
 
           page = Path('admin-v2.html').read_text(encoding='utf-8')
           hrefs = re.findall(r'''href=["']([^"']+)["']''', page, flags=re.I)
@@ -38,25 +45,23 @@ jobs:
               if not href or href.startswith(ignored):
                   continue
 
-              if href.startswith('/'):
-                  target = Path(href.lstrip('/'))
-              else:
-                  target = Path('admin-v2.html').parent / href
+              target = Path(href.lstrip('/')) if href.startswith('/') else Path(href)
+              candidates = [target]
+              if target.suffix == '':
+                  candidates.append(Path(f'{target}.html'))
+                  candidates.append(target / 'index.html')
 
-              if target.is_dir():
-                  target = target / 'index.html'
-
-              if not target.exists():
-                  errors.append(f'Missing internal target: {href} -> {target}')
+              if not any(candidate.exists() for candidate in candidates):
+                  errors.append(f'Missing internal target: {href} -> {candidates}')
 
           if errors:
               print('\n'.join(errors))
               raise SystemExit(1)
 
-          print(f'OK: validated {len(hrefs)} admin hrefs; all internal targets exist.')
+          print(f'OK: validated {len(hrefs)} admin hrefs; all internal targets exist or resolve to native Pages HTML routes.')
           PY
 
-      - name: Validate admin redirect
+      - name: Validate canonical admin redirect
         run: |
-          grep -Eq '^/admin\.html[[:space:]]+/admin-v2\.html[[:space:]]+302$' _redirects
-          echo 'OK: /admin.html redirects to /admin-v2.html'
+          grep -Eq '^/admin\.html[[:space:]]+/admin-v2[[:space:]]+301$' _redirects
+          echo 'OK: /admin.html redirects to /admin-v2'
