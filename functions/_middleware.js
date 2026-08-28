@@ -47,7 +47,8 @@ export async function onRequest(context) {
       '/article-management-v3.js?v=20260825-12',
       '/article-management-enhancements.js?v=20260825-3',
       '/article-format-fast-ui.js?v=20260825-3',
-      '/article-reader-preview.js?v=20260828-1'
+      '/article-reader-preview.js?v=20260828-1',
+      '/article-publish-slug.js?v=20260828-1'
     ];
     function ensureScript(src) {
       const plain = src.split('?')[0];
