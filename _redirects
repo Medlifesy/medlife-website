@@ -33,5 +33,9 @@
 /admin-teams/ /admin-teams.html 200
 /admin-telegram /admin-telegram.html 200
 /admin-telegram/ /admin-telegram.html 200
-/articles-admin /articles-admin.html 200
-/articles-admin/ /articles-admin.html 200
+
+# Articles administration: use an explicit redirect to the real static page
+# so navigation from /admin cannot depend on Pages SPA-style rewrites.
+/articles-admin /articles-admin.html 301
+/articles-admin/ /articles-admin.html 301
+/articles-admin.html /articles-admin.html 200
