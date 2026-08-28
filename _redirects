@@ -32,3 +32,7 @@
 /admin-teams.html /admin-teams 301
 /admin-telegram.html /admin-telegram 301
 /articles-admin.html /articles-admin 301
+
+# Canonical public article routing: keep /articles/{slug} in the browser URL
+# and internally render the shared article reader. This is a rewrite, not a redirect.
+/articles/* /article-reader-v5.html 200
