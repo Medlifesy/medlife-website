@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Articles admin route repair
-Timestamp: 2026-08-28T02:00:00+03:00
+Release: Permanent article publish slug selector
+Timestamp: 2026-08-28T13:45:00+03:00
 Source: main
 
-Deploy current main branch so the canonical /articles-admin route and administration navigation are refreshed.
+Deploy current main branch with the article publish slug selector and canonical article URL support.
