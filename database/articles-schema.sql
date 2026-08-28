@@ -6,6 +6,8 @@
 
 CREATE TABLE IF NOT EXISTS articles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT UNIQUE,
+    canonical_path TEXT UNIQUE,
     title_ar TEXT NOT NULL,
     title_en TEXT,
     content_ar TEXT NOT NULL,
@@ -29,6 +31,7 @@ CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category);
 CREATE INDEX IF NOT EXISTS idx_articles_author ON articles(author_member_id);
 CREATE INDEX IF NOT EXISTS idx_articles_created_at ON articles(created_at);
 CREATE INDEX IF NOT EXISTS idx_articles_published_at ON articles(published_at);
+CREATE INDEX IF NOT EXISTS idx_articles_published_slug ON articles(status, slug);
 
 CREATE TRIGGER IF NOT EXISTS articles_updated_at
 AFTER UPDATE ON articles
