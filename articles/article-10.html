@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المقال | MedLife Syria</title>
+<style>html,body{margin:0;padding:0;width:100%;min-height:100%;background:#f7f9fc}#reader-loading{min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Cairo,Arial,sans-serif;color:#64748b;font-size:16px}</style>
+</head>
+<body>
+<div id="reader-loading">جاري تحميل المقال…</div>
+<script>
+(async()=>{
+  try{
+    const response=await fetch('/article-reader-v5.html',{cache:'no-store'});
+    if(!response.ok) throw new Error('reader unavailable');
+    let html=await response.text();
+    html=html.replace(/<head([^>]*)>/i,'<head$1><base href="/">');
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(error){
+    document.getElementById('reader-loading').textContent='تعذر تحميل المقال. يرجى المحاولة مرة أخرى.';
+    console.error(error);
+  }
+})();
+</script>
+</body>
+</html>
