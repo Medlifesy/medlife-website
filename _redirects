@@ -21,7 +21,17 @@
 /admin/editorial-studio-v13.html /admin/ 301
 /api/admin/telegram https://medlife-team-api.broad-frog-3978.workers.dev/internal/admin/telegram 200
 /api/admin/telegram/ https://medlife-team-api.broad-frog-3978.workers.dev/internal/admin/telegram 200
-/admin /admin-v2.html 302
-/admin/ /admin-v2.html 302
-/admin.html /admin-v2.html 302
-/admin-members.html /admin-members-v3.html 302
+
+# Canonical administration routes
+/admin /admin-v2.html 200
+/admin/ /admin-v2.html 200
+/admin.html /admin-v2.html 301
+/admin-members /admin-members-v3.html 200
+/admin-members/ /admin-members-v3.html 200
+/admin-members.html /admin-members-v3.html 301
+/admin-teams /admin-teams.html 200
+/admin-teams/ /admin-teams.html 200
+/admin-telegram /admin-telegram.html 200
+/admin-telegram/ /admin-telegram.html 200
+/articles-admin /articles-admin.html 200
+/articles-admin/ /articles-admin.html 200
