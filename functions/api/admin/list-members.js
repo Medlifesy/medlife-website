@@ -1,6 +1,14 @@
 import { ensureAuthTables, json } from '../_auth.js';
 import { authenticateAdmin } from '../_admin-auth.js';
 
+async function teamApi(request, env, path, options = {}) {
+  if (env.TEAM_API) return env.TEAM_API.fetch(new Request(`https://internal${path}`, { ...options, headers: new Headers({ ...(options.headers || {}) }) }));
+  if (!env.TEAM_API_URL || !env.ADMIN_API_KEY) throw new Error('Team API binding/configuration is missing.');
+  const headers = new Headers(options.headers || {});
+  headers.set('X-Admin-Key', env.ADMIN_API_KEY);
+  return fetch(`${env.TEAM_API_URL}${path}`, { ...options, headers });
+}
+
 export async function onRequest({request,env}){
   if(request.method!=='GET') return json({success:false,error:'Method not allowed.'},405);
   if(!env.MEMBERS_DB) return json({success:false,error:'Database binding is not configured.'},500);
@@ -8,11 +16,8 @@ export async function onRequest({request,env}){
     await ensureAuthTables(env.MEMBERS_DB);
     const admin=await authenticateAdmin(request,env.MEMBERS_DB);
     if(!admin) return json({success:false,error:'غير مصرح.'},401);
-    const cols=await env.MEMBERS_DB.prepare('PRAGMA table_info(members)').all();
-    const have=new Set((cols.results||[]).map(x=>x.name));
-    for(const [name,type] of [['employment_status','TEXT'],['consultation_specialty','TEXT']]) if(!have.has(name)) await env.MEMBERS_DB.prepare(`ALTER TABLE members ADD COLUMN ${name} ${type}`).run();
-    const members=await env.MEMBERS_DB.prepare(`SELECT id,member_code,full_name,email,account_email,phone,governorate,medlife_role,cell,consultation_specialty,employment_status,profession,workplace,status,account_status,created_at FROM members ORDER BY id DESC`).all();
-    const applications=await env.MEMBERS_DB.prepare(`SELECT id,full_name,email,phone,governorate,academic_status,interest,profession,workplace,status,created_at FROM new_member_applications ORDER BY id DESC`).all();
-    return json({success:true,members:members.results||[],applications:applications.results||[]});
+    const response=await teamApi(request,env,'/internal/admin/members');
+    const data=await response.json().catch(()=>({success:false,error:'Team API returned invalid JSON.'}));
+    return json(data,response.status);
   }catch(e){console.error(e);return json({success:false,error:'تعذر تحميل بيانات الأعضاء حالياً.'},500)}
 }
