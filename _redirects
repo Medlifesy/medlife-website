@@ -22,19 +22,21 @@
 /api/admin/telegram https://medlife-team-api.broad-frog-3978.workers.dev/internal/admin/telegram 200
 /api/admin/telegram/ https://medlife-team-api.broad-frog-3978.workers.dev/internal/admin/telegram 200
 
-# Canonical administration routes
-/admin /admin-v2.html 200
-/admin/ /admin-v2.html 200
-/admin.html /admin-v2.html 301
-/admin-members /admin-members-v3.html 200
-/admin-members/ /admin-members-v3.html 200
-/admin-members.html /admin-members-v3.html 301
-/admin-teams /admin-teams.html 200
-/admin-teams/ /admin-teams.html 200
-/admin-telegram /admin-telegram.html 200
-/admin-telegram/ /admin-telegram.html 200
-
-# Articles administration: direct Pages rewrites, no redirect chain
-/articles-admin /articles-admin.html 200
-/articles-admin/ /articles-admin.html 200
-/articles-admin.html /articles-admin.html 200
+# Canonical administration routes - Cloudflare Pages serves matching .html at extensionless paths
+/admin /admin-v2 301
+/admin/ /admin-v2 301
+/admin.html /admin-v2 301
+/admin-v2.html /admin-v2 301
+/admin-members /admin-members-v3 301
+/admin-members/ /admin-members-v3 301
+/admin-members.html /admin-members-v3 301
+/admin-members-v3.html /admin-members-v3 301
+/admin-teams /admin-teams 200
+/admin-teams/ /admin-teams 200
+/admin-teams.html /admin-teams 301
+/admin-telegram /admin-telegram 200
+/admin-telegram/ /admin-telegram 200
+/admin-telegram.html /admin-telegram 301
+/articles-admin /articles-admin 200
+/articles-admin/ /articles-admin 200
+/articles-admin.html /articles-admin 301
