@@ -22,7 +22,6 @@ export async function onRequest(context) {
       const scriptPattern = new RegExp(`<script\\s+src=["'][^"']*${escapedScript}[^"']*["'][^>]*><\\/script>`, 'gi');
       html = html.replace(scriptPattern, '');
     }
-    // CI markers: <section\\\s+class= ; article-ai-studio\\.js ; article-ai-editorial-v2\\.js ; article-images-studio\\.js ; article-ai-upgrade\\.js
 
     const addButton = '<button id="articleAddStatic" type="button" class="btn primary" style="margin-top:14px;width:100%;font-weight:900;padding:13px">➕ إضافة مقالة جديدة</button>';
     if (!html.includes('id="articleAddStatic"')) {
@@ -38,7 +37,8 @@ export async function onRequest(context) {
     const scripts = [
       '/article-management-v3.js?v=20260825-12',
       '/article-management-enhancements.js?v=20260825-3',
-      '/article-format-fast-ui.js?v=20260825-3'
+      '/article-format-fast-ui.js?v=20260825-3',
+      '/article-reader-preview.js?v=20260828-1'
     ];
     function ensureScript(src) {
       const plain = src.split('?')[0];
