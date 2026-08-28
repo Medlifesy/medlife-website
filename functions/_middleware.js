@@ -7,9 +7,20 @@ export async function onRequest(context) {
 
     const path = new URL(context.request.url).pathname.toLowerCase();
     const isArticlesAdmin = path === '/articles-admin' || path === '/articles-admin/' || path.endsWith('/articles-admin.html');
-    if (!isArticlesAdmin) return response;
+    const isArticleReader = path === '/article-reader-v5.html' || path.startsWith('/articles/');
+    if (!isArticlesAdmin && !isArticleReader) return response;
 
     let html = await response.text();
+
+    if (isArticleReader && !isArticlesAdmin) {
+      const tag = '<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>';
+      if (!html.includes('/article-reader-rich-content.js')) html = html.includes('</body>') ? html.replace('</body>', `${tag}</body>`) : `${html}${tag}`;
+      const headers = new Headers(response.headers);
+      headers.delete('content-length');
+      headers.set('cache-control','no-store, no-cache, must-revalidate, max-age=0');
+      headers.set('pragma','no-cache');
+      return new Response(html,{status:response.status,statusText:response.statusText,headers});
+    }
 
     const legacySectionClasses = ['ai-studio', 'images-studio'];
     for (const className of legacySectionClasses) {
@@ -24,9 +35,7 @@ export async function onRequest(context) {
     }
 
     const addButton = '<button id="articleAddStatic" type="button" class="btn primary" style="margin-top:14px;width:100%;font-weight:900;padding:13px">➕ إضافة مقالة جديدة</button>';
-    if (!html.includes('id="articleAddStatic"')) {
-      html = html.replace('<section class="hero"><h1>لوحة إدارة المقالات</h1><p>مراجعة وتحرير ونشر محتوى MedLife من مكان واحد.</p></section>', `<section class="hero"><h1>لوحة إدارة المقالات</h1><p>مراجعة وتحرير ونشر محتوى MedLife من مكان واحد.</p>${addButton}</section>`);
-    }
+    if (!html.includes('id="articleAddStatic"')) html = html.replace('<section class="hero"><h1>لوحة إدارة المقالات</h1><p>مراجعة وتحرير ونشر محتوى MedLife من مكان واحد.</p></section>', `<section class="hero"><h1>لوحة إدارة المقالات</h1><p>مراجعة وتحرير ونشر محتوى MedLife من مكان واحد.</p>${addButton}</section>`);
 
     const previewBar = '<div id="articlePreviewStaticBar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:14px 0;padding:14px 16px;border:1px solid #dbe4f0;border-radius:16px;background:#f7f9fc"><div><strong style="color:#12203a">👁️ المعاينة</strong><div style="font-size:11px;color:#6b778c;margin-top:2px">شاهد شكل المقال والصور كما سيظهر قبل النشر.</div></div><button id="articlePreviewStatic" type="button" class="btn primary" style="font-weight:900;padding:12px 20px">👁️ معاينة المقالة</button></div>';
     if (!html.includes('id="articlePreviewStaticBar"')) html = html.replace('<div class="editor-footer">', previewBar + '<div class="editor-footer">');
