@@ -6,7 +6,6 @@ const fs = require('node:fs');
 const redirects = fs.readFileSync('_redirects', 'utf8');
 const route = fs.readFileSync('functions/articles/[slug].js', 'utf8');
 const reader = fs.readFileSync('article-reader-v5.html', 'utf8');
-const gateway = fs.readFileSync('functions/articles/[slug].js', 'utf8');
 
 if (/^\/articles\/(?!\*)\S+\s+\/article-reader-v5\.html/im.test(redirects)) {
   throw new Error('Article-specific redirect/rewrite detected');
@@ -44,8 +43,8 @@ if (!reader.includes("const pathSlug=decodeURIComponent(location.pathname.split(
   throw new Error('Article Reader does not read the canonical slug from the route');
 }
 
-if (!reader.includes("history.replaceState({},'', '/articles/'+slugify(title))")) {
-  throw new Error('Article Reader regression check: expected existing canonical URL normalization');
+if (/history\.replaceState\([^)]*\/articles\//i.test(reader)) {
+  throw new Error('Article Reader must never rewrite the public canonical URL');
 }
 
 console.log('Article canonical routing contract: OK');
