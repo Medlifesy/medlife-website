@@ -14,7 +14,7 @@ export async function onRequest({ request }) {
     if (request.method === 'GET') {
       target.search = incoming.search;
       target.searchParams.set('admin', '1');
-    } else if (request.method === 'PUT') {
+    } else if (request.method === 'PUT' || request.method === 'PATCH') {
       target.searchParams.set('admin', '1');
     }
 
@@ -32,10 +32,13 @@ export async function onRequest({ request }) {
               if (payload[field] === undefined) payload[field] = null;
             }
 
-            // The Worker expects item routes as /articles/:id for PUT/DELETE,
-            // while the legacy admin UI sends the article id in JSON/query data.
-            if (request.method === 'PUT' && payload.id !== undefined && payload.id !== null && String(payload.id).trim() !== '') {
-              target.pathname = `${target.pathname.replace(/\/$/, '')}/${encodeURIComponent(String(payload.id))}`;
+            // The Worker expects item routes as /articles/:id and status routes as
+            // /articles/:id/status. The admin UI may send the id in the JSON body.
+            if ((request.method === 'PUT' || request.method === 'PATCH') && payload.id !== undefined && payload.id !== null && String(payload.id).trim() !== '') {
+              const id = encodeURIComponent(String(payload.id));
+              target.pathname = request.method === 'PATCH'
+                ? `${target.pathname.replace(/\/$/, '')}/${id}/status`
+                : `${target.pathname.replace(/\/$/, '')}/${id}`;
               delete payload.id;
             }
 
@@ -58,6 +61,14 @@ export async function onRequest({ request }) {
       target.searchParams.set('admin', '1');
     }
 
+    // Also support status routes where the client puts the id in the URL.
+    if (request.method === 'PATCH' && !target.pathname.endsWith('/status')) {
+      const parts = incoming.pathname.split('/').filter(Boolean);
+      const articleIndex = parts.indexOf('articles');
+      const id = articleIndex >= 0 ? parts[articleIndex + 1] : null;
+      if (id) target.pathname = `${target.pathname.replace(/\/$/, '')}/${encodeURIComponent(id)}/status`;
+    }
+
     const response = await fetch(target.toString(), {
       method: request.method,
       headers,
@@ -69,7 +80,7 @@ export async function onRequest({ request }) {
     outHeaders.delete('content-length');
     outHeaders.set('cache-control', 'no-store');
 
-    if (response.ok && (request.method === 'GET' || request.method === 'POST' || request.method === 'PUT' || request.method === 'DELETE')) {
+    if (response.ok && ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
       const contentType = response.headers.get('content-type') || '';
       if (contentType.includes('application/json')) {
         const data = await response.json();
