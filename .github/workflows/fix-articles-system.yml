@@ -1,0 +1,138 @@
+name: Fix Articles System
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-articles-system.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Repair canonical article flow
+        shell: python
+        run: |
+          from pathlib import Path
+
+          worker = Path('workers/articles-api/worker.js')
+          text = worker.read_text(encoding='utf-8')
+
+          marker = "async function ensureCanonicalColumns(db){"
+          helper = r'''async function ensureLegacyArticles(env){
+            const db=env.DB;
+            const legacy=[
+              {slug:'tension-headache',title_ar:'صداع التوتر: رحلتك نحو الراحة',excerpt_ar:'تعرف على صداع التوتر، أسبابه وأعراضه وعلامات الخطر والعلاج المتكامل وطرق الوقاية.',author_name:'الصيدلانية دلع باسل العباس',category:'توعية صحية',image_url:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Large_headache_diagram.png',created_at:'2026-08-14T00:00:00Z',source:'articles/tension-headache.html'},
+              {slug:'endometriosis-endotest-endosure',title_ar:'الاختبارات التشخيصية الحديثة وغير الباضعة للانتباذ البطاني الرحمي',excerpt_ar:'Global Journal Club يناقش Endotest وEndoSure، مع قراءة نقدية للدليل العلمي والدقة التشخيصية والفائدة السريرية.',author_name:'د. أمين نحاس',category:'Medical Education',created_at:'2026-08-14T00:00:00Z',source:'articles/endometriosis-endotest-endosure.html'},
+              {slug:'family-planning-conscious-choice',title_ar:'وسائل تنظيم الأسرة: التخطيط الواعي لحياة أسرية متوازنة',excerpt_ar:'دليل حول وسائل تنظيم الأسرة الهرمونية وغير الهرمونية ومزايا وعيوب كل وسيلة.',author_name:'الممرضة صفا علاء الدين الحكيم',category:'توعية صحية',image_url:'/images/family-planning-cover.jpg',created_at:'2026-08-26T00:00:00Z',source:'family-planning.html'}
+            ];
+            for(const a of legacy){
+              const exists=await db.prepare('SELECT id FROM articles WHERE slug=? LIMIT 1').bind(a.slug).first();
+              if(exists) continue;
+              let content='';
+              try{
+                const r=await fetch('https://raw.githubusercontent.com/Medlifesy/medlife-website/main/'+a.source,{headers:{'User-Agent':'MedLife-Articles-Migrator/1.0'}});
+                if(r.ok){
+                  const html=await r.text();
+                  const body=(html.match(/<body[^>]*>([\\s\\S]*?)<\\/body>/i)||[])[1]||html;
+                  content=body.replace(/<header[\\s\\S]*?<\\/header>/gi,'').replace(/<footer[\\s\\S]*?<\\/footer>/gi,'').replace(/<script[\\s\\S]*?<\\/script>/gi,'').replace(/<style[\\s\\S]*?<\\/style>/gi,'').trim();
+                }
+              }catch(e){console.warn('legacy import fetch failed',a.slug,e?.message||e);}
+              if(!content) content=`<h2>${a.title_ar}</h2><p>${a.excerpt_ar}</p>`;
+              await db.prepare(`INSERT INTO articles(slug,canonical_path,title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,published_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(a.slug,'/articles/'+a.slug,a.title_ar,null,a.excerpt_ar,null,content,null,a.author_name,null,a.category,a.image_url||null,'published',a.created_at,a.created_at,a.created_at).run();
+            }
+          }
+          '''
+          if 'async function ensureLegacyArticles(env)' not in text:
+              if marker not in text: raise SystemExit('canonical helper not found')
+              text=text.replace(marker,helper+marker,1)
+          call='await ensureCanonicalColumns(env.DB);'
+          if 'await ensureLegacyArticles(env);' not in text:
+              if call not in text: raise SystemExit('canonical call not found')
+              text=text.replace(call,call+'\n  await ensureLegacyArticles(env);',1)
+          worker.write_text(text,encoding='utf-8')
+
+          # Public Pages proxy: the public article listing must read the same D1-backed Worker as the reader route.
+          public_api=Path('functions/api/articles/public.js')
+          public_api.parent.mkdir(parents=True,exist_ok=True)
+          public_api.write_text(r'''const WORKER="https://medlife-articles-api.broad-frog-3978.workers.dev/public/articles";
+export async function onRequestGet({request}){
+  try{
+    const u=new URL(request.url);
+    const slug=u.searchParams.get('slug');
+    const target=slug?`${WORKER}/${encodeURIComponent(slug)}`:WORKER;
+    const r=await fetch(target,{headers:{Accept:'application/json'},cache:'no-store'});
+    const text=await r.text();
+    return new Response(text,{status:r.status,headers:{'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store'}});
+  }catch(e){
+    return new Response(JSON.stringify({success:false,error:'تعذر تحميل المقالات المنشورة حالياً.'}),{status:502,headers:{'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store'}});
+  }
+}
+''',encoding='utf-8')
+
+          # Keep the existing design, but make the article grid authoritative from the public API.
+          index=Path('articles.html')
+          html=index.read_text(encoding='utf-8')
+          marker='medlife-dynamic-articles-v1'
+          script=r'''<script id="medlife-dynamic-articles-v1">
+          (()=>{
+            const load=async()=>{
+              const root=document.getElementById('articlesContainer');
+              const loading=document.getElementById('articlesLoading');
+              if(!root)return;
+              try{
+                const r=await fetch('/api/articles/public',{cache:'no-store',headers:{Accept:'application/json'}});
+                if(!r.ok)throw new Error('HTTP '+r.status);
+                const data=await r.json();
+                const items=Array.isArray(data)?data:(data.articles||data.results||[]);
+                if(!items.length){root.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:50px;color:#64748B">لا توجد مقالات منشورة حالياً.</div>';return;}
+                root.innerHTML=items.map(a=>{
+                  const slug=encodeURIComponent(a.slug||'');
+                  const title=a.title_ar||a.title_en||'مقال طبي';
+                  const excerpt=a.excerpt_ar||a.excerpt_en||'';
+                  const author=a.author_name||'MedLife';
+                  const image=a.image_url?`<img src="${String(a.image_url).replace(/&/g,'&amp;').replace(/\"/g,'&quot;')}" alt="${title.replace(/\"/g,'&quot;')}" loading="lazy">`:'<div class="article-placeholder"><i class="fa-solid fa-book-medical"></i></div>';
+                  const date=a.created_at?new Date(a.created_at).toLocaleDateString('ar-SY',{day:'numeric',month:'long',year:'numeric'}):'';
+                  return `<article class="public-article-card"><a class="article-image" href="/articles/${slug}">${image}</a><div class="public-article-content"><div class="article-category">${a.category||'MedLife Knowledge'}</div><h2><a href="/articles/${slug}">${title}</a></h2><p>${excerpt}</p><div class="article-meta"><span>${author}</span><span>${date}</span></div><a class="read-more" href="/articles/${slug}">اقرأ المقال</a></div></article>`;
+                }).join('');
+              }catch(e){console.error('MedLife articles load',e);}
+              finally{if(loading)loading.style.display='none';}
+            };
+            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load);else load();
+          })();
+          </script>'''
+          if marker not in html:
+              html=html.replace('</body>',script+'\n</body>')
+          index.write_text(html,encoding='utf-8')
+
+      - name: Validate JavaScript
+        run: |
+          node --check workers/articles-api/worker.js
+          node --check functions/api/articles/public.js
+
+      - name: Commit repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add workers/articles-api/worker.js functions/api/articles/public.js articles.html
+          git diff --cached --quiet && exit 0
+          git commit -m "fix(articles): unify legacy imports and public publishing flow"
+          git push
+
+      - name: Deploy Articles Worker when Cloudflare credentials are configured
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+        working-directory: workers/articles-api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --yes wrangler deploy
