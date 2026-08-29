@@ -1,5 +1,11 @@
 const ARTICLES_WORKER_URL = 'https://medlife-articles-api.broad-frog-3978.workers.dev/articles';
 
+const ARTICLE_FIELDS = [
+  'title_ar','title_en','excerpt_ar','excerpt_en',
+  'content_ar','content_en','author_name','author_email',
+  'category','image_url','status','slug','author_member_id','rejection_reason'
+];
+
 export async function onRequest({ request }) {
   try {
     const incoming = new URL(request.url);
@@ -16,11 +22,33 @@ export async function onRequest({ request }) {
     const headers = new Headers(request.headers);
     headers.delete('host');
 
-    // Pass the existing article-admin session through unchanged.
+    let body;
+    if (!['GET', 'HEAD'].includes(request.method)) {
+      const raw = await request.text();
+      if (raw) {
+        try {
+          const payload = JSON.parse(raw);
+          if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+            for (const field of ARTICLE_FIELDS) {
+              if (payload[field] === undefined) payload[field] = null;
+            }
+            body = JSON.stringify(payload);
+            headers.set('Content-Type', 'application/json');
+          } else {
+            body = raw;
+          }
+        } catch {
+          body = raw;
+        }
+      } else {
+        body = raw;
+      }
+    }
+
     const response = await fetch(target.toString(), {
       method: request.method,
       headers,
-      body: ['GET', 'HEAD'].includes(request.method) ? undefined : request.body,
+      body,
       redirect: 'manual'
     });
 
