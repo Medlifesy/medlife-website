@@ -21,7 +21,6 @@
 /api/admin/telegram/ https://medlife-team-api.broad-frog-3978.workers.dev/internal/admin/telegram 200
 
 # Canonical administration routes
-# Cloudflare Pages automatically serves matching .html files at extensionless paths.
 /admin /admin-v2 301
 /admin/ /admin-v2 301
 /admin.html /admin-v2 301
@@ -34,6 +33,6 @@
 /admin-telegram.html /admin-telegram 301
 /articles-admin.html /articles-admin 301
 
-# Canonical public article routing: keep /articles/{slug} in the browser URL
-# and internally render the shared article reader. This is a rewrite, not a redirect.
-/articles/* /article-reader-v5.html 200
+# NOTE: /articles/* is intentionally NOT rewritten here.
+# Canonical article URLs are handled by functions/articles/[slug].js.
+# Legacy .html article files therefore remain directly accessible.
