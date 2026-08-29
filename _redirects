@@ -8,7 +8,6 @@
 /submit-article-v3.html /submit-article 301
 /submit-article-final /submit-article 301
 /submit-article-final/ /submit-article 301
-/submit-article-v5 /submit-article 301
 /submit-article /submit-article-v6 200
 /submit-article/ /submit-article-v6 200
 /admin/editorial-command-center-v23.html /admin/ 301
@@ -24,7 +23,6 @@
 /admin /admin-v2 301
 /admin/ /admin-v2 301
 /admin.html /admin-v2 301
-/admin-v2.html /admin-v2 301
 /admin-members /admin-members-v3 301
 /admin-members/ /admin-members-v3 301
 /admin-members.html /admin-members-v3 301
@@ -32,10 +30,6 @@
 /admin-teams.html /admin-teams 301
 /admin-telegram.html /admin-telegram 301
 /articles-admin.html /articles-admin 301
-
-# Independent MedLife Content Center
-/content-center /content-center.html 200
-/content-center/ /content-center.html 200
 
 # Articles admin API is served by the dedicated Worker/D1 stack.
 /api/articles https://medlife-articles-api.broad-frog-3978.workers.dev/articles 200
