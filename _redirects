@@ -28,9 +28,13 @@
 /admin-members /admin-members-v3 301
 /admin-members/ /admin-members-v3 301
 /admin-members.html /admin-members-v3 301
-/admin-members-v3.html /admin-members-v3 301
+/admin-members-v3.html /admin-members-v4 301
 /admin-teams.html /admin-teams 301
 /admin-telegram.html /admin-telegram 301
+
+# Explicit clean route for the article administration page
+/articles-admin /articles-admin.html 200
+/articles-admin/ /articles-admin.html 200
 /articles-admin.html /articles-admin 301
 
 # NOTE: /articles/* is intentionally NOT rewritten here.
