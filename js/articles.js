@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let articles = [];
     loadArticles();
 
-    function addSubmissionCTA(){const hero=document.querySelector(".hero-content");if(!hero||document.getElementById("submitArticleCTA"))return;const wrapper=document.createElement("div");wrapper.id="submitArticleCTA";wrapper.style.cssText="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px";wrapper.innerHTML=`<a href="/articles-admin" style="display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:13px;background:#FF2A54;color:#fff;font-weight:800;text-decoration:none"><i class="fa-solid fa-pen-to-square"></i> أرسل مقالتك للنشر</a>`;hero.appendChild(wrapper)}
+    function addSubmissionCTA(){const hero=document.querySelector(".hero-content");if(!hero||document.getElementById("submitArticleCTA"))return;const wrapper=document.createElement("div");wrapper.id="submitArticleCTA";wrapper.style.cssText="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px";wrapper.innerHTML=`<a href="/submit-article" style="display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:13px;background:#FF2A54;color:#fff;font-weight:800;text-decoration:none"><i class="fa-solid fa-pen-to-square"></i> أرسل مقالتك للنشر</a>`;hero.appendChild(wrapper)}
     function slugify(value){return String(value||"").normalize("NFKC").toLowerCase().trim().replace(/[\u064B-\u065F\u0670]/g,"").replace(/[إأآٱ]/g,"ا").replace(/[ى]/g,"ي").replace(/[ؤ]/g,"و").replace(/[ئ]/g,"ي").replace(/[ـ]/g,"").replace(/[^\p{L}\p{N}]+/gu,"-").replace(/^-+|-+$/g,"").slice(0,90)}
     async function loadArticles(){
         showLoading();
