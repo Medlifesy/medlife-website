@@ -42,6 +42,23 @@ export async function onRequest({ request }) {
       }
     }
 
+    // The Worker CRUD routes use /articles/:id for update/delete. The admin UI
+    // sends the id in the request body (PUT) or query string (DELETE), so
+    // normalize both forms here before forwarding.
+    if (request.method === 'PUT' || request.method === 'DELETE') {
+      let id = incoming.searchParams.get('id');
+      if (request.method === 'PUT' && body) {
+        try {
+          const payload = JSON.parse(body);
+          if (payload?.id != null) id = String(payload.id);
+        } catch {}
+      }
+      if (id && /^\d+$/.test(String(id))) {
+        target.pathname = `${target.pathname.replace(/\/$/, '')}/${encodeURIComponent(id)}`;
+        if (request.method === 'DELETE') target.search = '';
+      }
+    }
+
     const response = await fetch(target.toString(), {
       method: request.method,
       headers,
