@@ -2907,6 +2907,20 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', dedupe); else dedupe();
 })();
 </script>
+<script id="medlife-public-submit-guard">
+(() => {
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest && event.target.closest('a');
+    if (!link) return;
+    const raw = link.getAttribute('href') || '';
+    if (/^(?:https?:\/\/[^/]+)?\/?articles-admin(?:\.html)?(?:\/)?(?:[?#].*)?$/i.test(raw)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.location.assign('/submit-article');
+    }
+  }, true);
+})();
+</script>
 </body>
 
 </html>
