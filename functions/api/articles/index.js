@@ -10,9 +10,11 @@ export async function onRequest({ request }) {
   try {
     const incoming = new URL(request.url);
     const target = new URL(ARTICLES_WORKER_URL);
-    target.search = incoming.search;
 
-    if (request.method === 'GET' || request.method === 'PUT' || request.method === 'DELETE') {
+    if (request.method === 'GET') {
+      target.search = incoming.search;
+      target.searchParams.set('admin', '1');
+    } else if (request.method === 'PUT') {
       target.searchParams.set('admin', '1');
     }
 
@@ -29,6 +31,14 @@ export async function onRequest({ request }) {
             for (const field of ARTICLE_FIELDS) {
               if (payload[field] === undefined) payload[field] = null;
             }
+
+            // The Worker expects item routes as /articles/:id for PUT/DELETE,
+            // while the legacy admin UI sends the article id in JSON/query data.
+            if (request.method === 'PUT' && payload.id !== undefined && payload.id !== null && String(payload.id).trim() !== '') {
+              target.pathname = `${target.pathname.replace(/\/$/, '')}/${encodeURIComponent(String(payload.id))}`;
+              delete payload.id;
+            }
+
             body = JSON.stringify(payload);
             headers.set('Content-Type', 'application/json');
           } else {
@@ -42,21 +52,10 @@ export async function onRequest({ request }) {
       }
     }
 
-    // The Worker CRUD routes use /articles/:id for update/delete. The admin UI
-    // sends the id in the request body (PUT) or query string (DELETE), so
-    // normalize both forms here before forwarding.
-    if (request.method === 'PUT' || request.method === 'DELETE') {
-      let id = incoming.searchParams.get('id');
-      if (request.method === 'PUT' && body) {
-        try {
-          const payload = JSON.parse(body);
-          if (payload?.id != null) id = String(payload.id);
-        } catch {}
-      }
-      if (id && /^\d+$/.test(String(id))) {
-        target.pathname = `${target.pathname.replace(/\/$/, '')}/${encodeURIComponent(id)}`;
-        if (request.method === 'DELETE') target.search = '';
-      }
+    if (request.method === 'DELETE') {
+      const id = incoming.searchParams.get('id');
+      if (id) target.pathname = `${target.pathname.replace(/\/$/, '')}/${encodeURIComponent(id)}`;
+      target.searchParams.set('admin', '1');
     }
 
     const response = await fetch(target.toString(), {
