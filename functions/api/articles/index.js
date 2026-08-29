@@ -53,20 +53,40 @@ export async function onRequest({ request }) {
     outHeaders.delete('content-length');
     outHeaders.set('cache-control', 'no-store');
 
-    if (request.method === 'GET' && response.ok) {
+    if (response.ok && (request.method === 'GET' || request.method === 'POST' || request.method === 'PUT' || request.method === 'DELETE')) {
       const contentType = response.headers.get('content-type') || '';
       if (contentType.includes('application/json')) {
         const data = await response.json();
-        if (Array.isArray(data)) {
-          const articles = data;
-          const summary = {
-            total: articles.length,
-            pending: articles.filter(a => a?.status === 'pending').length,
-            published: articles.filter(a => a?.status === 'published').length,
-            rejected: articles.filter(a => a?.status === 'rejected').length,
-            draft: articles.filter(a => a?.status === 'draft').length
-          };
-          return new Response(JSON.stringify({ success: true, articles, summary }), {
+
+        if (request.method === 'GET') {
+          if (Array.isArray(data)) {
+            const articles = data;
+            const summary = {
+              total: articles.length,
+              pending: articles.filter(a => a?.status === 'pending').length,
+              published: articles.filter(a => a?.status === 'published').length,
+              rejected: articles.filter(a => a?.status === 'rejected').length,
+              draft: articles.filter(a => a?.status === 'draft').length
+            };
+            return new Response(JSON.stringify({ success: true, articles, summary }), {
+              status: response.status,
+              statusText: response.statusText,
+              headers: outHeaders
+            });
+          }
+          if (data && typeof data === 'object' && data.success === true) return new Response(JSON.stringify(data), { status: response.status, statusText: response.statusText, headers: outHeaders });
+        }
+
+        if (data && typeof data === 'object' && data.success === true) {
+          return new Response(JSON.stringify(data), {
+            status: response.status,
+            statusText: response.statusText,
+            headers: outHeaders
+          });
+        }
+
+        if (data && typeof data === 'object' && !Array.isArray(data)) {
+          return new Response(JSON.stringify({ success: true, ...data }), {
             status: response.status,
             statusText: response.statusText,
             headers: outHeaders
