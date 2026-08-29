@@ -12,9 +12,6 @@ export async function onRequest({ request }) {
     const target = new URL(ARTICLES_WORKER_URL);
     target.search = incoming.search;
 
-    // GET/PUT/DELETE from the articles administration UI must request the
-    // complete administrative dataset. The Worker still requires a valid
-    // medlife_articles_session cookie before exposing non-public articles.
     if (request.method === 'GET' || request.method === 'PUT' || request.method === 'DELETE') {
       target.searchParams.set('admin', '1');
     }
@@ -55,6 +52,28 @@ export async function onRequest({ request }) {
     const outHeaders = new Headers(response.headers);
     outHeaders.delete('content-length');
     outHeaders.set('cache-control', 'no-store');
+
+    if (request.method === 'GET' && response.ok) {
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          const articles = data;
+          const summary = {
+            total: articles.length,
+            pending: articles.filter(a => a?.status === 'pending').length,
+            published: articles.filter(a => a?.status === 'published').length,
+            rejected: articles.filter(a => a?.status === 'rejected').length,
+            draft: articles.filter(a => a?.status === 'draft').length
+          };
+          return new Response(JSON.stringify({ success: true, articles, summary }), {
+            status: response.status,
+            statusText: response.statusText,
+            headers: outHeaders
+          });
+        }
+      }
+    }
 
     return new Response(response.body, {
       status: response.status,
