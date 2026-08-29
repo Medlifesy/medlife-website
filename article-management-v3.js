@@ -8,7 +8,7 @@
   const signature=f=>[f.title_ar,f.category,f.content_ar,f.image_url].join('\n').trim();
   const markDirty=()=>{previewedSignature=''};
   const clearForm=()=>{fields.forEach(k=>{if($(k))$(k).value=''});markDirty()};
-  async function api(url,options={}){const r=await fetch(url,{...options,credentials:'include',headers:{Accept:'application/json',...(options.body?{'Content-Type':'application/json'}:{}),...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw Error(d.error||'تعذر تنفيذ العملية');return d;}
+  async function api(url,options={}){const r=await fetch(url,{...options,credentials:'include',headers:{Accept:'application/json',...(options.body?{'Content-Type':'application/json'}:{}),...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw Error(d.error||'تعذر تنفيذ العملية');return d}
   function message(text,type='ok'){const el=$('editMsg');if(el){el.className='msg '+type;el.textContent=text}}
   function addNewArticle(){clearForm();creating=true;showEditor();$('editor')?.scrollIntoView({behavior:'smooth',block:'start'})}
   function addNewButton(){const hero=document.querySelector('.hero');if(!hero||$('addNewArticleV3')||$('articleAddStatic'))return;const b=document.createElement('button');b.id='addNewArticleV3';b.className='btn primary';b.type='button';b.textContent='➕ إضافة مقالة جديدة';b.style.cssText='margin-top:14px;width:100%;font-size:14px;padding:13px;font-weight:900';b.onclick=addNewArticle;hero.appendChild(b)}
