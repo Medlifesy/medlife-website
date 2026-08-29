@@ -6,6 +6,13 @@ export async function onRequest({ request }) {
     const target = new URL(ARTICLES_WORKER_URL);
     target.search = incoming.search;
 
+    // GET/PUT/DELETE from the articles administration UI must request the
+    // complete administrative dataset. The Worker still requires a valid
+    // medlife_articles_session cookie before exposing non-public articles.
+    if (request.method === 'GET' || request.method === 'PUT' || request.method === 'DELETE') {
+      target.searchParams.set('admin', '1');
+    }
+
     const headers = new Headers(request.headers);
     headers.delete('host');
 
