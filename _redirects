@@ -33,9 +33,11 @@
 /admin-telegram.html /admin-telegram 301
 /articles-admin.html /articles-admin 301
 
+# Independent MedLife Content Center
+/content-center /content-center.html 200
+/content-center/ /content-center.html 200
+
 # Articles admin API is served by the dedicated Worker/D1 stack.
-# Authenticated requests keep the medlife_articles_session cookie and the Worker
-# itself decides whether to return public or admin article data.
 /api/articles https://medlife-articles-api.broad-frog-3978.workers.dev/articles 200
 /api/articles/ https://medlife-articles-api.broad-frog-3978.workers.dev/articles 200
 
