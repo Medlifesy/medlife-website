@@ -34,10 +34,6 @@
 /articles-admin.html /articles-admin 301
 
 # Independent MedLife Content Center
-/content-center /content-center.html 200
-/content-center/ /content-center.html 200
-/content-center-admin /content-center-admin.html 200
-/content-center-admin/ /content-center-admin.html 200
 
 # Articles admin API is served by the dedicated Worker/D1 stack.
 /api/articles https://medlife-articles-api.broad-frog-3978.workers.dev/articles 200
