@@ -28,8 +28,8 @@ export async function onRequest(context) {
     }
     if (isContentCenter) {
       let html = await response.text();
-      const tag = '<script src="/content-center-login.js?v=20260830-1" defer></script>';
-      if (!html.includes('/content-center-login.js')) html = html.includes('</body>') ? html.replace('</body>', `${tag}</body>`) : `${html}${tag}`;
+      const tags = '<script src="/content-center-login.js?v=20260830-1" defer></script><script src="/content-center-writers.js?v=20260830-2" defer></script>';
+      if (!html.includes('/content-center-writers.js')) html = html.includes('</body>') ? html.replace('</body>', `${tags}</body>`) : `${html}${tags}`;
       const headers = new Headers(response.headers);
       headers.delete('content-length'); headers.set('cache-control','no-store, no-cache, must-revalidate, max-age=0'); headers.set('pragma','no-cache');
       return new Response(html,{status:response.status,statusText:response.statusText,headers});
