@@ -1,0 +1,51 @@
+name: Fix Content Center isolation
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor == 'Medlifesy'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce Content Center admin isolation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('functions/api/content-center.js')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace("import { authenticateArticleAdmin } from './article-admin-session.js';\n\n", "")
+          old = "async function admin(request,db){return Boolean(await authenticateArticleAdmin(request,db))}"
+          new = "async function admin(request,db,env){const a=await activeSession(request,db,env);return Boolean(a&&a.status==='فعّال'&&ADMIN_ROLES.includes(a.role))}"
+          if old in s:
+              s = s.replace(old, new)
+          else:
+              raise SystemExit('Expected admin helper was not found')
+          s = s.replace('admin(request,db)', 'admin(request,db,env)')
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add functions/api/content-center.js
+          if git diff --cached --quiet; then
+            echo "No change needed"
+            exit 0
+          fi
+          git commit -m "fix(content-center): enforce cell isolation"
+          git push
+      - name: Remove temporary workflow
+        if: success()
+        shell: bash
+        run: |
+          git rm .github/workflows/fix-content-center-isolation.yml || true
+          git commit -m "chore: remove temporary isolation fix workflow" || true
+          git push || true
