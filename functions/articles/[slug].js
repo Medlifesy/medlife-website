@@ -1,15 +1,46 @@
 const READER_ASSET = "/article-reader-v5.html";
 const ARTICLES_WORKER = "https://medlife-articles-api.broad-frog-3978.workers.dev/public/articles";
 
+const LEGACY_ARTICLE_ROUTES = {
+  "tension-headache": "/articles/tension-headache.html",
+  "صداع-التوتر-رحلتك-نحو-الراحة": "/articles/tension-headache.html",
+  "endometriosis-endotest-endosure": "/articles/endometriosis-endotest-endosure.html",
+  "الاختبارات-التشخيصية-الحديثة-وغير-الباضعة-للانتباذ-البطاني-الرحمي": "/articles/endometriosis-endotest-endosure.html",
+  "family-planning-conscious-choice": "/family-planning.html",
+  "وسائل-تنظيم-الأسرة-التخطيط-الواعي-لحياة-أسرية-متوازنة": "/family-planning.html",
+};
+
+async function legacyFallback(context, slug) {
+  const target = LEGACY_ARTICLE_ROUTES[slug];
+  if (!target) return null;
+  const response = await context.env.ASSETS.fetch(new URL(target, context.request.url));
+  if (!response.ok) return null;
+  return new Response(response.body, {
+    status: 200,
+    headers: {
+      "content-type": response.headers.get("content-type") || "text/html; charset=UTF-8",
+      "cache-control": "no-store",
+      "x-medlife-article-renderer": "legacy-static-fallback",
+      "x-medlife-article-route": slug,
+    },
+  });
+}
+
 export async function onRequestGet(context) {
   const slug = String(context.params.slug || "").trim();
   if (!slug || slug.includes("/") || slug === "." || slug === "..") return new Response("Not found", { status: 404 });
 
   const direct = await fetch(`${ARTICLES_WORKER}/${encodeURIComponent(slug)}`, { headers: { Accept: "application/json" } });
-  if (direct.status === 404) return new Response("Not found", { status: 404 });
+  if (direct.status === 404) {
+    const fallback = await legacyFallback(context, slug);
+    return fallback || new Response("Not found", { status: 404 });
+  }
   if (!direct.ok) return new Response("Article service unavailable", { status: 502 });
   const article = await direct.json();
-  if (!article || article.status !== "published") return new Response("Not found", { status: 404 });
+  if (!article || article.status !== "published") {
+    const fallback = await legacyFallback(context, slug);
+    return fallback || new Response("Not found", { status: 404 });
+  }
 
   const assetResponse = await context.env.ASSETS.fetch(new URL(READER_ASSET, context.request.url));
   if (!assetResponse.ok) return assetResponse;
