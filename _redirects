@@ -32,8 +32,7 @@
 /articles-admin.html /articles-admin 301
 
 # Unified Content Center
-/content-center /content-center.html 200
-/content-center/ /content-center.html 200
+# /content-center is handled by functions/content-center.js
 
 # Content Center central department routes
 /content-coordination /content-coordination.html 200
