@@ -1,35 +1,16 @@
-const CONTENT_DS = '6fdacc1d-7b08-4a25-8e85-4cbeff40bc25';
-const ACCOUNTS_DS = '8450cfc9-2ecf-4dcb-8fe3-80a0ecb81efb';
-const NOTION_VERSION = '2025-09-03';
-const COOKIE = 'medlife_content_center_session';
-const enc = new TextEncoder();
-
+const CONTENT_DS='6fdacc1d-7b08-4a25-8e85-4cbeff40bc25';
+const PLASMA_DS='1c22fca6-8017-49d6-a679-b3eb885bbd8c';
+const NOTION_VERSION='2025-09-03',COOKIE='medlife_content_center_session';
+const enc=new TextEncoder();
 function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store, no-cache, must-revalidate, max-age=0'}})}
 function hex(bytes){return Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,'0')).join('')}
 async function sha(v){return hex(await crypto.subtle.digest('SHA-256',enc.encode(v)))}
 function cookieValue(request){const raw=request.headers.get('Cookie')||'';for(const part of raw.split(';')){const p=part.trim();if(p.startsWith(COOKIE+'='))return decodeURIComponent(p.slice(COOKIE.length+1))}return null}
 function prop(p){if(!p)return '';if(p.type==='title')return(p.title||[]).map(x=>x.plain_text||'').join('').trim();if(p.type==='rich_text')return(p.rich_text||[]).map(x=>x.plain_text||'').join('').trim();if(p.type==='select')return p.select?.name||'';return ''}
 async function notion(env,path,init={}){if(!env.NOTION_API_TOKEN)throw Error('NOTION_API_TOKEN is not configured');const r=await fetch('https://api.notion.com'+path,{...init,headers:{Authorization:`Bearer ${env.NOTION_API_TOKEN}`,'Notion-Version':NOTION_VERSION,'Content-Type':'application/json',...(init.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.message||d.code||`Notion ${r.status}`);return d}
-async function queryAll(env,ds){let out=[],cursor;for(let i=0;i<10;i++){const body={page_size:100};if(cursor)body.start_cursor=cursor;const d=await notion(env,`/v1/data_sources/${ds}/query`,{method:'POST',body:JSON.stringify(body)});out.push(...(d.results||[]));if(!d.has_more||!d.next_cursor)break;cursor=d.next_cursor}return out}
+async function queryAll(env,ds){let out=[],cursor;for(let i=0;i<10;i++){const body={page_size:100,...(cursor?{start_cursor:cursor}:{})};const d=await notion(env,`/v1/data_sources/${ds}/query`,{method:'POST',body:JSON.stringify(body)});out.push(...(d.results||[]));if(!d.has_more||!d.next_cursor)break;cursor=d.next_cursor}return out}
 function normalize(s){return String(s||'').toLowerCase().normalize('NFKC').replace(/[ً-ٟـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim()}
 function tokens(s){return new Set(normalize(s).split(' ').filter(x=>x.length>2))}
-function score(a,b){const na=normalize(a),nb=normalize(b);if(!na||!nb)return 0;if(na===nb)return 1;if(na.includes(nb)||nb.includes(na))return 0.92;const A=tokens(a),B=tokens(b);if(!A.size||!B.size)return 0;let common=0;for(const x of A)if(B.has(x))common++;const j=common/(A.size+B.size-common);return j}
+function score(a,b){const na=normalize(a),nb=normalize(b);if(!na||!nb)return 0;if(na===nb)return 1;if(na.includes(nb)||nb.includes(na))return .92;const A=tokens(a),B=tokens(b);if(!A.size||!B.size)return 0;let common=0;for(const x of A)if(B.has(x))common++;return common/(A.size+B.size-common)}
 async function activeSession(request,env,db){const token=cookieValue(request);if(!token)return null;const row=await db.prepare("SELECT account_page_id FROM content_center_sessions WHERE token_hash=?1 AND datetime(expires_at)>datetime('now') LIMIT 1").bind(await sha(token)).first();if(!row)return null;const page=await notion(env,`/v1/pages/${row.account_page_id}`);const p=page.properties||{};return{cell:prop(p['الخلية']),status:prop(p['الحالة']),role:prop(p['الدور'])}}
-
-export async function onRequest({request,env}){
-  if(request.method!=='GET')return json({success:false,error:'Method not allowed'},405);
-  if(!env.DB)return json({success:false,error:'Database binding DB is not configured.'},500);
-  try{
-    const me=await activeSession(request,env,env.DB);
-    if(!me||me.status!=='فعّال'||!['مسؤول خلية','مشرف خلية'].includes(me.role))return json({success:false,error:'Unauthorized'},401);
-    const title=String(new URL(request.url).searchParams.get('title')||'').trim();
-    if(title.length<4)return json({success:true,level:'none',matches:[]});
-    const pages=await queryAll(env,CONTENT_DS);
-    const matches=[];
-    for(const page of pages){const p=page.properties||{};const cell=prop(p['الخلية']);const otherTitle=prop(p['عنوان المحتوى']);const status=prop(p['الحالة']);if(!cell||cell===me.cell||!otherTitle||['أرشيف','مؤرشف'].includes(status))continue;const s=score(title,otherTitle);if(s>=0.55)matches.push({cell,score:Math.round(s*100)});}
-    const grouped={};for(const m of matches){if(!grouped[m.cell]||m.score>grouped[m.cell])grouped[m.cell]=m.score}
-    const unique=Object.entries(grouped).map(([cell,s])=>({cell,score:s})).sort((a,b)=>b.score-a.score).slice(0,5);
-    const level=unique.some(x=>x.score>=80)?'high':unique.some(x=>x.score>=60)?'possible':'none';
-    return json({success:true,level,matches:unique});
-  }catch(e){console.error('content-center-similarity',e);return json({success:false,error:e instanceof Error?e.message:'تعذر فحص تشابه المحتوى.'},502)}
-}
+export async function onRequest({request,env}){if(request.method!=='GET')return json({success:false,error:'Method not allowed'},405);if(!env.DB)return json({success:false,error:'Database binding DB is not configured.'},500);try{const me=await activeSession(request,env,env.DB);if(!me||me.status!=='فعّال'||!['مسؤول خلية','مشرف خلية'].includes(me.role))return json({success:false,error:'Unauthorized'},401);const title=String(new URL(request.url).searchParams.get('title')||'').trim();if(title.length<4)return json({success:true,level:'none',matches:[]});const [oldPages,plasmaPages]=await Promise.all([queryAll(env,CONTENT_DS),queryAll(env,PLASMA_DS)]);const matches=[];for(const page of oldPages){const p=page.properties||{},cell=prop(p['الخلية']),otherTitle=prop(p['عنوان المحتوى']),status=prop(p['الحالة']);if(!cell||cell===me.cell||!otherTitle||['أرشيف','مؤرشف'].includes(status))continue;const s=score(title,otherTitle);if(s>=.55)matches.push({cell,score:Math.round(s*100)})}if(me.cell!=='Plasma Cell')for(const page of plasmaPages){const p=page.properties||{},otherTitle=prop(p['عنوان المنشور']),status=prop(p['الحالة']);if(!otherTitle||['أرشيف','مؤرشف'].includes(status))continue;const s=score(title,otherTitle);if(s>=.55)matches.push({cell:'Plasma Cell',score:Math.round(s*100)})}const grouped={};for(const m of matches)if(!grouped[m.cell]||m.score>grouped[m.cell])grouped[m.cell]=m.score;const unique=Object.entries(grouped).map(([cell,s])=>({cell,score:s})).sort((a,b)=>b.score-a.score).slice(0,5);const level=unique.some(x=>x.score>=80)?'high':unique.some(x=>x.score>=60)?'possible':'none';return json({success:true,level,matches:unique})}catch(e){console.error('content-center-similarity',e);return json({success:false,error:e instanceof Error?e.message:'تعذر فحص تشابه المحتوى.'},502)}}
