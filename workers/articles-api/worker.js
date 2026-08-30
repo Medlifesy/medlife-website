@@ -28,6 +28,29 @@ function normalizeArticleContent(v){
 }
 function slug(v){return String(v||'article').toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]+/g,'-').replace(/^-+|-+$/g,'').slice(0,70)||'article';}
 async function uniqueSlug(db,title,id=null){const base=slug(title);let candidate=base;for(let i=0;i<20;i++){const row=id?await db.prepare('SELECT id FROM articles WHERE slug=? AND id<>? LIMIT 1').bind(candidate,id).first():await db.prepare('SELECT id FROM articles WHERE slug=? LIMIT 1').bind(candidate).first();if(!row)return candidate;candidate=`${base}-${crypto.randomUUID().slice(0,8)}`;}return `${base}-${Date.now().toString(36)}`;}
+async function ensureLegacyArticles(env){
+  const db=env.DB;
+  const legacy=[
+    {slug:'tension-headache',title_ar:'صداع التوتر: رحلتك نحو الراحة',excerpt_ar:'تعرف على صداع التوتر، أسبابه وأعراضه وعلامات الخطر والعلاج المتكامل وطرق الوقاية.',author_name:'الصيدلانية دلع باسل العباس',category:'توعية صحية',image_url:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Large_headache_diagram.png',created_at:'2026-08-14T00:00:00Z',source:'articles/tension-headache.html'},
+    {slug:'endometriosis-endotest-endosure',title_ar:'الاختبارات التشخيصية الحديثة وغير الباضعة للانتباذ البطاني الرحمي',excerpt_ar:'Global Journal Club يناقش Endotest وEndoSure، مع قراءة نقدية للدليل العلمي والدقة التشخيصية والفائدة السريرية.',author_name:'د. أمين نحاس',category:'Medical Education',created_at:'2026-08-14T00:00:00Z',source:'articles/endometriosis-endotest-endosure.html'},
+    {slug:'family-planning-conscious-choice',title_ar:'وسائل تنظيم الأسرة: التخطيط الواعي لحياة أسرية متوازنة',excerpt_ar:'دليل حول وسائل تنظيم الأسرة الهرمونية وغير الهرمونية ومزايا وعيوب كل وسيلة.',author_name:'الممرضة صفا علاء الدين الحكيم',category:'توعية صحية',image_url:'/images/family-planning-cover.jpg',created_at:'2026-08-26T00:00:00Z',source:'family-planning.html'}
+  ];
+  for(const a of legacy){
+    const exists=await db.prepare('SELECT id FROM articles WHERE slug=? LIMIT 1').bind(a.slug).first();
+    if(exists) continue;
+    let content='';
+    try{
+      const r=await fetch('https://raw.githubusercontent.com/Medlifesy/medlife-website/main/'+a.source,{headers:{'User-Agent':'MedLife-Articles-Migrator/1.0'}});
+      if(r.ok){
+        const html=await r.text();
+        const body=(html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)||[])[1]||html;
+        content=body.replace(/<header[\s\S]*?<\/header>/gi,'').replace(/<footer[\s\S]*?<\/footer>/gi,'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'').trim();
+      }
+    }catch(e){console.warn('legacy import fetch failed',a.slug,e?.message||e);}
+    if(!content) content='<h2>'+a.title_ar+'</h2><p>'+a.excerpt_ar+'</p>';
+    await db.prepare('INSERT INTO articles(slug,canonical_path,title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,published_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(a.slug,'/articles/'+a.slug,a.title_ar,null,a.excerpt_ar,null,content,null,a.author_name,null,a.category,a.image_url||null,'published',a.created_at,a.created_at,a.created_at).run();
+  }
+}
 async function ensureCanonicalColumns(db){
   for(const [column,type] of [['slug','TEXT'],['canonical_path','TEXT']]){
     try{await db.prepare(`ALTER TABLE articles ADD COLUMN ${column} ${type}`).run();}
@@ -47,6 +70,7 @@ if(p[0]==='api'&&p[1]==='article-images-auto'){if(req.method!=='POST')return jso
 if(p[0]==='public'&&p[1]==='articles'){
   if(req.method!=='GET')return json({error:'Method not allowed'},405);
   await ensureCanonicalColumns(env.DB);
+  await ensureLegacyArticles(env);
   const published=(await env.DB.prepare("SELECT * FROM articles WHERE status='published' ORDER BY created_at DESC").all()).results||[];
   for(const a of published){
     if(!a.slug){const s=await uniqueSlug(env.DB,a.title_ar||a.title_en||'article',a.id);await env.DB.prepare('UPDATE articles SET slug=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(s,a.id).run();a.slug=s;}
