@@ -31,7 +31,11 @@
 /admin-telegram.html /admin-telegram 301
 /articles-admin.html /articles-admin 301
 
-# Content Center 2.0 central department routes
+# Unified Content Center
+/content-center /content-center.html 200
+/content-center/ /content-center.html 200
+
+# Content Center central department routes
 /content-coordination /content-coordination.html 200
 /content-coordination/ /content-coordination.html 200
 /content-design /content-design.html 200
