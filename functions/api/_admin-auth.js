@@ -36,6 +36,8 @@ export async function authenticateAdmin(request, db) {
 }
 
 export async function loginAdmin(request, db) {
+  await ensureAuthTables(db);
+  await ensureAdminTables(db);
   const body = await request.json();
   const identifier = String(body.identifier || body.email || body.username || '').trim().toLowerCase();
   const password = String(body.password || '');
@@ -52,7 +54,6 @@ export async function loginAdmin(request, db) {
   if (!isAdmin) return json({success:false,error:'هذا الحساب لا يملك صلاحية الإدارة.'},403);
   if (!member.password_hash || !(await verifyPassword(password, member.password_hash))) return json({success:false,error:'بيانات الدخول غير صحيحة.'},401);
 
-  await ensureAdminTables(db);
   const token = randomToken();
   const tokenHash = await hashToken(token);
   await db.prepare(`DELETE FROM ${ADMIN_SESSION_TABLE} WHERE datetime(expires_at)<=datetime('now') OR member_id=?`).bind(member.id).run();
