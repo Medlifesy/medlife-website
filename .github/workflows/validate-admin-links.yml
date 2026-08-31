@@ -1,0 +1,54 @@
+name: Validate Admin Navigation (Clean Rebuild)
+
+on:
+  push:
+    branches:
+      - admin-cleanup-safe-2026-08-31-v2
+    paths:
+      - '.github/workflows/validate-admin-links.yml'
+      - '_redirects'
+      - 'ADMIN_CLEAN_REBUILD.md'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/validate-admin-links.yml'
+      - '_redirects'
+      - 'ADMIN_CLEAN_REBUILD.md'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-clean-admin-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate clean administration boundary
+        shell: python
+        run: |
+          from pathlib import Path
+
+          redirects = Path('_redirects').read_text(encoding='utf-8') if Path('_redirects').exists() else ''
+          legacy = [
+              'admin.html',
+              'admin-v2.html',
+              'admin-login.html',
+              'admin-members-v3.html',
+              'admin-teams.html',
+              'admin-telegram.html',
+              'articles-admin.html',
+          ]
+          present = [name for name in legacy if Path(name).exists()]
+          if present:
+              raise SystemExit(f'Legacy admin files must not return during clean rebuild: {present}')
+
+          if '/articles-admin' in redirects:
+              raise SystemExit('Legacy /articles-admin routing must remain retired during rebuild')
+
+          if '/admin /admin-login 302' not in redirects and '/admin/ /admin-login 302' not in redirects:
+              raise SystemExit('Canonical /admin -> /admin-login entrypoint is missing')
+
+          print('OK: legacy administration surface is retired and clean rebuild boundary is preserved.')
