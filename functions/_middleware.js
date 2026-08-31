@@ -26,6 +26,10 @@ export async function onRequest(context) {
     if (isArticleReader) tags.push('<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>');
     if (isSupportPage) tags.push('<script src="/site-nav.js?v=20260831-support1" defer></script>');
     if (isContactPage) {
+      // Hide the legacy Contact shell before first paint. contact-page-v8 removes these nodes
+      // and replaces them with the final UI, so users never see a legacy->new flash.
+      const earlyStyle = '<style id="medlife-contact-no-flash">body>header.hero,body>main.wrap{visibility:hidden!important;opacity:0!important}</style>';
+      html = html.includes('</head>') ? html.replace('</head>', `${earlyStyle}</head>`) : `${earlyStyle}${html}`;
       tags.push('<script src="/site-nav.js?v=20260831-contact-final10" defer></script>');
       tags.push('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">');
       tags.push('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous" defer></script>');
@@ -43,6 +47,7 @@ export async function onRequest(context) {
       tags.push('<script src="/contact-nav-direct-final.js?v=20260831-contact-nav-direct-final" defer></script>');
       tags.push('<script src="/contact-collaboration-center-final.js?v=20260831-contact-collaboration-center-final" defer></script>');
       tags.push('<script src="/contact-ui-align-final.js?v=20260831-contact-ui-align-final" defer></script>');
+      tags.push('<script src="/contact-ui-final-fix.js?v=20260831-contact-ui-final-fix" defer></script>');
     }
     const marker = tags.join('');
     if (marker && tags.some(src => !html.includes(src.match(/(?:src|href)="([^"]+)/)?.[1] || ''))) {
