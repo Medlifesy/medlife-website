@@ -10,7 +10,8 @@
     ['contact.html', 'تواصل معنا', 'contact']
   ];
 
-  const page = location.pathname.split('/').pop() || 'index.html';
+  const rawPage = location.pathname.split('/').filter(Boolean).pop() || 'index.html';
+  const page = rawPage.endsWith('/') ? rawPage.slice(0, -1) : rawPage;
   const home = page === '' || page === 'index.html';
 
   const activeKey = () => {
@@ -18,6 +19,7 @@
     if (home && location.hash === '#programs') return 'programs';
     if (home && location.hash === '#homepageGallery') return 'gallery';
     if (home) return 'home';
+    if (page === 'about-medlife' || page === 'about-medlife.html') return 'about';
     const match = items.find(item => item[0].split('#')[0] === page && !item[0].includes('#'));
     return match ? match[2] : '';
   };
@@ -52,9 +54,7 @@
           <a class="member" href="/login.html">دخول الأعضاء</a>
           <a class="join" href="/join-options.html">الانضمام</a>
         </div>
-        <button class="medlife-global-menu" type="button" aria-label="فتح قائمة التنقل" aria-expanded="false" aria-controls="medlife-global-mobile">
-          القائمة
-        </button>
+        <button class="medlife-global-menu" type="button" aria-label="فتح قائمة التنقل" aria-expanded="false" aria-controls="medlife-global-mobile">القائمة</button>
       </div>
       <div id="medlife-global-mobile" class="medlife-global-mobile" hidden>
         ${items.map(([url, label, key]) => `
