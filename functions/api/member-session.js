@@ -36,13 +36,11 @@ async function findMembersDatabase(env) {
 }
 
 async function login(request, db) {
+    await ensureAdminRoutingSchema(db);
     const body = await request.json();
     const identifier = String(body.identifier || body.username || body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
     if (!identifier || !password) return json({success:false, error:"يرجى إدخال البريد الإلكتروني أو اسم المستخدم وكلمة المرور."},400);
-    // Initialize the admin RBAC schema before resolving an administrative redirect.
-    // This prevents a first login from silently falling back to the members area.
-    await ensureAdminTables(db);
     const member = await db.prepare(`SELECT id,membership_number,full_name,email,account_email,password_hash,account_status,status,member_code,medlife_role,cell,field_location,governorate,join_date,volunteer_certificate FROM members WHERE lower(COALESCE(account_email,''))=? OR lower(COALESCE(email,''))=? OR lower(COALESCE(member_code,''))=? LIMIT 1`).bind(identifier,identifier,identifier).first();
     if (!member) return json({success:false, error:"بيانات الدخول غير صحيحة."},401);
     if (!(member.status === "active" || member.status === "approved")) return json({success:false, error:"عضويتك لم تُعتمد بعد من الإدارة."},403);
@@ -56,6 +54,18 @@ async function login(request, db) {
     const redirect = await resolveRedirect(db,member.id);
     const adminToken = await hasAdminRole(db,member.id) ? await issueAdminSession(db,member.id) : null;
     return withCookies(json({success:true,member:profile,redirect}), session, adminToken);
+}
+
+async function ensureAdminRoutingSchema(db){
+    await ensureAdminTables(db);
+    await db.prepare(`CREATE TABLE IF NOT EXISTS medlife_admin_roles (role_key TEXT PRIMARY KEY,name TEXT NOT NULL,description TEXT,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run();
+    await db.prepare(`CREATE TABLE IF NOT EXISTS medlife_admin_permissions (permission_key TEXT PRIMARY KEY,name TEXT NOT NULL)`).run();
+    await db.prepare(`CREATE TABLE IF NOT EXISTS medlife_admin_role_permissions (role_key TEXT NOT NULL,permission_key TEXT NOT NULL,PRIMARY KEY(role_key,permission_key))`).run();
+    await db.prepare(`CREATE TABLE IF NOT EXISTS medlife_admin_user_roles (member_id INTEGER NOT NULL,role_key TEXT NOT NULL,PRIMARY KEY(member_id,role_key))`).run();
+    const roles=[['system_admin','مدير النظام'],['content_manager','مدير المحتوى'],['content_editor','محرر المحتوى'],['medical_reviewer','مراجع طبي'],['members_manager','مدير الأعضاء'],['support_manager','مدير الدعم'],['complaints_manager','مدير الشكاوى']];
+    for(const [key,name] of roles) await db.prepare(`INSERT OR IGNORE INTO medlife_admin_roles(role_key,name) VALUES(?,?)`).bind(key,name).run();
+    await db.prepare(`INSERT OR IGNORE INTO medlife_admin_permissions(permission_key,name) VALUES('*','جميع الصلاحيات')`).run();
+    await db.prepare(`INSERT OR IGNORE INTO medlife_admin_role_permissions(role_key,permission_key) VALUES('system_admin','*')`).run();
 }
 
 async function hasAdminRole(db,memberId){
