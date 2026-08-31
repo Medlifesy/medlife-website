@@ -28,7 +28,7 @@ export async function onRequest(context) {
     if (isContactPage) {
       tags.push('<script src="/site-nav.js?v=20260831-contact1" defer></script>');
       tags.push('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>');
-      tags.push('<script src="/contact-map-fix.js?v=20260831-contact5" defer></script>');
+      tags.push('<script src="/contact-map-fix.js?v=20260831-contact6" defer></script>');
     }
     const marker = tags.join('');
     if (marker && tags.some(src => !html.includes(src.match(/src=\"([^\"]+)/)?.[1] || ''))) {
