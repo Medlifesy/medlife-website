@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Fix legacy members ID generation for system administrator bootstrap
-Timestamp: 2026-09-01T23:00:00+03:00
+Release: Fix general admin login verification and redirect
+Timestamp: 2026-09-01T23:05:00+03:00
 Source: main
 
-Deploy current main branch after updating one-time system administrator bootstrap to explicitly allocate the next members.id for legacy schemas that do not auto-generate IDs.
+Deploy current main branch after making the general admin login verify the session before redirecting to /admin.html, ensuring the authenticated session is established before the admin dashboard loads.
