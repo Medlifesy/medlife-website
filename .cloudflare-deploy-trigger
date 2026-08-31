@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Repair permanent article publish flow
-Timestamp: 2026-08-28T13:50:00+03:00
+Release: Clean Articles navigation header
+Timestamp: 2026-09-01T21:10:00+03:00
 Source: main
 
-Deploy current main branch after repairing the article publish slug flow.
+Deploy current main branch after removing the duplicated articles navigation header.
