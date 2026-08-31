@@ -1,16 +1,16 @@
 import { authenticateAdmin, loginAdmin, logoutAdmin } from './_admin-auth.js';
 
 // The public administration login/session endpoint owns the main admin session.
-// Article Admin accepts this same session through article-admin-session.js.
+// Prefer the members database binding used by the administration APIs; retain DB as a fallback.
 export async function onRequest({ request, env }) {
-  if (!env.DB) {
-    return new Response(JSON.stringify({ success: false, error: "Database binding 'DB' is not configured." }), {
+  const db = env.MEMBERS_DB || env.DB;
+  if (!db) {
+    return new Response(JSON.stringify({ success: false, error: "Database binding 'MEMBERS_DB'/'DB' is not configured." }), {
       status: 500,
       headers: { 'Content-Type': 'application/json; charset=UTF-8', 'Cache-Control': 'no-store' }
     });
   }
 
-  const db = env.DB;
   const action = new URL(request.url).searchParams.get('action') || 'me';
 
   try {
@@ -54,7 +54,7 @@ export async function onRequest({ request, env }) {
     });
   } catch (error) {
     console.error('admin-session error:', error);
-    return new Response(JSON.stringify({ success: false, error: 'تعذر تنفيذ جلسة الإدارة.' }), {
+    return new Response(JSON.stringify({ success: false, error: 'تعذر تنفيذ جلسة الإدارة.', detail: String(error?.message || error || '') }), {
       status: 500,
       headers: { 'Content-Type': 'application/json; charset=UTF-8', 'Cache-Control': 'no-store' }
     });
