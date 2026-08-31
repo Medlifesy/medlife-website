@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Fix general admin session database binding
-Timestamp: 2026-09-01T22:20:00+03:00
+Release: Fix admin session diagnostics UI
+Timestamp: 2026-09-01T22:30:00+03:00
 Source: main
 
-Deploy current main branch after routing the general admin session endpoint through MEMBERS_DB with DB fallback and exposing backend error detail for diagnosis.
+Deploy current main branch after updating admin-login to expose the backend session error detail for diagnosis.
