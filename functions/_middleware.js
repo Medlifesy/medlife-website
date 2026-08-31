@@ -8,6 +8,7 @@ export async function onRequest(context) {
     const path = new URL(context.request.url).pathname.toLowerCase();
     const isArticlesAdmin = path === '/articles-admin' || path === '/articles-admin/' || path.endsWith('/articles-admin.html');
     const isArticleReader = path === '/article-reader-v5.html' || path.startsWith('/articles/');
+    const isSupportPage = path === '/support' || path === '/support/' || path === '/support.html';
 
     // articles-admin.html is a self-contained application with its own
     // JavaScript handlers. Do not inject legacy admin scripts or bridge code
@@ -20,11 +21,16 @@ export async function onRequest(context) {
       return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
     }
 
-    if (!isArticleReader) return response;
+    if (!isArticleReader && !isSupportPage) return response;
 
     let html = await response.text();
-    const tag = '<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>';
-    if (!html.includes('/article-reader-rich-content.js')) html = html.includes('</body>') ? html.replace('</body>', `${tag}</body>`) : `${html}${tag}`;
+    const tags = [];
+    if (isArticleReader) tags.push('<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>');
+    if (isSupportPage) tags.push('<script src="/site-nav.js?v=20260831-support1" defer></script>');
+    const marker = tags.join('');
+    if (marker && tags.some(src => !html.includes(src.match(/src=\"([^\"]+)/)?.[1] || ''))) {
+      html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+    }
 
     const headers = new Headers(response.headers);
     headers.delete('content-length');
