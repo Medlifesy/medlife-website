@@ -26,7 +26,7 @@ export async function onRequest(context) {
     if (isArticleReader) tags.push('<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>');
     if (isSupportPage) tags.push('<script src="/site-nav.js?v=20260831-support1" defer></script>');
     if (isContactPage) {
-      tags.push('<script src="/site-nav.js?v=20260831-contact-final8" defer></script>');
+      tags.push('<script src="/site-nav.js?v=20260831-contact-final9" defer></script>');
       tags.push('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">');
       tags.push('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous" defer></script>');
       tags.push('<script src="/contact-page-v8.js?v=20260831-contact-final" defer></script>');
@@ -35,6 +35,7 @@ export async function onRequest(context) {
       tags.push('<script src="/contact-page-final-6.js?v=20260831-contact-final6" defer></script>');
       tags.push('<script src="/contact-page-final-7.js?v=20260831-contact-final7" defer></script>');
       tags.push('<script src="/contact-page-final-8.js?v=20260831-contact-final8" defer></script>');
+      tags.push('<script src="/contact-page-final-9.js?v=20260831-contact-final9" defer></script>');
     }
     const marker = tags.join('');
     if (marker && tags.some(src => !html.includes(src.match(/(?:src|href)=\"([^\"]+)/)?.[1] || ''))) {
