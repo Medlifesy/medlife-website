@@ -1,4 +1,4 @@
-const READER_ASSET = "/article-reader-v7.html";
+const READER_ASSET = "/article-reader-v8.html";
 const ARTICLES_WORKER = "https://medlife-articles-api.broad-frog-3978.workers.dev/public/articles";
 
 export async function onRequestGet(context) {
@@ -43,7 +43,7 @@ export async function onRequestGet(context) {
       "content-type": "text/html; charset=UTF-8",
       "cache-control": "no-store",
       "link": `<${canonical}>; rel="canonical"`,
-      "x-medlife-article-renderer": "article-reader-v7-d1",
+      "x-medlife-article-renderer": "article-reader-v8",
       "x-medlife-article-route": article.slug || slug,
     },
   });
