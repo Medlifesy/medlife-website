@@ -5,7 +5,7 @@
    Password format:
    pbkdf2$sha256$<iterations>$<salt-hex>$<hash-hex>
 */
-const ITERATIONS = 120000;
+const ITERATIONS = 100000;
 const enc = new TextEncoder();
 function bytesToHex(bytes){return Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,'0')).join('');}
 function hexToBytes(hex){if(!/^[0-9a-f]+$/i.test(hex)||hex.length%2)throw new Error('Invalid hex value');const out=new Uint8Array(hex.length/2);for(let i=0;i<out.length;i++)out[i]=parseInt(hex.slice(i*2,i*2+2),16);return out;}
@@ -18,20 +18,10 @@ export async function ensureAuthTables(db){
   await db.prepare(`CREATE TABLE IF NOT EXISTS member_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,member_id INTEGER NOT NULL,token_hash TEXT NOT NULL UNIQUE,expires_at TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run();
   const r=await db.prepare('PRAGMA table_info(members)').all();
   const have=new Set((r.results||[]).map(x=>x.name));
-  // Keep the legacy members table compatible with the current administration code.
-  // Existing deployments may predate these columns, so add them before any SELECT/UPDATE uses them.
-  const cols={
-    status:'TEXT',
-    account_email:'TEXT',
-    password_hash:'TEXT',
-    account_status:'TEXT',
-    member_code:'TEXT',
-    medlife_role:'TEXT'
-  };
+  const cols={status:'TEXT',account_email:'TEXT',password_hash:'TEXT',account_status:'TEXT',member_code:'TEXT',medlife_role:'TEXT'};
   for(const [name,type] of Object.entries(cols)){
     if(!have.has(name)) await db.prepare(`ALTER TABLE members ADD COLUMN ${name} ${type}`).run();
   }
-  // Existing members without an explicit status remain usable as active members unless disabled.
   await db.prepare("UPDATE members SET status='active' WHERE status IS NULL OR trim(status)=''").run();
   await db.prepare("UPDATE members SET account_status='active' WHERE account_status IS NULL OR trim(account_status)=''").run();
 }
