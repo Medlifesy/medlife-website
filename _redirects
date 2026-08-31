@@ -31,10 +31,10 @@
 /admin-teams.html /admin-teams 301
 /admin-telegram.html /admin-telegram 301
 
-# Articles admin: serve the real static entrypoint without an external redirect.
-/articles-admin /articles-admin.html 200
-/articles-admin/ /articles-admin.html 200
-/articles-admin.html /articles-admin.html 200
+# Articles admin: serve the new editorial studio directly.
+/articles-admin /articles-admin-v2.html 200
+/articles-admin/ /articles-admin-v2.html 200
+/articles-admin.html /articles-admin-v2.html 200
 
 # Articles admin API is served by the dedicated Worker/D1 stack.
 /api/articles https://medlife-articles-api.broad-frog-3978.workers.dev/articles 200
