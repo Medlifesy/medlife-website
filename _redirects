@@ -15,7 +15,6 @@
 # Public institutional pages
 /about-medlife /about-medlife.html 200
 /about-medlife/ /about-medlife.html 200
-/about-medlife.html /about-medlife.html 200
 
 # Legacy editorial aliases
 /admin/editorial-command-center-v23.html /admin-login 302
