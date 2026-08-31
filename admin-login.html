@@ -1,24 +1,49 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MedLife | دخول الإدارة</title><link rel="icon" href="/logo.PNG"><link rel="stylesheet" href="/homepage-redesign.css"></head>
-<body style="margin:0;background:#f7f8fa;font-family:Cairo,Arial,sans-serif;color:#283244">
-<main style="min-height:100vh;display:grid;place-items:center;padding:24px"><section style="width:min(460px,100%);background:#fff;border:1px solid #e1e5eb;border-radius:20px;padding:30px;box-shadow:0 18px 55px rgba(21,29,54,.08)">
-<div style="text-align:center"><img src="/logo.PNG" alt="MedLife" style="width:64px;height:64px"><h1 style="color:#151d36;margin:10px 0 4px">دخول الإدارة العامة</h1><p style="color:#6e7788;font-size:12px;margin:0 0 24px">مركز الإدارة العامة لمؤسسة MedLife</p></div>
-<form id="form"><label style="display:block;font-size:12px;font-weight:800;color:#151d36;margin:12px 0 6px">البريد الإلكتروني أو رمز العضوية</label><input id="identifier" required autocomplete="username email" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #e1e5eb;border-radius:10px;font:inherit"><label style="display:block;font-size:12px;font-weight:800;color:#151d36;margin:14px 0 6px">كلمة المرور</label><input id="password" type="password" required autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #e1e5eb;border-radius:10px;font:inherit"><button id="submit" type="submit" style="width:100%;margin-top:18px;padding:13px;border:0;border-radius:10px;background:#b21f45;color:#fff;font:inherit;font-weight:800;cursor:pointer">تسجيل الدخول</button><div id="msg" style="display:none;margin-top:12px;padding:11px;border-radius:9px;background:#fff1f3;color:#a32936;font-size:11px;line-height:1.8;white-space:pre-wrap"></div></form>
-</section></main>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#151d36">
+<meta name="description" content="بوابة الإدارة العامة لمؤسسة MedLife.">
+<title>دخول الإدارة العامة | MedLife</title>
+<link rel="icon" href="/logo.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#151d36;--red:#b21f45;--red-soft:#fff1f4;--ink:#253044;--muted:#6e7788;--line:#e2e6ec;--bg:#f5f7fa;--paper:#fff;--ok:#087f5b;--danger:#a32936;--max:1180px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,Arial,sans-serif;line-height:1.8}a{text-decoration:none;color:inherit}.page{min-height:100vh;display:flex;flex-direction:column}.header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}.header-inner{width:min(var(--max),calc(100% - 32px));min-height:76px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{display:flex;align-items:center;gap:12px}.brand img{width:48px;height:48px;object-fit:contain}.brand-title{display:block;color:var(--navy);font-size:16px;font-weight:900;line-height:1.4}.brand-sub{display:block;color:var(--muted);font-size:9px;line-height:1.5}.back{color:var(--navy);font-size:11px;font-weight:800;padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:#fff}.back:hover{border-color:#c9ced8}.main{width:min(var(--max),calc(100% - 32px));margin:auto;flex:1;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:72px;padding:58px 0}.intro{padding:18px 0}.eyebrow{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:var(--red-soft);border:1px solid #ffd5de;color:var(--red);font-size:10px;font-weight:900}.intro h1{margin:18px 0 12px;color:var(--navy);font-size:clamp(34px,4.7vw,58px);line-height:1.45;font-weight:900}.intro h1 span{color:var(--red)}.intro p{margin:0;max-width:610px;color:var(--muted);font-size:14px;line-height:2.25}.points{display:grid;gap:10px;margin-top:26px;max-width:560px}.point{display:flex;align-items:flex-start;gap:10px;color:#566174;font-size:11px}.point-dot{width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:9px;flex:0 0 auto}.card{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:0 24px 70px rgba(21,29,54,.09)}.card-head h2{margin:0;color:var(--navy);font-size:26px;font-weight:900}.card-head p{margin:6px 0 24px;color:var(--muted);font-size:11px}.field{margin-bottom:15px}.field label{display:block;margin-bottom:7px;color:var(--navy);font-size:11px;font-weight:900}.field input{width:100%;height:48px;border:1px solid var(--line);border-radius:11px;padding:0 13px;background:#fbfcfe;color:var(--ink);font:inherit;font-size:12px;outline:none;transition:.18s}.field input:focus{border-color:#db9dad;box-shadow:0 0 0 3px rgba(178,31,69,.07);background:#fff}.field input::placeholder{color:#a1a9b7}.submit{width:100%;height:49px;border:0;border-radius:11px;background:var(--red);color:#fff;font:inherit;font-size:12px;font-weight:900;cursor:pointer;transition:.18s}.submit:hover{filter:brightness(.96)}.submit:disabled{opacity:.68;cursor:wait}.status{display:none;margin-top:12px;padding:11px 12px;border-radius:10px;font-size:10px;line-height:1.9;white-space:pre-wrap}.status.show{display:block}.status.err{background:#fff1f3;border:1px solid #ffd1d8;color:var(--danger)}.status.ok{background:#edfaf5;border:1px solid #c6ebdc;color:var(--ok)}.help{margin-top:16px;padding-top:15px;border-top:1px solid var(--line);color:var(--muted);font-size:9px;line-height:1.9}.setup{display:inline-block;margin-top:8px;color:var(--red);font-weight:900}.footer{background:var(--navy);color:#bfc7d5;text-align:center;padding:20px 16px;font-size:9px}.footer strong{color:#fff}@media(max-width:900px){.main{grid-template-columns:1fr;gap:34px;padding:42px 0}.intro{padding:0;text-align:center}.intro p{margin-inline:auto}.points{margin-inline:auto;text-align:right}.card{max-width:560px;width:100%;margin:auto}}@media(max-width:520px){.header-inner{width:calc(100% - 20px);min-height:68px}.brand img{width:42px;height:42px}.brand-title{font-size:14px}.brand-sub{font-size:8px}.back{font-size:9px;padding:7px 9px}.main{width:calc(100% - 20px);padding:32px 0}.intro h1{font-size:32px}.intro p{font-size:12px}.card{padding:23px;border-radius:19px}.card-head h2{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="header"><div class="header-inner">
+<a class="brand" href="/index.html"><img src="/logo.PNG" alt="MedLife"><span><span class="brand-title">MedLife</span><span class="brand-sub">مؤسسة ميدلايف الطبية الخيرية التطوعية</span></span></a>
+<a class="back" href="/index.html">العودة إلى الموقع</a>
+</div></header>
+<main class="main">
+<section class="intro">
+<div class="eyebrow">بوابة الإدارة العامة</div>
+<h1>مرحباً بك في <span>إدارة MedLife</span></h1>
+<p>الدخول الآمن إلى مركز الإدارة العامة لإدارة الأنظمة، الأعضاء، الصلاحيات، والمحتوى المؤسسي.</p>
+<div class="points"><div class="point"><span class="point-dot"></span><span>صلاحيات الإدارة العامة مخصصة للحسابات المعتمدة.</span></div><div class="point"><span class="point-dot"></span><span>حسابات إدارة المحتوى تدخل مباشرة إلى استوديو المقالات دون الوصول إلى هذه اللوحة.</span></div><div class="point"><span class="point-dot"></span><span>تنتهي جلسة الإدارة تلقائياً بعد سبعة أيام.</span></div></div>
+</section>
+<section class="card">
+<div class="card-head"><h2>تسجيل الدخول</h2><p>استخدم بيانات حساب مدير النظام.</p></div>
+<form id="form" novalidate>
+<div class="field"><label for="identifier">البريد الإلكتروني أو رمز العضوية</label><input id="identifier" required autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="أدخل البريد الإلكتروني أو رمز العضوية"></div>
+<div class="field"><label for="password">كلمة المرور</label><input id="password" type="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور"></div>
+<button class="submit" id="submit" type="submit">تسجيل الدخول</button>
+<div id="status" class="status"></div>
+<div class="help">هذه البوابة مخصصة لمدير النظام العام. لإنشاء أول حساب مدير نظام، استخدم صفحة التهيئة الأولية لمرة واحدة.<br><a class="setup" href="/admin-setup.html">الانتقال إلى تهيئة مدير النظام</a></div>
+</form>
+</section>
+</main>
+<footer class="footer"><strong>MedLife</strong> — مركز الإدارة العامة</footer>
+</div>
 <script>
-const $=id=>document.getElementById(id);
-const show=text=>{$('msg').style.display='block';$('msg').textContent=text};
-async function jsonFetch(url,options){const r=await fetch(url,{credentials:'include',cache:'no-store',...options});const text=await r.text();let j={};try{j=JSON.parse(text)}catch{}return {r,j,text}}
-$('form').addEventListener('submit',async e=>{
- e.preventDefault();$('submit').disabled=true;$('submit').textContent='جاري التحقق...';$('msg').style.display='none';
- try{
-   const {r,j}=await jsonFetch('/api/admin-session?action=login',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({identifier:$('identifier').value.trim(),password:$('password').value})});
-   if(!r.ok||!j.success) throw new Error((j.error||'تعذر تسجيل الدخول.')+(j.detail?'\nتفاصيل النظام: '+j.detail:''));
-   const check=await jsonFetch('/api/admin-session?action=me');
-   if(!check.r.ok||!check.j.authenticated) throw new Error((check.j.error||'تم تسجيل الدخول ولكن لم يتم تثبيت جلسة الإدارة.')+(check.j.detail?'\nتفاصيل النظام: '+check.j.detail:''));
-   $('submit').textContent='تم التحقق — الانتقال...';
-   window.location.replace('/admin.html');
- }catch(err){show(err.message||'تعذر تسجيل الدخول حالياً.');$('submit').disabled=false;$('submit').textContent='تسجيل الدخول'}
-});
-</script></body></html>
+const $=id=>document.getElementById(id);const status=(text,type='err')=>{$('status').className='status show '+type;$('status').textContent=text};
+$('form').addEventListener('submit',async e=>{e.preventDefault();const identifier=$('identifier').value.trim();const password=$('password').value;if(!identifier||!password){status('يرجى إدخال بيانات الدخول.');return}$('submit').disabled=true;$('submit').textContent='جارٍ تسجيل الدخول...';$('status').className='status';try{const r=await fetch('/api/admin-session?action=login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','Accept':'application/json'},cache:'no-store',body:JSON.stringify({identifier,password})});const j=await r.json().catch(()=>({}));if(!r.ok||!j.success){const d=j.detail?`\nتفاصيل النظام: ${j.detail}`:'';throw new Error((j.error||'تعذر تسجيل الدخول حالياً.')+d)}status('تم تسجيل الدخول بنجاح. جارٍ فتح لوحة الإدارة...','ok');window.location.replace('/admin.html')}catch(err){status(err.message||'تعذر تسجيل الدخول حالياً.')}finally{if($('status').classList.contains('err')){$('submit').disabled=false;$('submit').textContent='تسجيل الدخول'}}});
+</script>
+</body>
+</html>
