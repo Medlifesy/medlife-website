@@ -1,0 +1,50 @@
+name: Validate Admin Clean Rebuild
+
+on:
+  push:
+    branches:
+      - admin-cleanup-safe-2026-08-31-v2
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate-clean-admin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate legacy admin removal
+        shell: python
+        run: |
+          from pathlib import Path
+
+          forbidden = [
+              'admin.html',
+              'admin-v2.html',
+              'admin-login.html',
+              'articles-admin.html',
+              'admin-members-v3.html',
+              'admin-teams.html',
+              'admin-telegram.html',
+              'functions/api/_admin-auth.js',
+              'functions/api/admin-session.js',
+              'functions/api/article-admin-session.js',
+          ]
+
+          present = [p for p in forbidden if Path(p).exists()]
+          if present:
+              raise SystemExit(f'Legacy admin files still present: {present}')
+
+          redirects = Path('_redirects').read_text(encoding='utf-8') if Path('_redirects').exists() else ''
+          if '/articles-admin' in redirects:
+              raise SystemExit('Legacy /articles-admin routing is still present in _redirects')
+
+          if '/admin ' in redirects and '/admin-login' not in redirects:
+              raise SystemExit('Admin entrypoint is not protected by admin-login')
+
+          print('OK: legacy administration layer is retired and the public site boundary is preserved.')
