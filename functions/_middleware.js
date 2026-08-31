@@ -11,9 +11,6 @@ export async function onRequest(context) {
     const isSupportPage = path === '/support' || path === '/support/' || path === '/support.html';
     const isContactPage = path === '/contact' || path === '/contact/' || path === '/contact.html';
 
-    // articles-admin.html is a self-contained application with its own
-    // JavaScript handlers. Do not inject legacy admin scripts or bridge code
-    // into it; doing so can override/stop its native button handlers.
     if (isArticlesAdmin) {
       const headers = new Headers(response.headers);
       headers.delete('content-length');
@@ -31,7 +28,7 @@ export async function onRequest(context) {
     if (isContactPage) {
       tags.push('<script src="/site-nav.js?v=20260831-contact1" defer></script>');
       tags.push('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>');
-      tags.push('<script src="/contact-map-fix.js?v=20260831-map1" defer></script>');
+      tags.push('<script src="/contact-map-fix.js?v=20260831-map2" defer></script>');
     }
     const marker = tags.join('');
     if (marker && tags.some(src => !html.includes(src.match(/src=\"([^\"]+)/)?.[1] || ''))) {
