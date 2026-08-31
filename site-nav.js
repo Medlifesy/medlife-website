@@ -15,7 +15,7 @@
   const home = page === '' || page === 'index.html';
 
   const activeKey = () => {
-    if (page === 'gallery.html') return 'gallery';
+    if (page === 'gallery' || page === 'gallery.html') return 'gallery';
     if (home && location.hash === '#programs') return 'programs';
     if (home && location.hash === '#homepageGallery') return 'gallery';
     if (home) return 'home';
@@ -35,6 +35,9 @@
     document.querySelectorAll('body > header.top, body header.top').forEach(el => el.remove());
     if (page === 'forum-v3.html' || page === 'forum-v3') {
       document.querySelectorAll('body > header.nav').forEach(el => el.remove());
+    }
+    if (page === 'gallery' || page === 'gallery.html') {
+      document.querySelectorAll('body > header.gallery-legacy-header, body > header:not(.medlife-global-header)').forEach(el => el.remove());
     }
   };
 
