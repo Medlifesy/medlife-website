@@ -20,6 +20,7 @@
     if (home && location.hash === '#homepageGallery') return 'gallery';
     if (home) return 'home';
     if (page === 'about-medlife' || page === 'about-medlife.html') return 'about';
+    if (page === 'forum-v3' || page === 'forum-v3.html') return 'forum';
     const match = items.find(item => item[0].split('#')[0] === page && !item[0].includes('#'));
     return match ? match[2] : '';
   };
