@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Fix admin dashboard redirect loop
-Timestamp: 2026-09-01T23:25:00+03:00
+Release: MedLife centralized Admin Core V3
+Timestamp: 2026-09-01T23:40:00+03:00
 Source: main
 
-Deploy current main branch after removing automatic redirect from admin.html on internal session/data errors and exposing the actual dashboard error instead.
+Deploy centralized administration dashboard with roles, permissions, audit log, notifications and dedicated management sections.
