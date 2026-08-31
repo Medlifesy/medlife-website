@@ -1,0 +1,45 @@
+name: Add About international presence
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-about:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update About page
+        shell: python
+        run: |
+          from pathlib import Path
+          page = Path('about-medlife.html')
+          text = page.read_text(encoding='utf-8')
+
+          old_note = 'لا نملك حتى الآن مادة مستقلة كافية تسمح بوصف «رأي الشارع السوري» أو «الرأي العالمي» تجاه ميدلايف بشكل عام؛ لذلك لن ننسب آراء عامة لمصادر أو أشخاص من دون توثيق. يمكن توسيع هذا القسم لاحقاً بإضافة مقابلات واستبيانات وشهادات منشورة من متطوعين ومستفيدين وشركاء.'
+          new_note = 'نسعى إلى توثيق مزيد من الشهادات والانطباعات من المتطوعين والمستفيدين والشركاء مع توسّع حضور ميدلايف.'
+          if old_note in text:
+              text = text.replace(old_note, new_note, 1)
+
+          marker = '<section class="logo-strip reveal">'
+          if 'id="international-presence"' not in text and marker in text:
+              section = '''<section class="section media-section reveal" id="international-presence"><div class="wrap"><div class="section-head"><span class="eyebrow">الحضور الدولي</span><h2>ميدلايف من المحلية إلى الانفتاح الدولي</h2><p>تعمل ميدلايف على توسيع حضورها المهني والانفتاح على المحافل والشبكات الصحية خارج الإطار المحلي، مع الحفاظ على جذورها ورسالتها الإنسانية في سوريا.</p></div><div class="media-grid"><article class="media-card"><span class="media-label">نقاشات صحية دولية</span><h3>المشاركة في حوار حول مستقبل الصحة في سوريا</h3><p>ظهر اسم ميدلايف في مادة منشورة باللغة الإنجليزية ضمن سياق نقاش دولي حول استقرار سوريا وإعادة تأهيل نظام الصحة العامة، بما شمل المستشفيات والتعليم الطبي ودعم الكوادر الصحية.</p><a href="https://ae.linkedin.com/posts/med-life-syria_medlife-syria-publichealth-activity-7356102055956045825-JKc2" target="_blank" rel="noopener noreferrer">الاطلاع على المادة</a></article><article class="media-card"><span class="media-label">حضور مهني دولي</span><h3>منصة LinkedIn والوصول إلى جمهور دولي</h3><p>تحافظ ميدلايف على حضور مهني عبر LinkedIn، ما يتيح عرض برامجها ومبادراتها وقصتها المؤسسية أمام جمهور يتجاوز النطاق المحلي.</p><a href="https://sy.linkedin.com/company/med-life-syria" target="_blank" rel="noopener noreferrer">زيارة الصفحة الرسمية</a></article><article class="media-card"><span class="media-label">امتداد الكفاءات</span><h3>روابط مهنية وأكاديمية خارج سوريا</h3><p>يمتد الحضور المهني المرتبط بميدلايف إلى أعضاء يتابعون مسارات أكاديمية ومهنية خارج سوريا، بما يعزز التواصل ونقل الخبرات والانفتاح على التجارب الصحية الدولية.</p><a href="https://uk.linkedin.com/in/carla-jam" target="_blank" rel="noopener noreferrer">استعراض المثال الموثق</a></article></div><div class="media-note">لا نستخدم تعبير «معروفة عالمياً» أو «حصلت على إشادة دولية» إلا عندما يتوفر مصدر مستقل يثبت ذلك بشكل واضح.</div></div></section>'''
+              text = text.replace(marker, section + marker, 1)
+
+          page.write_text(text, encoding='utf-8')
+
+      - name: Commit and remove this temporary workflow
+        shell: bash
+        run: |
+          git config user.name 'MedLife Bot'
+          git config user.email 'actions@medlifesy.org'
+          git add about-medlife.html .github/workflows/add-about-international.yml
+          git commit -m 'fix(about): add international presence section'
+          git rm .github/workflows/add-about-international.yml
+          git commit -m 'chore: remove temporary About international workflow'
+          git push
