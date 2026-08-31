@@ -11,8 +11,8 @@ async function teamApi(request, env, path, options = {}) {
 
 export async function onRequest({request,env}){
   if(request.method!=='GET') return json({success:false,error:'Method not allowed.'},405);
-  const db=env.TEAM_DB || env.MEMBERS_DB || env.DB;
-  if(!db) return json({success:false,error:'Database binding is not configured.'},500);
+  const db=env.TEAM_DB||env.MEMBERS_DB;
+  if(!db) return json({success:false,error:'Team database binding is not configured.'},500);
   try{
     await ensureAuthTables(db);
     const admin=await authenticateAdmin(request,db);
