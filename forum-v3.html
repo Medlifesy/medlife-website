@@ -16,7 +16,7 @@
 </head>
 <body>
 <div class="progress" id="progress"></div>
-<header class="nav"><div class="container navin"><a href="index.html"><img class="logo" src="./logo.PNG" alt="مؤسسة ميدلايف"></a><nav class="links"><a href="index.html">الرئيسية</a><a href="about-medlife-foundation.html">عن مؤسسة ميدلايف</a><a href="#about">عن المنتدى</a><a href="#activities">الأنشطة</a><a href="#booking">احجز مساحتك</a><a href="#contact">تواصل معنا</a></nav><div><button class="lang" id="lang">EN</button><button class="menu" id="menu"><i class="fa-solid fa-bars"></i></button></div></div></header>
+
 <main>
 <section class="hero"><div class="blob a"></div><div class="blob b"></div><div class="container heroGrid"><div class="reveal"><span class="eyebrow"><i class="fa-solid fa-sparkles"></i> مساحة ميدلايف للتعلم والمشاركة</span><h1>مكان يجمع<br><em>الكتاب، الطالب، والفكرة.</em></h1><p>منتدى ميدلايف في طرطوس مساحة هادئة ومفتوحة للقراءة والدراسة والتعلّم، ولإقامة الدروس والورشات والأنشطة الثقافية والتعليمية.</p><div class="actions"><a class="btn primary" href="#booking"><i class="fa-regular fa-calendar-check"></i> احجز مساحتك</a><a class="btn light" href="#activities"><i class="fa-solid fa-arrow-down"></i> اكتشف الأنشطة</a></div></div><div class="scene reveal"><span class="tag t1">📚 اقرأ • تعلّم • شارك</span><span class="tag t2">🎓 Study Zone</span><span class="tag t3">💡 مساحة للأفكار</span><img src="./logo.PNG" alt="شعار منتدى ميدلايف"></div></div></section>
 <section class="container"><div class="numbers reveal"><div class="number"><strong>2026</strong><span>عام الانطلاق</span></div><div class="number"><strong>200+</strong><span>كتاب تقريباً</span></div><div class="number"><strong>7</strong><span>أيام في الأسبوع</span></div><div class="number"><strong>9–20</strong><span>ساعات الدوام المعلنة</span></div></div></section>
@@ -37,4 +37,5 @@ $('#lang')?.addEventListener('click',()=>{alert('النسخة الإنجليزي
 let selected='';$$('.type').forEach(b=>b.addEventListener('click',()=>{$$('.type').forEach(x=>x.classList.remove('active'));b.classList.add('active');selected=b.dataset.type}));
 $('#bookingForm').addEventListener('submit',async e=>{e.preventDefault();const msg=$('#msg');if(!selected){msg.textContent='يرجى اختيار نوع الحجز أولاً.';return}const data=Object.fromEntries(new FormData(e.target));data.type=selected;msg.textContent='⏳ جارٍ إرسال طلب الحجز...';try{const r=await fetch('/api/forum-bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const j=await r.json();if(!r.ok)throw new Error(j.error||'تعذر إرسال الطلب');msg.textContent='✅ تم استلام طلبك بنجاح. رقم الحجز: '+(j.booking_id||'سيتم إرساله لك');e.target.reset();$$('.type').forEach(x=>x.classList.remove('active'));selected=''}catch(err){msg.textContent='⚠️ تعذر إرسال الطلب حالياً. يرجى المحاولة مرة أخرى أو التواصل معنا هاتفياً.'}});
 </script>
+<script src="/site-nav.js"></script>
 </body></html>
