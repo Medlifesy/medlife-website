@@ -1,2 +1,0 @@
-// Ensure authenticated article reads use the admin dataset.
-(function(){try{const f=window.fetch.bind(window);window.fetch=function(r,o){try{const input=typeof r==='string'?r:r&&r.url;const m=String((o&&o.method)||(r&&r.method)||'GET').toUpperCase();if(m==='GET'&&input){const u=new URL(input,location.origin);if(u.origin===location.origin&&u.pathname==='/api/articles'&&!u.searchParams.has('admin')){u.searchParams.set('admin','1');r=typeof r==='string'?u.toString():new Request(u.toString(),r)}}}catch(_){}return f(r,o)}}catch(_){}})();
