@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
 Release: Split team and article databases for admin and content accounts
-Timestamp: 2026-09-01T22:35:00+03:00
+Timestamp: 2026-09-01T22:40:00+03:00
 Source: main
 
-Deploy current main branch after routing general administration, members, and article-admin accounts through TEAM_DB while keeping article content in DB.
+Deploy current main branch after routing general administration, members, and article-admin accounts through TEAM_DB while keeping article content in DB, and initialize the member account schema before login queries.
