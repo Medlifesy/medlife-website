@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Fix canonical general administration dashboard route
-Timestamp: 2026-09-01T23:20:00+03:00
+Release: Fix admin dashboard redirect loop
+Timestamp: 2026-09-01T23:25:00+03:00
 Source: main
 
-Deploy current main branch after making /admin serve the protected general administration dashboard and /articles-admin serve the content administration entrypoint directly.
+Deploy current main branch after removing automatic redirect from admin.html on internal session/data errors and exposing the actual dashboard error instead.
