@@ -1,0 +1,98 @@
+name: Refine about page motion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refine-about-motion.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Refine about page
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('about-medlife.html')
+          s = p.read_text(encoding='utf-8')
+
+          old = '<p>مواصلة رحلة ميدلايف بروح المحبة والإخلاص، وتوجيه الطاقات الطبية والشبابية نحو خدمة المجتمع، والنهوض بالثقافة الطبية، وتنمية المواهب واستثمارها، وتأمين بيئة مناسبة للتطور، وتقديم الخدمات الطبية والعلاجية للأشخاص المحتاجين عبر إيصال الداعم بالمستفيد.</p>'
+          new = '''<p>تواصل ميدلايف رحلتها بروح المحبة والإخلاص، وتوجّه الطاقات الطبية والشبابية نحو خدمة المجتمع، والنهوض بالثقافة الطبية، وتنمية المواهب واستثمارها، وتأمين بيئة مناسبة للتطور، وتقديم الخدمات الطبية والعلاجية للأشخاص المحتاجين عبر إيصال الداعم بالمستفيد.</p>
+          <p class="message-emphasis">ونؤمن أن تعزيز مفهوم التطوع في المجتمع ليس نشاطاً جانبياً، بل جزء أصيل من رسالتنا؛ لذلك نسعى إلى تحويل التطوع إلى ثقافة مجتمعية راسخة، وتشجيع الأطباء والطلاب والشباب وأصحاب المواهب على تقديم وقتهم وخبراتهم ومهاراتهم لخدمة الآخرين.</p>
+          <p>كما نسعى إلى نشر محبة الله بين الناس، والوقوف إلى جانبهم في احتياجاتهم، وأن يكون العمل الطبي والإنساني باباً للمحبة والرحمة والعطاء.</p>'''
+          if old in s:
+              s = s.replace(old, new, 1)
+
+          motion_css = '''
+          /* Refined institutional motion */
+          .institutional-motion{opacity:0;transform:translateY(30px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
+          .institutional-motion.visible{opacity:1;transform:none}
+          .institutional-motion.d1{transition-delay:.08s}.institutional-motion.d2{transition-delay:.16s}.institutional-motion.d3{transition-delay:.24s}
+          .hero .logo-box{animation:aboutFloat 7s ease-in-out infinite;will-change:transform}
+          .logo-box:before{animation:aboutRing 13s linear infinite}.logo-box:after{animation:aboutRingReverse 17s linear infinite}
+          .program,.team-card,.value,.statement,.panel,.coverage-item,.stat,.milestone{transition:transform .42s cubic-bezier(.22,1,.36,1),box-shadow .42s ease,border-color .42s ease}
+          .program:hover,.team-card:hover,.value:hover,.statement:hover,.panel:hover,.coverage-item:hover,.stat:hover,.milestone:hover{transform:translateY(-6px);box-shadow:0 20px 45px rgba(21,29,54,.11);border-color:#efcbd4}
+          .gallery-card{transition:transform .5s cubic-bezier(.22,1,.36,1),box-shadow .5s ease}.gallery-card:hover{transform:translateY(-9px);box-shadow:0 24px 54px rgba(21,29,54,.15)}
+          .gallery-card img{transition:transform .7s cubic-bezier(.22,1,.36,1),filter .45s ease}.gallery-card:hover img{transform:scale(1.06);filter:saturate(1.06)}
+          .message-emphasis{margin-top:16px!important;padding:18px 20px;border-right:4px solid var(--red);background:linear-gradient(90deg,#fff7f9,#fff);border-radius:14px;color:var(--navy)!important;font-weight:800!important;box-shadow:0 12px 30px rgba(229,42,80,.07)}
+          .section-head h2{position:relative}.section-head h2:after{content:"";display:block;width:48px;height:3px;margin:13px auto 0;border-radius:999px;background:var(--red);transform:scaleX(.35);transition:transform .65s ease}.institutional-motion.visible .section-head h2:after{transform:scaleX(1)}
+          @keyframes aboutFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+          @keyframes aboutRing{to{transform:rotate(360deg)}}@keyframes aboutRingReverse{to{transform:rotate(-360deg)}}
+          @media(prefers-reduced-motion:reduce){.hero .logo-box,.logo-box:before,.logo-box:after{animation:none}.institutional-motion{opacity:1;transform:none}.gallery-card,.gallery-card img,.program,.team-card,.value,.statement,.panel,.coverage-item,.stat,.milestone{transition:none}}
+          '''
+          if '/* Refined institutional motion */' not in s:
+              s = s.replace('</style>', motion_css + '\n</style>', 1)
+
+          motion_js = '''
+          <script id="about-motion-v2">
+          (()=>{
+            const selectors=['.section','.panel','.statement','.value','.program','.coverage','.milestone','.team-card','.volunteer','.gallery-card','.logo-strip','.cta'];
+            const nodes=[];
+            selectors.forEach(sel=>document.querySelectorAll(sel).forEach(el=>{if(!nodes.includes(el)){el.classList.add('institutional-motion');nodes.push(el)}}));
+            nodes.forEach((el,i)=>el.classList.add(i%4===1?'d1':i%4===2?'d2':i%4===3?'d3':''));
+            if(!('IntersectionObserver' in window)){nodes.forEach(el=>el.classList.add('visible'));return;}
+            const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}}),{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+            nodes.forEach(el=>io.observe(el));
+          })();
+          </script>
+          '''
+          if 'id="about-motion-v2"' not in s:
+              s = s.replace('</body>', motion_js + '\n</body>', 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit refinement
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add about-medlife.html
+          if git diff --cached --quiet; then
+            echo 'No about-page refinement changes.'
+          else
+            git commit -m 'style(about): add refined motion and strengthen volunteer mission'
+            git push
+          fi
+
+      - name: Remove temporary workflow
+        shell: bash
+        run: |
+          rm -f .github/workflows/refine-about-motion.yml
+          git add .github/workflows/refine-about-motion.yml
+          if git diff --cached --quiet; then
+            echo 'Temporary workflow already removed.'
+          else
+            git commit -m 'chore: remove temporary about motion workflow'
+            git push
+          fi
