@@ -11,13 +11,14 @@ async function teamApi(request, env, path, options = {}) {
 
 export async function onRequest({request,env}){
   if(request.method!=='GET') return json({success:false,error:'Method not allowed.'},405);
-  if(!env.MEMBERS_DB) return json({success:false,error:'Database binding is not configured.'},500);
+  const db=env.TEAM_DB || env.MEMBERS_DB || env.DB;
+  if(!db) return json({success:false,error:'Database binding is not configured.'},500);
   try{
-    await ensureAuthTables(env.MEMBERS_DB);
-    const admin=await authenticateAdmin(request,env.MEMBERS_DB);
+    await ensureAuthTables(db);
+    const admin=await authenticateAdmin(request,db);
     if(!admin) return json({success:false,error:'غير مصرح.'},401);
     const response=await teamApi(request,env,'/internal/admin/members');
     const data=await response.json().catch(()=>({success:false,error:'Team API returned invalid JSON.'}));
     return json(data,response.status);
-  }catch(e){console.error(e);return json({success:false,error:'تعذر تحميل بيانات الأعضاء حالياً.'},500)}
+  }catch(e){console.error(e);return json({success:false,error:'تعذر تحميل بيانات الأعضاء حالياً.',detail:String(e?.message||e||'')},500)}
 }
