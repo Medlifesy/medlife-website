@@ -32,6 +32,9 @@
   const removeLegacyHeaders = () => {
     document.querySelectorAll('.medlife-global-header').forEach(el => el.remove());
     document.querySelectorAll('body > header.top, body header.top').forEach(el => el.remove());
+    if (page === 'forum-v3.html' || page === 'forum-v3') {
+      document.querySelectorAll('body > header.nav').forEach(el => el.remove());
+    }
   };
 
   function build() {
@@ -66,6 +69,51 @@
     `;
 
     document.body.prepend(header);
+
+    if (current === 'forum') {
+      const sub = document.createElement('nav');
+      sub.className = 'medlife-forum-subnav';
+      sub.setAttribute('aria-label', 'تنقل المنتدى');
+      sub.innerHTML = `
+        <div class="medlife-forum-subnav-inner">
+          <a href="#about" data-forum-key="about">عن المنتدى</a>
+          <a href="#activities" data-forum-key="activities">الأنشطة</a>
+          <a href="#booking" data-forum-key="booking">احجز مساحتك</a>
+          <a href="#contact" data-forum-key="contact">تواصل معنا</a>
+        </div>`;
+      header.insertAdjacentElement('afterend', sub);
+
+      const style = document.createElement('style');
+      style.id = 'medlife-forum-subnav-style';
+      style.textContent = `
+        .medlife-forum-subnav{position:sticky;top:72px;z-index:2400;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid #e8edf3;box-shadow:0 5px 15px rgba(21,29,54,.045);animation:medlifeForumSubnavIn .28s ease-out both}
+        .medlife-forum-subnav-inner{width:min(1180px,calc(100% - 28px));min-height:48px;margin:auto;display:flex;align-items:stretch;justify-content:center;gap:3px;overflow-x:auto;scrollbar-width:none}
+        .medlife-forum-subnav-inner::-webkit-scrollbar{display:none}
+        .medlife-forum-subnav-inner a{position:relative;display:flex;align-items:center;justify-content:center;padding:0 16px;color:#151d36;text-decoration:none;font:800 12px Cairo,sans-serif;white-space:nowrap;transition:color .2s ease,background .2s ease}
+        .medlife-forum-subnav-inner a::after{content:"";position:absolute;left:14px;right:14px;bottom:6px;height:2px;border-radius:999px;background:#ff2a54;transform:scaleX(0);transition:transform .2s ease}
+        .medlife-forum-subnav-inner a:hover{color:#ff2a54;background:#fff8fa;border-radius:8px}
+        .medlife-forum-subnav-inner a.active{color:#ff2a54}
+        .medlife-forum-subnav-inner a.active::after{transform:scaleX(1)}
+        @keyframes medlifeForumSubnavIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+        @media(max-width:700px){.medlife-forum-subnav{top:64px}.medlife-forum-subnav-inner{justify-content:flex-start}.medlife-forum-subnav-inner a{padding:0 13px;font-size:11px}}
+      `;
+      document.head.appendChild(style);
+
+      const forumLinks = [...sub.querySelectorAll('[data-forum-key]')];
+      const setForumActive = key => forumLinks.forEach(a => a.classList.toggle('active', a.dataset.forumKey === key));
+      const sections = forumLinks.map(a => [a.getAttribute('href').slice(1), a.dataset.forumKey]);
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+          const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (visible) setForumActive(visible.target.dataset.forumKey);
+        }, {rootMargin:'-26% 0px -58% 0px', threshold:[0,.2,.5,.8]});
+        sections.forEach(([id,key]) => {
+          const el = document.getElementById(id);
+          if (el) { el.dataset.forumKey = key; observer.observe(el); }
+        });
+      }
+      forumLinks.forEach(a => a.addEventListener('click', () => setForumActive(a.dataset.forumKey)));
+    }
 
     if (!document.getElementById('medlife-global-nav-style')) {
       const style = document.createElement('style');
