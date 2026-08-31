@@ -1,0 +1,19 @@
+(()=>{ 'use strict'; const ID='medlife-contact-final-9'; if(document.getElementById(ID)) return; const s=document.createElement('style'); s.id=ID; s.textContent=`
+#medlife-contact-v8 .mc7-forum{padding:20px!important;border-radius:18px!important;background:#fff1f4!important;border:1px solid #f0d6dd!important}
+#medlife-contact-v8 .mc7-forum .mc10-forum-title{display:block!important;color:#10182f!important;font:900 18px Cairo,Arial,sans-serif!important;margin-bottom:4px!important}
+#medlife-contact-v8 .mc7-forum .mc10-forum-copy{display:block!important;color:#687181!important;font:500 10px/1.8 Cairo,Arial,sans-serif!important;margin-bottom:8px!important}
+#medlife-contact-v8 .mc7-forum-row{display:grid!important;grid-template-columns:18px minmax(0,1fr)!important;gap:9px!important;align-items:start!important;padding:11px 0!important;border-top:1px solid #efdde2!important}
+#medlife-contact-v8 .mc7-forum-row i{width:18px!important;color:#e92850!important;text-align:center!important;padding-top:3px!important}
+#medlife-contact-v8 .mc7-forum-row strong{display:block!important;color:#10182f!important;font:900 10px Cairo,Arial,sans-serif!important;margin-bottom:2px!important}
+#medlife-contact-v8 .mc7-forum-row span,#medlife-contact-v8 .mc7-forum-row a{display:block!important;color:#596273!important;font:500 10px/1.8 Cairo,Arial,sans-serif!important;text-decoration:none!important;margin:0!important}
+#medlife-contact-v8 .mc7-forum-row a.mc7-num,#medlife-contact-v8 .mc7-num,#medlife-contact-v8 .mc7-forum-row a[href^='tel:'],#medlife-contact-v8 .mc7-forum-row a[href^='mailto:']{direction:ltr!important;unicode-bidi:isolate!important;display:inline-block!important;text-align:left!important;white-space:nowrap!important;letter-spacing:0!important;word-spacing:0!important}
+#medlife-contact-v8 .mc8-item a[href^='tel:'],#medlife-contact-v8 .mc8-item a[href^='mailto:']{direction:ltr!important;unicode-bidi:isolate!important;display:inline-block!important;text-align:left!important;white-space:nowrap!important;letter-spacing:0!important;word-spacing:0!important}
+#medlife-contact-v8 .mc10-forum-social{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin-top:16px!important;padding-top:14px!important;border-top:1px solid #efdde2!important}
+#medlife-contact-v8 .mc10-forum-social a{min-width:0!important;min-height:40px!important;box-sizing:border-box!important;padding:8px 9px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;background:#fff!important;border:1px solid #e4dadd!important;border-radius:10px!important;color:#10182f!important;text-decoration:none!important;font:800 9px Cairo,Arial,sans-serif!important;white-space:nowrap!important}
+#medlife-contact-v8 .mc10-forum-social a i{color:#e92850!important;font-size:13px!important}
+#medlife-contact-v8 .mc10-forum-social a:hover{border-color:#e92850!important;color:#e92850!important;background:#fffafa!important}
+@media(max-width:640px){#medlife-contact-v8 .mc10-forum-social{grid-template-columns:1fr!important}.mc7-forum-row span,.mc7-forum-row a{font-size:9.5px!important}}
+`; document.head.appendChild(s);
+function init(){const p=document.getElementById('medlife-contact-v8'); if(!p)return; p.querySelectorAll('a[href^="tel:"],a[href^="mailto:"]').forEach(a=>{a.setAttribute('dir','ltr');a.style.direction='ltr';a.style.unicodeBidi='isolate';a.style.display='inline-block';a.style.textAlign='left';a.style.whiteSpace='nowrap';});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();setTimeout(init,700);setTimeout(init,1500);
+})();
