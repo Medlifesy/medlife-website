@@ -11,20 +11,25 @@
 /submit-article-v5 /submit-article 301
 /submit-article /submit-article-v6 200
 /submit-article/ /submit-article-v6 200
-/admin/editorial-command-center-v23.html /admin/ 301
-/admin/editorial-command-center-v24.html /admin/ 301
-/admin/editorial-studio-v10.html /admin/ 301
-/admin/editorial-studio-v11.html /admin/ 301
-/admin/editorial-studio-v12.html /admin/ 301
-/admin/editorial-studio-v13.html /admin/ 301
-/api/admin/telegram https://medlife-team-api.broad-frog-3978.workers.dev/internal/admin/telegram 200
-/api/admin/telegram/ https://medlife-team-api.broad-frog-3978.workers.dev/internal/admin/telegram 200
 
-# Canonical administration routes
-/admin /admin-v2 301
-/admin/ /admin-v2 301
-/admin.html /admin-v2 301
-/admin-v2.html /admin-v2 301
+# Legacy editorial aliases
+/admin/editorial-command-center-v23.html /admin-login 302
+/admin/editorial-command-center-v24.html /admin-login 302
+/admin/editorial-studio-v10.html /admin-login 302
+/admin/editorial-studio-v11.html /admin-login 302
+/admin/editorial-studio-v12.html /admin-login 302
+/admin/editorial-studio-v13.html /admin-login 302
+
+# Admin API proxy remains disabled here; Pages Functions own admin APIs.
+
+# Canonical administration entrypoint: authentication must begin at admin-login.
+/admin /admin-login 302
+/admin/ /admin-login 302
+/admin.html /admin-login 302
+/admin-v2 /admin-login 302
+/admin-v2/ /admin-login 302
+/admin-v2.html /admin-login 302
+
 /admin-members /admin-members-v3 301
 /admin-members/ /admin-members-v3 301
 /admin-members.html /admin-members-v3 301
