@@ -12,12 +12,10 @@
 /submit-article /submit-article-v6 200
 /submit-article/ /submit-article-v6 200
 
-# Legacy administration aliases — canonicalize old dashboards.
+# Legacy administration aliases — send only old v2 dashboard to canonical entrypoint.
 /admin-v2 /admin.html 302
 /admin-v2/ /admin.html 302
 /admin-v2.html /admin.html 302
-/admin-v3 /admin.html 302
-/admin-v3/ /admin.html 302
 
 # Legacy editorial aliases
 /admin/editorial-command-center-v23.html /admin-login 302
