@@ -20,7 +20,7 @@
 /admin/editorial-studio-v12.html /admin-login 302
 /admin/editorial-studio-v13.html /admin-login 302
 
-# Canonical administration entrypoint: authentication must begin at admin-login.
+# Canonical administration entrypoint
 /admin /admin-login 302
 /admin/ /admin-login 302
 
@@ -31,15 +31,15 @@
 /admin-teams.html /admin-teams 301
 /admin-telegram.html /admin-telegram 301
 
-# Articles admin: serve the real static entrypoint without an external redirect.
+# Articles admin canonical static entrypoint
 /articles-admin /articles-admin.html 200
 /articles-admin/ /articles-admin.html 200
 /articles-admin.html /articles-admin.html 200
 
-# Articles admin API is served by the dedicated Worker/D1 stack.
+# Articles API
 /api/articles https://medlife-articles-api.broad-frog-3978.workers.dev/articles 200
 /api/articles/ https://medlife-articles-api.broad-frog-3978.workers.dev/articles 200
 
 # NOTE: /articles/* is intentionally NOT rewritten here.
 # Canonical article URLs are handled by functions/articles/[slug].js.
-# Legacy .html article files therefore remain directly accessible.
+# Legacy .html article files remain directly accessible.
