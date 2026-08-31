@@ -6,25 +6,18 @@ export async function onRequest(context) {
     if (!contentType.includes('text/html')) return response;
 
     const path = new URL(context.request.url).pathname.toLowerCase();
-    const isArticlesAdmin = path === '/articles-admin' || path === '/articles-admin/' || path.endsWith('/articles-admin.html');
     const isArticleReader = path === '/article-reader-v5.html' || path.startsWith('/articles/');
 
-    // articles-admin.html is a self-contained application with its own
-    // JavaScript handlers. Do not inject legacy admin scripts or bridge code
-    // into it; doing so can override/stop its native button handlers.
-    if (isArticlesAdmin) {
-      const headers = new Headers(response.headers);
-      headers.delete('content-length');
-      headers.set('cache-control','no-store, no-cache, must-revalidate, max-age=0');
-      headers.set('pragma','no-cache');
-      return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
-    }
-
+    // Administration pages are static entrypoints and intentionally have no
+    // middleware-specific behavior. Article-reader enhancement remains the
+    // only HTML transformation owned by this middleware.
     if (!isArticleReader) return response;
 
     let html = await response.text();
     const tag = '<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>';
-    if (!html.includes('/article-reader-rich-content.js')) html = html.includes('</body>') ? html.replace('</body>', `${tag}</body>`) : `${html}${tag}`;
+    if (!html.includes('/article-reader-rich-content.js')) {
+      html = html.includes('</body>') ? html.replace('</body>', `${tag}</body>`) : `${html}${tag}`;
+    }
 
     const headers = new Headers(response.headers);
     headers.delete('content-length');
