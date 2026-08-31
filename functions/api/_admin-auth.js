@@ -2,6 +2,7 @@ import { hashToken, randomToken, verifyPassword, getCookie, json, cookie, ensure
 
 const ADMIN_SESSION_COOKIE = 'medlife_admin_session';
 const ADMIN_SESSION_DAYS = 7;
+const ADMIN_SESSION_TABLE = 'medlife_system_admin_sessions_v2';
 const ORG_ADMIN_ROLES = new Set(['general_team_supervisor','advisor','medical_director']);
 
 async function getOrgAdminRole(db,memberId){
@@ -15,7 +16,9 @@ async function getOrgAdminRole(db,memberId){
 
 export async function ensureAdminTables(db) {
   await ensureAuthTables(db);
-  await db.prepare(`CREATE TABLE IF NOT EXISTS admin_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, member_id INTEGER NOT NULL, token_hash TEXT NOT NULL UNIQUE, expires_at TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run();
+  await db.prepare(`CREATE TABLE IF NOT EXISTS ${ADMIN_SESSION_TABLE} (id INTEGER PRIMARY KEY AUTOINCREMENT, member_id INTEGER NOT NULL, token_hash TEXT NOT NULL UNIQUE, expires_at TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run();
+  await db.prepare(`CREATE INDEX IF NOT EXISTS idx_${ADMIN_SESSION_TABLE}_member ON ${ADMIN_SESSION_TABLE}(member_id)`).run();
+  await db.prepare(`CREATE INDEX IF NOT EXISTS idx_${ADMIN_SESSION_TABLE}_expires ON ${ADMIN_SESSION_TABLE}(expires_at)`).run();
 }
 
 export async function authenticateAdmin(request, db) {
@@ -23,12 +26,12 @@ export async function authenticateAdmin(request, db) {
   const token = getCookie(request, ADMIN_SESSION_COOKIE);
   if (!token) return null;
   const tokenHash = await hashToken(token);
-  const row = await db.prepare(`SELECT a.member_id, m.full_name, m.email, m.account_email, m.medlife_role, m.account_status, m.status FROM admin_sessions a JOIN members m ON m.id=a.member_id WHERE a.token_hash=? AND datetime(a.expires_at)>datetime('now') LIMIT 1`).bind(tokenHash).first();
+  const row = await db.prepare(`SELECT s.member_id, m.full_name, m.email, m.account_email, m.medlife_role, m.account_status, m.status FROM ${ADMIN_SESSION_TABLE} s JOIN members m ON m.id=s.member_id WHERE s.token_hash=? AND datetime(s.expires_at)>datetime('now') LIMIT 1`).bind(tokenHash).first();
   if (!row) return null;
   if (row.account_status && row.account_status !== 'active') return null;
   if (!(row.status === 'active' || row.status === 'approved')) return null;
   row.org_role = await getOrgAdminRole(db,row.member_id);
-  await db.prepare(`UPDATE admin_sessions SET last_seen_at=CURRENT_TIMESTAMP WHERE token_hash=?`).bind(tokenHash).run();
+  await db.prepare(`UPDATE ${ADMIN_SESSION_TABLE} SET last_seen_at=CURRENT_TIMESTAMP WHERE token_hash=?`).bind(tokenHash).run();
   return row;
 }
 
@@ -51,7 +54,9 @@ export async function loginAdmin(request, db) {
 
   await ensureAdminTables(db);
   const token = randomToken();
-  await db.prepare(`INSERT INTO admin_sessions(member_id,token_hash,expires_at) VALUES(?,?,datetime('now','+7 days'))`).bind(member.id,await hashToken(token)).run();
+  const tokenHash = await hashToken(token);
+  await db.prepare(`DELETE FROM ${ADMIN_SESSION_TABLE} WHERE datetime(expires_at)<=datetime('now') OR member_id=?`).bind(member.id).run();
+  await db.prepare(`INSERT INTO ${ADMIN_SESSION_TABLE}(member_id,token_hash,expires_at,created_at,last_seen_at) VALUES(?,?,datetime('now','+7 days'),CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(member.id,tokenHash).run();
   const response = json({success:true,admin:{id:member.id,full_name:member.full_name,email:member.account_email || member.email,medlife_role:member.medlife_role,org_role:orgRole}});
   const headers = new Headers(response.headers);
   headers.set('Set-Cookie', cookie(ADMIN_SESSION_COOKIE, encodeURIComponent(token), ADMIN_SESSION_DAYS*86400));
@@ -61,7 +66,7 @@ export async function loginAdmin(request, db) {
 export async function logoutAdmin(request, db) {
   await ensureAdminTables(db);
   const token = getCookie(request, ADMIN_SESSION_COOKIE);
-  if (token) await db.prepare(`DELETE FROM admin_sessions WHERE token_hash=?`).bind(await hashToken(token)).run();
+  if (token) await db.prepare(`DELETE FROM ${ADMIN_SESSION_TABLE} WHERE token_hash=?`).bind(await hashToken(token)).run();
   const response = json({success:true});
   const headers = new Headers(response.headers);
   headers.set('Set-Cookie', cookie(ADMIN_SESSION_COOKIE,'',0));
