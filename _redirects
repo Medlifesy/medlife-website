@@ -20,15 +20,9 @@
 /admin/editorial-studio-v12.html /admin-login 302
 /admin/editorial-studio-v13.html /admin-login 302
 
-# Admin API proxy remains disabled here; Pages Functions own admin APIs.
-
 # Canonical administration entrypoint: authentication must begin at admin-login.
 /admin /admin-login 302
 /admin/ /admin-login 302
-/admin.html /admin-login 302
-/admin-v2 /admin-login 302
-/admin-v2/ /admin-login 302
-/admin-v2.html /admin-login 302
 
 /admin-members /admin-members-v3 301
 /admin-members/ /admin-members-v3 301
