@@ -1,1 +1,0 @@
-MedLife AI image studio connection trigger. This file can be removed after the workflow completes.
