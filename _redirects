@@ -12,19 +12,6 @@
 /submit-article /submit-article-v6 200
 /submit-article/ /submit-article-v6 200
 
-# Legacy administration aliases — send only old v2 dashboard to canonical entrypoint.
-/admin-v2 /admin.html 302
-/admin-v2/ /admin.html 302
-/admin-v2.html /admin.html 302
-
-# Legacy editorial aliases
-/admin/editorial-command-center-v23.html /admin-login 302
-/admin/editorial-command-center-v24.html /admin-login 302
-/admin/editorial-studio-v10.html /admin-login 302
-/admin/editorial-studio-v11.html /admin-login 302
-/admin/editorial-studio-v12.html /admin-login 302
-/admin/editorial-studio-v13.html /admin-login 302
-
 # Canonical general administration entrypoint.
 /admin /admin.html 200
 /admin/ /admin.html 200
