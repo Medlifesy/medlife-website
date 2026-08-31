@@ -42,9 +42,10 @@ export async function onRequest(context) {
       tags.push('<script src="/contact-social-roles-final.js?v=20260831-social-roles-final" defer></script>');
       tags.push('<script src="/contact-nav-direct-final.js?v=20260831-contact-nav-direct-final" defer></script>');
       tags.push('<script src="/contact-collaboration-center-final.js?v=20260831-contact-collaboration-center-final" defer></script>');
+      tags.push('<script src="/contact-ui-align-final.js?v=20260831-contact-ui-align-final" defer></script>');
     }
     const marker = tags.join('');
-    if (marker && tags.some(src => !html.includes(src.match(/(?:src|href)=\"([^\"]+)/)?.[1] || ''))) {
+    if (marker && tags.some(src => !html.includes(src.match(/(?:src|href)="([^"]+)/)?.[1] || ''))) {
       html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
     }
 
