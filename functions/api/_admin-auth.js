@@ -21,6 +21,15 @@ export async function ensureAdminTables(db) {
   await db.prepare(`CREATE INDEX IF NOT EXISTS idx_${ADMIN_SESSION_TABLE}_expires ON ${ADMIN_SESSION_TABLE}(expires_at)`).run();
 }
 
+export async function issueAdminSession(db,memberId) {
+  await ensureAdminTables(db);
+  const token=randomToken();
+  const tokenHash=await hashToken(token);
+  await db.prepare(`DELETE FROM ${ADMIN_SESSION_TABLE} WHERE datetime(expires_at)<=datetime('now') OR member_id=?`).bind(memberId).run();
+  await db.prepare(`INSERT INTO ${ADMIN_SESSION_TABLE}(member_id,token_hash,expires_at,created_at,last_seen_at) VALUES(?,?,datetime('now','+7 days'),CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(memberId,tokenHash).run();
+  return token;
+}
+
 export async function authenticateAdmin(request, db) {
   await ensureAdminTables(db);
   const token = getCookie(request, ADMIN_SESSION_COOKIE);
@@ -42,22 +51,16 @@ export async function loginAdmin(request, db) {
   const identifier = String(body.identifier || body.email || body.username || '').trim().toLowerCase();
   const password = String(body.password || '');
   if (!identifier || !password) return json({success:false,error:'يرجى إدخال البريد الإلكتروني أو اسم المستخدم وكلمة المرور.'},400);
-
   const member = await db.prepare(`SELECT id,full_name,email,account_email,password_hash,account_status,status,medlife_role,member_code FROM members WHERE lower(COALESCE(account_email,''))=? OR lower(COALESCE(email,''))=? OR lower(COALESCE(member_code,''))=? LIMIT 1`).bind(identifier,identifier,identifier).first();
   if (!member) return json({success:false,error:'بيانات الدخول غير صحيحة.'},401);
   if (!(member.status === 'active' || member.status === 'approved')) return json({success:false,error:'العضوية لم تُعتمد بعد من الإدارة.'},403);
   if (member.account_status && member.account_status !== 'active') return json({success:false,error:'الحساب غير مفعل حالياً.'},403);
-
   const role = String(member.medlife_role || '').toLowerCase();
   const orgRole = await getOrgAdminRole(db,member.id);
   const isAdmin = role.includes('admin') || role.includes('administrator') || role.includes('مشرف') || role.includes('إدارة') || role.includes('مدير') || role.includes('رئيس') || role.includes('مستشار') || ORG_ADMIN_ROLES.has(orgRole);
   if (!isAdmin) return json({success:false,error:'هذا الحساب لا يملك صلاحية الإدارة.'},403);
   if (!member.password_hash || !(await verifyPassword(password, member.password_hash))) return json({success:false,error:'بيانات الدخول غير صحيحة.'},401);
-
-  const token = randomToken();
-  const tokenHash = await hashToken(token);
-  await db.prepare(`DELETE FROM ${ADMIN_SESSION_TABLE} WHERE datetime(expires_at)<=datetime('now') OR member_id=?`).bind(member.id).run();
-  await db.prepare(`INSERT INTO ${ADMIN_SESSION_TABLE}(member_id,token_hash,expires_at,created_at,last_seen_at) VALUES(?,?,datetime('now','+7 days'),CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(member.id,tokenHash).run();
+  const token=await issueAdminSession(db,member.id);
   const response = json({success:true,admin:{id:member.id,full_name:member.full_name,email:member.account_email || member.email,medlife_role:member.medlife_role,org_role:orgRole}});
   const headers = new Headers(response.headers);
   headers.set('Set-Cookie', cookie(ADMIN_SESSION_COOKIE, encodeURIComponent(token), ADMIN_SESSION_DAYS*86400));
