@@ -1,0 +1,35 @@
+name: Add MedLife visual identity section
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/add-visual-identity.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply section
+        run: python - <<'PY'
+          from pathlib import Path
+          p=Path('about-medlife.html');s=p.read_text(encoding='utf-8')
+          if 'id="medlife-visual-identity"' in s: raise SystemExit('already present')
+          css='''.visual-identity{padding:88px 0;background:linear-gradient(135deg,#151d36,#1d2745 58%,#3b1828);color:#fff}.visual-identity-grid{display:grid;grid-template-columns:.78fr 1.22fr;gap:55px;align-items:center}.visual-logo-frame{width:min(330px,82vw);aspect-ratio:1;background:#fff;border-radius:34px;padding:46px;display:grid;place-items:center;box-shadow:0 24px 70px rgba(0,0,0,.2);animation:visualFloat 7s ease-in-out infinite}.visual-logo-frame img{width:75%}.visual-copy .eyebrow{color:#ffb4c3}.visual-copy h2{font-size:clamp(30px,4vw,46px);line-height:1.3;margin:8px 0 16px;color:#fff}.visual-copy>p{color:#dbe1eb;font-size:15px}.visual-statement{margin-top:24px;padding:19px 21px;border-right:4px solid #ff5f7d;background:rgba(255,255,255,.07);border-radius:13px}.visual-statement strong{display:block;color:#fff;font-size:14px}.visual-statement span{color:#dbe1eb;font-size:13px}.visual-points{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}.visual-point{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.045);border-radius:14px;padding:17px;transition:transform .35s ease,background .35s ease}.visual-point:hover{transform:translateY(-5px);background:rgba(255,255,255,.08)}.visual-point strong{display:block;color:#fff;font-size:13px;margin-bottom:4px}.visual-point span{color:#cbd3df;font-size:11.5px}.visual-caption{margin-top:18px;font-size:11px;color:#b9c2cf}@keyframes visualFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}@media(max-width:850px){.visual-identity-grid{grid-template-columns:1fr}.visual-logo-stage{order:-1}.visual-points{grid-template-columns:1fr 1fr}}@media(max-width:600px){.visual-identity{padding:68px 0}.visual-logo-frame{width:260px;padding:34px}.visual-points{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){.visual-logo-frame{animation:none}.visual-point{transition:none}}'''
+          sec='''<section class="visual-identity" id="medlife-visual-identity"><div class="wrap visual-identity-grid"><div class="visual-logo-stage"><div class="visual-logo-frame"><img src="./logo.PNG" alt="شعار مؤسسة ميدلايف"></div></div><div class="visual-copy"><span class="eyebrow">الهوية البصرية</span><h2>شعار ميدلايف هو علامة لهوية تقوم على الإنسان والتطوع والخدمة</h2><p>يمثل الشعار الواجهة البصرية لمؤسسة ميدلايف، ويجسّد حضورها المؤسسي عبر العمل الطبي والتوعوي والإنساني والتطوعي، ويربط بين المعرفة والمهارة والوقت وبين خدمة المجتمع.</p><div class="visual-statement"><strong>الهوية ليست مجرد شعار</strong><span>إنها تعبير عن قيم نحاول ترجمتها إلى عمل: خدمة الإنسان، نشر المعرفة الطبية، تنمية المواهب، وتعزيز ثقافة التطوع والوقوف إلى جانب الناس.</span></div><div class="visual-points"><div class="visual-point"><strong>هوية مؤسسية موحّدة</strong><span>يظهر الشعار كعلامة ثابتة في حضور ميدلايف الإعلامي والميداني والرقمي.</span></div><div class="visual-point"><strong>ارتباط بالمجتمع</strong><span>تعكس الهوية توجّه المؤسسة نحو خدمة الناس والوصول إلى احتياجاتهم الصحية والمجتمعية.</span></div><div class="visual-point"><strong>التطوع والعمل الجماعي</strong><span>يرتبط الشعار بمجتمع يقدّم أفراده وقتهم وخبراتهم ومواهبهم لخدمة الآخرين.</span></div><div class="visual-point"><strong>هوية تتطور وتحافظ على جوهرها</strong><span>تتطور البرامج والأدوات، بينما تبقى قيم الخدمة والمعرفة والتطوع في قلب هوية ميدلايف.</span></div></div><div class="visual-caption">شعار ميدلايف جزء من هويتها المؤسسية ويستخدم بصورة موحّدة عبر منصاتها وأنشطتها.</div></div></div></section>'''
+          s=s.replace('</style>\n</head>',css+'\n</style>\n</head>',1).replace('</main>',sec+'\n</main>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit and remove workflow
+        run: |
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add about-medlife.html
+          git commit -m 'feat(about): add visual identity section'
+          rm .github/workflows/add-visual-identity.yml
+          git add .github/workflows/add-visual-identity.yml
+          git commit -m 'chore: remove temporary visual identity workflow'
+          git push
