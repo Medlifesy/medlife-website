@@ -1,5 +1,5 @@
-import { ensureAuthTables, hashPassword, json } from '../../api/_auth.js';
-import { authenticateAdmin } from '../../api/_admin-auth.js';
+import { ensureAuthTables, hashPassword, json } from '../_auth.js';
+import { authenticateAdmin } from '../_admin-auth.js';
 
 const ACCOUNT_ROLES = new Set(['admin','administrator','medical_director','general_team_supervisor','advisor','editor','reviewer']);
 
@@ -19,7 +19,7 @@ export async function onRequest({request,env}){
     const role=String(body.role||'editor').trim().toLowerCase();
     const accountStatus=body.status==='inactive'?'inactive':'active';
     if(!Number.isInteger(memberId)||memberId<1) return json({success:false,error:'يجب اختيار عضو صحيح.'},400);
-    if(!email||!/^\S+@\S+\.\S+$/.test(email)) return json({success:false,error:'يرجى إدخال بريد إلكتروني صالح.'},400);
+    if(!email||!/\S+@\S+\.\S+/.test(email)) return json({success:false,error:'يرجى إدخال بريد إلكتروني صالح.'},400);
     if(password.length<12) return json({success:false,error:'كلمة المرور يجب أن تكون 12 محرفاً على الأقل.'},400);
     if(password!==confirm) return json({success:false,error:'كلمتا المرور غير متطابقتين.'},400);
     if(!ACCOUNT_ROLES.has(role)) return json({success:false,error:'الدور الإداري غير صالح.'},400);
