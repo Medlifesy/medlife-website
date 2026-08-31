@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Fix PBKDF2 compatibility for one-time system administrator setup
-Timestamp: 2026-09-01T22:50:00+03:00
+Release: Fix legacy members ID generation for system administrator bootstrap
+Timestamp: 2026-09-01T23:00:00+03:00
 Source: main
 
-Deploy current main branch after changing PBKDF2 password hashing from 120000 to 100000 iterations for Cloudflare WebCrypto compatibility, while preserving verification compatibility with stored iteration counts.
+Deploy current main branch after updating one-time system administrator bootstrap to explicitly allocate the next members.id for legacy schemas that do not auto-generate IDs.
