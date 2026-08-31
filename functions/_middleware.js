@@ -9,6 +9,7 @@ export async function onRequest(context) {
     const isArticlesAdmin = path === '/articles-admin' || path === '/articles-admin/' || path.endsWith('/articles-admin.html');
     const isArticleReader = path === '/article-reader-v5.html' || path.startsWith('/articles/');
     const isSupportPage = path === '/support' || path === '/support/' || path === '/support.html';
+    const isContactPage = path === '/contact' || path === '/contact/' || path === '/contact.html';
 
     // articles-admin.html is a self-contained application with its own
     // JavaScript handlers. Do not inject legacy admin scripts or bridge code
@@ -21,12 +22,17 @@ export async function onRequest(context) {
       return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
     }
 
-    if (!isArticleReader && !isSupportPage) return response;
+    if (!isArticleReader && !isSupportPage && !isContactPage) return response;
 
     let html = await response.text();
     const tags = [];
     if (isArticleReader) tags.push('<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>');
     if (isSupportPage) tags.push('<script src="/site-nav.js?v=20260831-support1" defer></script>');
+    if (isContactPage) {
+      tags.push('<script src="/site-nav.js?v=20260831-contact1" defer></script>');
+      tags.push('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>');
+      tags.push('<script src="/contact-map-fix.js?v=20260831-map1" defer></script>');
+    }
     const marker = tags.join('');
     if (marker && tags.some(src => !html.includes(src.match(/src=\"([^\"]+)/)?.[1] || ''))) {
       html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
