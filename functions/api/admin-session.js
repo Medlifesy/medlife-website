@@ -17,7 +17,7 @@ export async function onRequest({ request, env }) {
     if (request.method === 'GET' && action === 'me') {
       const admin = await authenticateAdmin(request, db);
       if (!admin) return new Response(JSON.stringify({ success: false, authenticated: false }), { status: 401, headers: { 'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store' } });
-      return new Response(JSON.stringify({ success:true, authenticated:true, admin:{ id:admin.member_id, member_id:admin.member_id, full_name:admin.full_name, email:admin.account_email||admin.email||null, medlif​e_role:admin.medlif​e_role||null, org_role:admin.org_role||null } }), { status:200, headers:{'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store'} });
+      return new Response(JSON.stringify({ success:true, authenticated:true, admin:{ id:admin.member_id, member_id:admin.member_id, full_name:admin.full_name, email:admin.account_email||admin.email||null, medlife_role:admin.medlife_role||null, org_role:admin.org_role||null } }), { status:200, headers:{'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store'} });
     }
     return new Response(JSON.stringify({ success:false,error:'Method or action not allowed.' }), { status:405, headers:{'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store'} });
   } catch(error) {
