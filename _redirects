@@ -20,9 +20,9 @@
 /admin/editorial-studio-v12.html /admin-login 302
 /admin/editorial-studio-v13.html /admin-login 302
 
-# Canonical administration entrypoint: authentication must begin at admin-login.
-/admin /admin-login 302
-/admin/ /admin-login 302
+# Canonical general administration entrypoint. The dashboard performs its own session guard.
+/admin /admin.html 200
+/admin/ /admin.html 200
 
 /admin-members /admin-members-v3 301
 /admin-members/ /admin-members-v3 301
@@ -31,9 +31,9 @@
 /admin-teams.html /admin-teams 301
 /admin-telegram.html /admin-telegram 301
 
-# Articles admin: authentication begins at the general admin login.
-/articles-admin /admin-login 302
-/articles-admin/ /admin-login 302
+# Articles admin: content accounts will use a dedicated role-aware entrypoint later.
+/articles-admin /articles-admin-v2.html 200
+/articles-admin/ /articles-admin-v2.html 200
 /articles-admin.html /articles-admin-v2.html 200
 
 # Articles admin API is served by the dedicated Worker/D1 stack.
