@@ -1,4 +1,4 @@
-import { issueAdminSession, ADMIN_SESSION_COOKIE } from './_admin-auth.js';
+import { issueAdminSession, ADMIN_SESSION_COOKIE, ensureAdminTables } from './_admin-auth.js';
 
 const SESSION_COOKIE = "medlife_member_session";
 const SESSION_DAYS = 30;
@@ -40,6 +40,9 @@ async function login(request, db) {
     const identifier = String(body.identifier || body.username || body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
     if (!identifier || !password) return json({success:false, error:"يرجى إدخال البريد الإلكتروني أو اسم المستخدم وكلمة المرور."},400);
+    // Initialize the admin RBAC schema before resolving an administrative redirect.
+    // This prevents a first login from silently falling back to the members area.
+    await ensureAdminTables(db);
     const member = await db.prepare(`SELECT id,membership_number,full_name,email,account_email,password_hash,account_status,status,member_code,medlife_role,cell,field_location,governorate,join_date,volunteer_certificate FROM members WHERE lower(COALESCE(account_email,''))=? OR lower(COALESCE(email,''))=? OR lower(COALESCE(member_code,''))=? LIMIT 1`).bind(identifier,identifier,identifier).first();
     if (!member) return json({success:false, error:"بيانات الدخول غير صحيحة."},401);
     if (!(member.status === "active" || member.status === "approved")) return json({success:false, error:"عضويتك لم تُعتمد بعد من الإدارة."},403);
