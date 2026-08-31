@@ -12,6 +12,13 @@
 /submit-article /submit-article-v6 200
 /submit-article/ /submit-article-v6 200
 
+# Legacy administration aliases — canonicalize old dashboards.
+/admin-v2 /admin.html 302
+/admin-v2/ /admin.html 302
+/admin-v2.html /admin.html 302
+/admin-v3 /admin.html 302
+/admin-v3/ /admin.html 302
+
 # Legacy editorial aliases
 /admin/editorial-command-center-v23.html /admin-login 302
 /admin/editorial-command-center-v24.html /admin-login 302
@@ -20,7 +27,7 @@
 /admin/editorial-studio-v12.html /admin-login 302
 /admin/editorial-studio-v13.html /admin-login 302
 
-# Canonical general administration entrypoint. The dashboard performs its own session guard.
+# Canonical general administration entrypoint.
 /admin /admin.html 200
 /admin/ /admin.html 200
 
@@ -31,7 +38,7 @@
 /admin-teams.html /admin-teams 301
 /admin-telegram.html /admin-telegram 301
 
-# Articles admin: content accounts will use a dedicated role-aware entrypoint later.
+# Articles admin: content accounts use a dedicated role-aware entrypoint.
 /articles-admin /articles-admin-v2.html 200
 /articles-admin/ /articles-admin-v2.html 200
 /articles-admin.html /articles-admin-v2.html 200
@@ -42,4 +49,3 @@
 
 # NOTE: /articles/* is intentionally NOT rewritten here.
 # Canonical article URLs are handled by functions/articles/[slug].js.
-# Legacy .html article files therefore remain directly accessible.
