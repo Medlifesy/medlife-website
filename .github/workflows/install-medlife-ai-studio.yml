@@ -1,0 +1,37 @@
+name: Validate MedLife Article Studio (Clean Rebuild)
+
+on:
+  push:
+    branches:
+      - admin-cleanup-safe-2026-08-31-v2
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate retired legacy Article Studio surface
+        shell: python
+        run: |
+          from pathlib import Path
+
+          legacy = [
+              'articles-admin.html',
+              'article-management-v3.js',
+              'article-management-enhancements.js',
+              'article-ai-studio.js',
+              'article-editor-enhancements.js',
+          ]
+          present = [p for p in legacy if Path(p).exists()]
+          if present:
+              raise SystemExit(f'Legacy Article Studio files must remain retired: {present}')
+
+          print('OK: legacy Article Studio surface is retired and ready for clean rebuild.')
