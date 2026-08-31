@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Fix Articles Admin direct entry route
-Timestamp: 2026-09-01T21:50:00+03:00
+Release: Unified general administration access
+Timestamp: 2026-09-01T22:00:00+03:00
 Source: main
 
-Deploy current main branch after fixing the direct /articles-admin entrypoint to serve the new editorial studio.
+Deploy current main branch after routing article administration through the general admin login and adding the general administration dashboard with account creation.
