@@ -39,6 +39,7 @@ export async function onRequest(context) {
       tags.push('<script src="/contact-page-final-10.js?v=20260831-contact-final10" defer></script>');
       tags.push('<script src="/contact-page-nav-final.js?v=20260831-contact-nav-final" defer></script>');
       tags.push('<script src="/contact-social-refinement-v2.js?v=20260831-social-refinement2" defer></script>');
+      tags.push('<script src="/contact-social-roles-final.js?v=20260831-social-roles-final" defer></script>');
     }
     const marker = tags.join('');
     if (marker && tags.some(src => !html.includes(src.match(/(?:src|href)=\"([^\"]+)/)?.[1] || ''))) {
