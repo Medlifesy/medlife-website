@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Fix admin session diagnostics UI
-Timestamp: 2026-09-01T22:30:00+03:00
+Release: Split team and article databases for admin and content accounts
+Timestamp: 2026-09-01T22:35:00+03:00
 Source: main
 
-Deploy current main branch after updating admin-login to expose the backend session error detail for diagnosis.
+Deploy current main branch after routing general administration, members, and article-admin accounts through TEAM_DB while keeping article content in DB.
