@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Clean Articles navigation header
-Timestamp: 2026-09-01T21:10:00+03:00
+Release: Articles Library and Article Reader V8
+Timestamp: 2026-09-01T21:35:00+03:00
 Source: main
 
-Deploy current main branch after removing the duplicated articles navigation header.
+Deploy current main branch after completing the new Medical Library landing page and V8 article reader.
