@@ -12,6 +12,11 @@
 /submit-article /submit-article-v6 200
 /submit-article/ /submit-article-v6 200
 
+# Public institutional pages
+/about-medlife /about-medlife.html 200
+/about-medlife/ /about-medlife.html 200
+/about-medlife.html /about-medlife.html 200
+
 # Legacy editorial aliases
 /admin/editorial-command-center-v23.html /admin-login 302
 /admin/editorial-command-center-v24.html /admin-login 302
