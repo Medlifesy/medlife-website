@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MedLife | دخول الإدارة</title><link rel="icon" href="logo.PNG"><link rel="stylesheet" href="/homepage-redesign.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MedLife | دخول الإدارة</title><link rel="icon" href="/logo.PNG"><link rel="stylesheet" href="/homepage-redesign.css"></head>
 <body style="margin:0;background:#f7f8fa;font-family:Cairo,Arial,sans-serif;color:#283244">
 <main style="min-height:100vh;display:grid;place-items:center;padding:24px"><section style="width:min(460px,100%);background:#fff;border:1px solid #e1e5eb;border-radius:20px;padding:30px;box-shadow:0 18px 55px rgba(21,29,54,.08)">
 <div style="text-align:center"><img src="/logo.PNG" alt="MedLife" style="width:64px;height:64px"><h1 style="color:#151d36;margin:10px 0 4px">دخول الإدارة العامة</h1><p style="color:#6e7788;font-size:12px;margin:0 0 24px">مركز الإدارة العامة لمؤسسة MedLife</p></div>
@@ -8,11 +8,17 @@
 </section></main>
 <script>
 const $=id=>document.getElementById(id);
-async function login(){
- const r=await fetch('/api/admin-session?action=login',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:'include',cache:'no-store',body:JSON.stringify({identifier:$('identifier').value.trim(),password:$('password').value})});
- const j=await r.json().catch(()=>({}));
- if(!r.ok||!j.success){const e=new Error(j.error||'تعذر تسجيل الدخول.');e.detail=j.detail||'';throw e}
- return j;
-}
-$('form').addEventListener('submit',async e=>{e.preventDefault();$('submit').disabled=true;$('submit').textContent='جاري التحقق...';$('msg').style.display='none';try{await login();window.location.replace('/admin.html')}catch(err){$('msg').style.display='block';$('msg').textContent=err.message+(err.detail?'\nتفاصيل النظام: '+err.detail:'')}finally{$('submit').disabled=false;$('submit').textContent='تسجيل الدخول'}});
+const show=text=>{$('msg').style.display='block';$('msg').textContent=text};
+async function jsonFetch(url,options){const r=await fetch(url,{credentials:'include',cache:'no-store',...options});const text=await r.text();let j={};try{j=JSON.parse(text)}catch{}return {r,j,text}}
+$('form').addEventListener('submit',async e=>{
+ e.preventDefault();$('submit').disabled=true;$('submit').textContent='جاري التحقق...';$('msg').style.display='none';
+ try{
+   const {r,j}=await jsonFetch('/api/admin-session?action=login',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({identifier:$('identifier').value.trim(),password:$('password').value})});
+   if(!r.ok||!j.success) throw new Error((j.error||'تعذر تسجيل الدخول.')+(j.detail?'\nتفاصيل النظام: '+j.detail:''));
+   const check=await jsonFetch('/api/admin-session?action=me');
+   if(!check.r.ok||!check.j.authenticated) throw new Error((check.j.error||'تم تسجيل الدخول ولكن لم يتم تثبيت جلسة الإدارة.')+(check.j.detail?'\nتفاصيل النظام: '+check.j.detail:''));
+   $('submit').textContent='تم التحقق — الانتقال...';
+   window.location.replace('/admin.html');
+ }catch(err){show(err.message||'تعذر تسجيل الدخول حالياً.');$('submit').disabled=false;$('submit').textContent='تسجيل الدخول'}
+});
 </script></body></html>
