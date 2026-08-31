@@ -1,0 +1,63 @@
+name: Update forum secondary navigation
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-forum:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update shared navigation and forum page
+        shell: python
+        run: |
+          from pathlib import Path
+
+          nav = Path('site-nav.js')
+          text = nav.read_text(encoding='utf-8')
+
+          old_remove = """  const removeLegacyHeaders = () => {\n    document.querySelectorAll('.medlife-global-header').forEach(el => el.remove());\n    document.querySelectorAll('body > header.top, body header.top').forEach(el => el.remove());\n  };"""
+          new_remove = """  const removeLegacyHeaders = () => {\n    document.querySelectorAll('.medlife-global-header').forEach(el => el.remove());\n    document.querySelectorAll('body > header.top, body header.top').forEach(el => el.remove());\n    if (page === 'forum-v3.html' || page === 'forum-v3') {\n      document.querySelectorAll('body > header.nav').forEach(el => el.remove());\n    }\n  };"""
+          if old_remove not in text:
+              raise SystemExit('Expected removeLegacyHeaders block not found')
+          text = text.replace(old_remove, new_remove, 1)
+
+          marker = """    document.body.prepend(header);"""
+          insertion = """    document.body.prepend(header);\n\n    if (current === 'forum') {\n      const sub = document.createElement('nav');\n      sub.className = 'medlife-forum-subnav';\n      sub.setAttribute('aria-label', 'تنقل المنتدى');\n      sub.innerHTML = `\n        <div class=\"medlife-forum-subnav-inner\">\n          <a href=\"#about\" data-forum-key=\"about\">عن المنتدى</a>\n          <a href=\"#activities\" data-forum-key=\"activities\">الأنشطة</a>\n          <a href=\"#booking\" data-forum-key=\"booking\">احجز مساحتك</a>\n          <a href=\"#contact\" data-forum-key=\"contact\">تواصل معنا</a>\n        </div>`;\n      header.insertAdjacentElement('afterend', sub);\n\n      const style = document.createElement('style');\n      style.id = 'medlife-forum-subnav-style';\n      style.textContent = `\n        .medlife-forum-subnav{position:sticky;top:72px;z-index:2400;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid #e8edf3;box-shadow:0 5px 15px rgba(21,29,54,.045);animation:medlifeForumSubnavIn .28s ease-out both}\n        .medlife-forum-subnav-inner{width:min(1180px,calc(100% - 28px));min-height:48px;margin:auto;display:flex;align-items:stretch;justify-content:center;gap:3px;overflow-x:auto;scrollbar-width:none}\n        .medlife-forum-subnav-inner::-webkit-scrollbar{display:none}\n        .medlife-forum-subnav-inner a{position:relative;display:flex;align-items:center;justify-content:center;padding:0 16px;color:#151d36;text-decoration:none;font:800 12px Cairo,sans-serif;white-space:nowrap;transition:color .2s ease,background .2s ease}\n        .medlife-forum-subnav-inner a::after{content:\"\";position:absolute;left:14px;right:14px;bottom:6px;height:2px;border-radius:999px;background:#ff2a54;transform:scaleX(0);transition:transform .2s ease}\n        .medlife-forum-subnav-inner a:hover{color:#ff2a54;background:#fff8fa;border-radius:8px}\n        .medlife-forum-subnav-inner a.active{color:#ff2a54}\n        .medlife-forum-subnav-inner a.active::after{transform:scaleX(1)}\n        @keyframes medlifeForumSubnavIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}\n        @media(max-width:700px){.medlife-forum-subnav{top:64px}.medlife-forum-subnav-inner{justify-content:flex-start}.medlife-forum-subnav-inner a{padding:0 13px;font-size:11px}}\n      `;\n      document.head.appendChild(style);\n\n      const forumLinks = [...sub.querySelectorAll('[data-forum-key]')];\n      const setForumActive = key => forumLinks.forEach(a => a.classList.toggle('active', a.dataset.forumKey === key));\n      const sections = forumLinks.map(a => [a.getAttribute('href').slice(1), a.dataset.forumKey]);\n      if ('IntersectionObserver' in window) {\n        const observer = new IntersectionObserver(entries => {\n          const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];\n          if (visible) setForumActive(visible.target.dataset.forumKey);\n        }, {rootMargin:'-26% 0px -58% 0px', threshold:[0,.2,.5,.8]});\n        sections.forEach(([id,key]) => {\n          const el = document.getElementById(id);\n          if (el) { el.dataset.forumKey = key; observer.observe(el); }\n        });\n      }\n      forumLinks.forEach(a => a.addEventListener('click', () => setForumActive(a.dataset.forumKey)));\n    }"""
+          if marker not in text:
+              raise SystemExit('Navigation insertion marker not found')
+          if 'medlife-forum-subnav' not in text:
+              text = text.replace(marker, insertion, 1)
+
+          nav.write_text(text, encoding='utf-8')
+
+          page = Path('forum-v3.html')
+          html = page.read_text(encoding='utf-8')
+          if '/site-nav.js' not in html:
+              html = html.replace('</body>', '<script src="/site-nav.js"></script>\n</body>', 1)
+          page.write_text(html, encoding='utf-8')
+
+      - name: Validate and commit
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          nav = Path('site-nav.js').read_text(encoding='utf-8')
+          page = Path('forum-v3.html').read_text(encoding='utf-8')
+          assert 'medlife-forum-subnav' in nav
+          assert 'data-forum-key="about"' in nav
+          assert '/site-nav.js' in page
+          PY
+          git config user.name 'MedLife Bot'
+          git config user.email 'actions@medlifesy.org'
+          git add site-nav.js forum-v3.html .github/workflows/update-forum-subnav.yml
+          git commit -m 'fix(forum): add secondary forum navigation'
+          git rm .github/workflows/update-forum-subnav.yml
+          git commit -m 'chore: remove temporary forum navigation workflow'
+          git push
