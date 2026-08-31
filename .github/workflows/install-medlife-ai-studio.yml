@@ -1,4 +1,4 @@
-name: Validate MedLife Article Studio
+name: Validate Public Article System
 
 on:
   push:
@@ -19,63 +19,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate article admin integration
+      - name: Validate public article infrastructure
         shell: python
         run: |
           from pathlib import Path
 
-          admin = Path('articles-admin.html').read_text(encoding='utf-8')
-          middleware = Path('functions/_middleware.js').read_text(encoding='utf-8')
-          visual = Path('article-management-v3.js').read_text(encoding='utf-8')
-
           required = [
-              'articles-admin.html',
+              'articles.html',
               'functions/_middleware.js',
-              'article-management-v3.js',
+              'functions/articles/[slug].js',
           ]
           missing = [p for p in required if not Path(p).exists()]
           if missing:
-              raise SystemExit(f'Missing required files: {missing}')
+              raise SystemExit(f'Missing required public article files: {missing}')
 
-          if '/article-management-v3.js' not in middleware:
-              raise SystemExit('Middleware does not inject article-management-v3.js')
+          middleware = Path('functions/_middleware.js').read_text(encoding='utf-8')
+          if '/article-reader-rich-content.js' not in middleware:
+              raise SystemExit('Middleware does not inject article-reader-rich-content.js')
 
-          for marker in ['إضافة مقالة جديدة', 'Visual Studio']:
-              if marker not in visual:
-                  raise SystemExit(f'Missing article management / Visual Studio marker: {marker}')
-
-          storage_markers = ['بدون تخزين', 'no-storage', 'noStorageVisualStudio']
-          if not any(marker in visual for marker in storage_markers):
-              raise SystemExit('Missing no-storage visual workflow marker')
-
-          legacy_guards = [
-              'ai-studio',
-              'images-studio',
-              'article-ai-studio.js',
-              'article-ai-editorial-v2.js',
-              'article-images-studio.js',
-              'article-ai-upgrade.js',
-          ]
-          missing_guards = [marker for marker in legacy_guards if marker not in middleware]
-          if missing_guards:
-              raise SystemExit(f'Missing legacy UI removal guards: {missing_guards}')
-
-          # Validate implementation semantics, not one exact JavaScript syntax.
-          if 'legacySectionClasses' not in middleware or 'className' not in middleware:
-              raise SystemExit('Legacy section removal implementation is missing')
-          if 'new RegExp' not in middleware or '<section\\\\s+class=' not in middleware:
-              raise SystemExit('Legacy section regex guard is missing')
-          if 'article-ai-studio\\\\.js' not in middleware:
-              raise SystemExit('Legacy article AI script removal guard is missing')
-          if 'article-ai-editorial-v2\\\\.js' not in middleware:
-              raise SystemExit('Legacy editorial AI script removal guard is missing')
-          if 'article-images-studio\\\\.js' not in middleware:
-              raise SystemExit('Legacy image studio script removal guard is missing')
-          if 'article-ai-upgrade\\\\.js' not in middleware:
-              raise SystemExit('Legacy AI upgrade script removal guard is missing')
-
-          if '<script' not in admin:
-              raise SystemExit('articles-admin.html has no script tags')
-
-          print('MedLife article management integration validated successfully.')
-          print('Legacy AI/image UI removal is actively guarded by middleware.')
+          print('Public article infrastructure validated successfully.')
+          print('Legacy Article Admin / Editorial Studio validation has been retired.')
