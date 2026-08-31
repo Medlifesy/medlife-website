@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Articles Library and Article Reader V8
-Timestamp: 2026-09-01T21:35:00+03:00
+Release: Fix Articles Admin direct entry route
+Timestamp: 2026-09-01T21:50:00+03:00
 Source: main
 
-Deploy current main branch after completing the new Medical Library landing page and V8 article reader.
+Deploy current main branch after fixing the direct /articles-admin entrypoint to serve the new editorial studio.
