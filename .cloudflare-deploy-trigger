@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Unified general administration access
-Timestamp: 2026-09-01T22:00:00+03:00
+Release: Fix system admin session handling
+Timestamp: 2026-09-01T22:10:00+03:00
 Source: main
 
-Deploy current main branch after routing article administration through the general admin login and adding the general administration dashboard with account creation.
+Deploy current main branch after isolating general system administrator sessions from the legacy session schema.
