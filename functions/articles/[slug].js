@@ -1,4 +1,4 @@
-const READER_ASSET = "/article-reader-v5.html";
+const READER_ASSET = "/article-reader-v6.html";
 const ARTICLES_WORKER = "https://medlife-articles-api.broad-frog-3978.workers.dev/public/articles";
 
 export async function onRequestGet(context) {
@@ -28,11 +28,12 @@ export async function onRequestGet(context) {
     category: article.category,
     image_url: article.image_url,
     slug: article.slug,
+    published_at: article.published_at,
     created_at: article.created_at,
     updated_at: article.updated_at
   });
 
-  const bootstrap = `<script>(function(){const article=${safeArticle};window.__MEDLIFE_ARTICLE__=article;window.__MEDLIFE_ARTICLE_ROUTE__=${safeSlug};const nativeFetch=window.fetch.bind(window);window.fetch=function(input,init){try{const raw=typeof input==='string'?input:(input&&input.url)||'';const u=new URL(raw,location.href);if(u.origin===location.origin&&(u.pathname==='/api/articles'||u.pathname.startsWith('/api/articles/')||u.pathname==='/api/article-public')){return Promise.resolve(new Response(JSON.stringify(article),{status:200,headers:{'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store'}}));}}catch(e){}return nativeFetch(input,init);};const nativeReplace=history.replaceState.bind(history);history.replaceState=function(state,title,url){try{if(url){const u=new URL(url,location.href);if(u.pathname.startsWith('/articles/'))return nativeReplace(state,title,'/articles/'+encodeURIComponent(article.slug||${safeSlug}));}}catch(e){}return nativeReplace(state,title,url);};})();</script>`;
+  const bootstrap = `<script>(function(){const article=${safeArticle};window.__MEDLIFE_ARTICLE__=article;window.__MEDLIFE_ARTICLE_ROUTE__=${safeSlug};})();</script>`;
   const patched = html.replace(/<head>/i, `<head>${bootstrap}`);
   const canonical = new URL(`/articles/${encodeURIComponent(article.slug || slug)}`, context.request.url).href;
 
@@ -42,7 +43,7 @@ export async function onRequestGet(context) {
       "content-type": "text/html; charset=UTF-8",
       "cache-control": "no-store",
       "link": `<${canonical}>; rel="canonical"`,
-      "x-medlife-article-renderer": "article-reader-v5-d1",
+      "x-medlife-article-renderer": "article-reader-v6-d1",
       "x-medlife-article-route": article.slug || slug,
     },
   });
