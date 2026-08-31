@@ -58,50 +58,35 @@
     #medlife-contact-v8 .mc5-footer-brand strong{display:block;font:900 15px Cairo,Arial,sans-serif}.mc5-footer-brand span{display:block;margin-top:3px;color:#cdd3df;font:500 10px Cairo,Arial,sans-serif}
     #medlife-contact-v8 .mc5-footer-links{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}.mc5-footer-links a{color:#fff;text-decoration:none;font:800 10px Cairo,Arial,sans-serif;padding:7px 9px;border:1px solid rgba(255,255,255,.18);border-radius:9px}.mc5-footer-links a:hover{border-color:#ff4b6e;color:#ff4b6e}
     #medlife-contact-v8 .mc5-footer-copy{text-align:center;margin:20px auto 0;padding-top:15px;border-top:1px solid rgba(255,255,255,.11);color:#aeb7c7;font:500 9px/1.7 Cairo,Arial,sans-serif;width:min(1120px,calc(100% - 30px))}
+    #medlife-contact-v8 .mc4-social,#medlife-contact-v8 .mc4-footer{display:none!important}
+    #medlife-contact-v8 .mc3-social-note,#medlife-contact-v8 .mc4-social-note{display:none!important}
     @media(max-width:900px){#medlife-contact-v8 .mc8-main{grid-template-columns:1fr!important}.mc8-contact-card,.mc8-map-card{grid-column:1!important;grid-row:auto!important}.mc5-social-grid{grid-template-columns:repeat(3,1fr)!important}.mc5-footer-inner{grid-template-columns:1fr!important}.mc5-footer-links{justify-content:flex-start!important}}
     @media(max-width:640px){#medlife-contact-v8 .mc8-wrap{padding:27px 16px 24px!important;border-radius:22px!important}#medlife-contact-v8 .mc8-logo{width:116px!important;height:116px!important}.mc5-social-grid{grid-template-columns:repeat(2,1fr)!important}.mc5-footer{padding:28px 14px 22px!important}}
     @media(prefers-reduced-motion:reduce){#medlife-contact-v8 .mc8-logo{animation:none!important}}
   `;
   document.head.appendChild(s);
-
-  function cleanupCopy(){
+  function cleanup(){
     const page=document.getElementById('medlife-contact-v8');
-    if(!page) return;
-    page.querySelectorAll('.mc3-social-note').forEach(el=>el.remove());
+    if(!page)return;
+    page.querySelectorAll('.mc3-social-note,.mc4-social-note,.mc4-social,.mc4-footer').forEach(el=>el.remove());
   }
-
   function addSocial(){
     const page=document.getElementById('medlife-contact-v8');
-    if(!page || page.querySelector('.mc5-social')) return;
-    const anchor=page.querySelector('.mc8-lower') || page.querySelector('.mc8-content');
-    if(!anchor) return;
-    const sec=document.createElement('section');
-    sec.className='mc5-social';
-    sec.innerHTML=`
-      <div class="mc5-social-head"><span>مجتمع ميدلايف الرقمي</span><h3>تابع ميدلايف عبر منصاتها الرسمية</h3><p>آخر المبادرات والمحتوى الطبي والأنشطة والتحديثات.</p></div>
-      <div class="mc5-social-grid">
-        <a class="mc5-social-card" href="https://www.facebook.com/Medlifesyforum" target="_blank" rel="noopener noreferrer"><span class="mc5-social-icon"><i class="fa-brands fa-facebook-f"></i></span><strong>Facebook المنتدى</strong></a>
-        <div class="mc5-social-card disabled"><span class="mc5-social-icon"><i class="fa-brands fa-instagram"></i></span><strong>Instagram</strong></div>
-        <div class="mc5-social-card disabled"><span class="mc5-social-icon"><i class="fa-brands fa-telegram"></i></span><strong>Telegram</strong></div>
-        <a class="mc5-social-card" href="https://www.youtube.com/@medlifesy" target="_blank" rel="noopener noreferrer"><span class="mc5-social-icon"><i class="fa-brands fa-youtube"></i></span><strong>YouTube</strong></a>
-        <a class="mc5-social-card" href="https://www.linkedin.com/company/med-life-syria" target="_blank" rel="noopener noreferrer"><span class="mc5-social-icon"><i class="fa-brands fa-linkedin-in"></i></span><strong>LinkedIn</strong></a>
-      </div>`;
+    if(!page||page.querySelector('.mc5-social'))return;
+    const anchor=page.querySelector('.mc8-lower')||page.querySelector('.mc8-content');
+    if(!anchor)return;
+    const sec=document.createElement('section');sec.className='mc5-social';
+    sec.innerHTML=`<div class="mc5-social-head"><span>الحضور الرقمي لميدلايف</span><h3>تابع ميدلايف عبر منصاتها الرسمية</h3><p>آخر المبادرات والأنشطة والمحتوى الطبي والتحديثات الرسمية.</p></div><div class="mc5-social-grid"><a class="mc5-social-card" href="https://www.facebook.com/Medlifesyforum" target="_blank" rel="noopener noreferrer"><span class="mc5-social-icon"><i class="fa-brands fa-facebook-f"></i></span><strong>Facebook المنتدى</strong></a><div class="mc5-social-card disabled"><span class="mc5-social-icon"><i class="fa-brands fa-instagram"></i></span><strong>Instagram</strong></div><div class="mc5-social-card disabled"><span class="mc5-social-icon"><i class="fa-brands fa-telegram"></i></span><strong>Telegram</strong></div><a class="mc5-social-card" href="https://www.youtube.com/@medlifesy" target="_blank" rel="noopener noreferrer"><span class="mc5-social-icon"><i class="fa-brands fa-youtube"></i></span><strong>YouTube</strong></a><a class="mc5-social-card" href="https://www.linkedin.com/company/med-life-syria" target="_blank" rel="noopener noreferrer"><span class="mc5-social-icon"><i class="fa-brands fa-linkedin-in"></i></span><strong>LinkedIn</strong></a></div>`;
     anchor.parentNode.insertBefore(sec,anchor.nextSibling);
   }
-
   function addFooter(){
     const page=document.getElementById('medlife-contact-v8');
-    if(!page || page.querySelector('.mc5-footer')) return;
-    const footer=document.createElement('footer');
-    footer.className='mc5-footer';
+    if(!page||page.querySelector('.mc5-footer'))return;
+    const footer=document.createElement('footer');footer.className='mc5-footer';
     footer.innerHTML=`<div class="mc5-footer-inner"><div class="mc5-footer-brand"><img src="${BRAND}" alt="شعار مؤسسة ميدلايف"><div><strong>مؤسسة ميدلايف الطبية الخيرية التطوعية</strong><span>طرطوس — سوريا</span></div></div><div class="mc5-footer-links"><a href="/about-medlife.html">عن ميدلايف</a><a href="/forum-v3.html">المنتدى</a><a href="/support.html">صندوق الدعم</a><a href="/contact.html">تواصل معنا</a></div></div><div class="mc5-footer-copy">بالعمل التطوعي نصنع الأثر.</div>`;
     page.appendChild(footer);
   }
-
-  function init(){
-    if(!document.getElementById('medlife-contact-v8')) return;
-    cleanupCopy(); addSocial(); addFooter();
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
-  setTimeout(init,800); setTimeout(init,1600);
+  function init(){if(!document.getElementById('medlife-contact-v8'))return;cleanup();addSocial();addFooter()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+  setTimeout(init,700);setTimeout(init,1500);
 })();
