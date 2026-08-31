@@ -1,7 +1,7 @@
 MedLife website deployment trigger
 
-Release: Redesign general admin login and fix successful redirect
-Timestamp: 2026-09-01T23:15:00+03:00
+Release: Fix canonical general administration dashboard route
+Timestamp: 2026-09-01T23:20:00+03:00
 Source: main
 
-Deploy current main branch after removing the secondary session check that blocked successful login navigation and replacing the admin login page with a clean responsive MedLife design.
+Deploy current main branch after making /admin serve the protected general administration dashboard and /articles-admin serve the content administration entrypoint directly.
