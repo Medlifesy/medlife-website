@@ -1,3 +1,5 @@
+import { authenticateArticleAdmin } from '../article-admin-session.js';
+
 const ARTICLES_WORKER_URL = 'https://medlife-articles-api.broad-frog-3978.workers.dev/articles';
 
 const ARTICLE_FIELDS = [
@@ -6,15 +8,31 @@ const ARTICLE_FIELDS = [
   'category','image_url','status','slug','author_member_id','rejection_reason'
 ];
 
-export async function onRequest({ request }) {
+export async function onRequest({ request, env }) {
   try {
+    if (!env.DB) {
+      return new Response(JSON.stringify({ success:false, error:'Database binding DB is not configured.' }), {
+        status:500,
+        headers:{'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store'}
+      });
+    }
+
+    const admin = await authenticateArticleAdmin(request, env.DB);
+    if (!admin) {
+      return new Response(JSON.stringify({ success:false, authenticated:false, error:'تعذر التحقق من جلسة الإدارة.' }), {
+        status:401,
+        headers:{'Content-Type':'application/json; charset=UTF-8','Cache-Control':'no-store'}
+      });
+    }
+
     const incoming = new URL(request.url);
     const target = new URL(ARTICLES_WORKER_URL);
 
+    if (['GET','POST','PUT','PATCH','DELETE'].includes(request.method)) {
+      target.searchParams.set('admin', '1');
+    }
     if (request.method === 'GET') {
       target.search = incoming.search;
-      target.searchParams.set('admin', '1');
-    } else if (request.method === 'PUT' || request.method === 'PATCH') {
       target.searchParams.set('admin', '1');
     }
 
