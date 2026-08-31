@@ -3,8 +3,6 @@ name: Optimize About page loading
 on:
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/perf-about.yml'
 
 permissions:
   contents: write
@@ -27,36 +25,30 @@ jobs:
           p = Path('about-medlife.html')
           s = p.read_text(encoding='utf-8')
 
-          # Keep the first logo eager; defer all other images so the initial
-          # viewport does not wait for the gallery/activity images.
-          count = 0
+          count = [0]
           def img_repl(m):
-              nonlocal count
               tag = m.group(0)
-              count += 1
-              if count == 1:
+              count[0] += 1
+              if count[0] == 1:
                   tag = re.sub(r'\sloading\s*=\s*["\']?[^\s>]+["\']?', '', tag, flags=re.I)
                   tag = re.sub(r'\sdecoding\s*=\s*["\']?[^\s>]+["\']?', '', tag, flags=re.I)
                   tag = tag[:-1] + ' fetchpriority="high">' if tag.endswith('>') else tag
               else:
                   if ' loading=' not in tag.lower():
-                      tag = tag[:-1] + ' loading="lazy"' if tag.endswith('>') else tag
+                      tag = tag[:-1] + ' loading="lazy">' if tag.endswith('>') else tag
                   if ' decoding=' not in tag.lower():
-                      tag = tag[:-1] + ' decoding="async"' if tag.endswith('>') else tag
+                      tag = tag[:-1] + ' decoding="async">' if tag.endswith('>') else tag
               return tag
 
           s = re.sub(r'<img\b[^>]*>', img_repl, s, flags=re.I)
-
-          # Avoid animation-related layout work until the browser has painted.
           s = s.replace('will-change:transform', 'will-change:auto')
 
-          # Browser-side performance hints for the page itself.
           if 'id="about-performance-hints"' not in s:
               hints = '<meta id="about-performance-hints" name="theme-color" content="#151d36">\n<link rel="preload" as="image" href="./logo.PNG" fetchpriority="high">'
               s = s.replace('<title>', hints + '\n<title>', 1)
 
           p.write_text(s, encoding='utf-8')
-          print(f'Optimized {count} images.')
+          print(f'Optimized {count[0]} images.')
 
       - name: Commit optimization
         shell: bash
