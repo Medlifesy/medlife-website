@@ -1,7 +1,5 @@
 import { ensureAuthTables, hashPassword, json } from '../_auth.js';
 
-const BOOTSTRAP_ROLES = new Set(['admin']);
-
 async function ensureMemberSchema(db) {
   const exists = await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='members' LIMIT 1").first();
   if (!exists) {
@@ -31,9 +29,7 @@ export async function onRequest({ request, env }) {
     const admin = await db.prepare("SELECT id FROM members WHERE lower(COALESCE(medlife_role,''))='admin' AND COALESCE(account_status,'active')='active' AND password_hash IS NOT NULL LIMIT 1").first();
     if (admin) return json({ success:false, locked:true, error:'تم إغلاق التهيئة الأولى لأن حساب مدير النظام موجود بالفعل.' },409);
 
-    if (request.method === 'GET') {
-      return json({ success:true, available:true, message:'تهيئة حساب مدير النظام متاحة لمرة واحدة.' });
-    }
+    if (request.method === 'GET') return json({ success:true, available:true, message:'تهيئة حساب مدير النظام متاحة لمرة واحدة.' });
     if (request.method !== 'POST') return json({ success:false,error:'Method not allowed.' },405);
 
     const body=await request.json().catch(()=>({}));
@@ -51,9 +47,11 @@ export async function onRequest({ request, env }) {
 
     const passwordHash=await hashPassword(password);
     const memberCode='SYS-ADMIN-001';
-    await db.prepare(`INSERT INTO members(full_name,email,status,account_email,password_hash,account_status,member_code,medlife_role,created_at,updated_at)
-      VALUES(?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(fullName,email,'active',email,passwordHash,'active',memberCode,'admin').run();
-    return json({success:true,message:'تم إنشاء حساب مدير النظام بنجاح.','login_url':'/admin-login'});
+    const nextIdRow=await db.prepare('SELECT COALESCE(MAX(id),0)+1 AS next_id FROM members').first();
+    const nextId=Number(nextIdRow?.next_id||1);
+    await db.prepare(`INSERT INTO members(id,full_name,email,status,account_email,password_hash,account_status,member_code,medlife_role,created_at,updated_at)
+      VALUES(?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(nextId,fullName,email,'active',email,passwordHash,'active',memberCode,'admin').run();
+    return json({success:true,message:'تم إنشاء حساب مدير النظام بنجاح.',login_url:'/admin-login',member_id:nextId});
   } catch(error) {
     console.error('admin bootstrap error:',error);
     return json({success:false,error:'تعذر إنشاء حساب مدير النظام.',detail:String(error?.message||error||'')},500);
