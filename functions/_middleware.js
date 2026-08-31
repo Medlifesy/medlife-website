@@ -27,8 +27,8 @@ export async function onRequest(context) {
     if (isSupportPage) tags.push('<script src="/site-nav.js?v=20260831-support1" defer></script>');
     if (isContactPage) {
       tags.push('<script src="/site-nav.js?v=20260831-contact8" defer></script>');
-      tags.push('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3uvku0lo6sX0oKcZJv7VY4fX3f9Q=" crossorigin="" />');
-      tags.push('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>');
+      tags.push('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">');
+      tags.push('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous" defer></script>');
       tags.push('<script src="/contact-page-v8.js?v=20260831-contact8" defer></script>');
     }
     const marker = tags.join('');
