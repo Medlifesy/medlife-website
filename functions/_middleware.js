@@ -40,7 +40,7 @@ export async function onRequest(context) {
 
     let html = await response.text();
     const tags = [];
-    if (isArticlesLibrary) tags.push('<script src="/articles-library-canonical.js?v=20260901-1" defer></script>');
+    if (isArticlesLibrary) tags.push('<script src="/articles-library-canonical.js?v=20260901-2" defer></script>');
     if (isArticleReader) tags.push('<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>');
     if (isSupportPage) tags.push('<script src="/site-nav.js?v=20260831-support1" defer></script>');
     if (isContactPage) {
