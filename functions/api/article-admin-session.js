@@ -1,8 +1,5 @@
-import { authenticateAdmin } from './_admin-auth.js';
-
 const COOKIE='medlife_articles_session';
 const DAYS=7;
-const BRIDGE_ACCOUNT_PREFIX='bridge:';
 const enc=new TextEncoder();
 
 function bytesToHex(bytes){return Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -27,20 +24,18 @@ export async function authenticateArticleAdmin(request,db){
     const token=getCookie(request,COOKIE);
     if(!token)return null;
     const hash=await hashToken(token);
-    try{
-      const row=await db.prepare(`
-        SELECT a.id account_id,a.member_id,a.username,a.role,a.account_status,p.display_name,p.avatar_url
-        FROM member_accounts a
-        JOIN article_admin_sessions s ON s.account_id=a.id
-        LEFT JOIN member_profiles p ON p.member_id=a.member_id
-        WHERE s.token_hash=? AND datetime(s.expires_at)>datetime('now')
-        LIMIT 1
-      `).bind(hash).first();
-      if(row&&row.account_status==='active'&&['admin','editor','reviewer'].includes(String(row.role||'').toLowerCase())){
-        await db.prepare('UPDATE article_admin_sessions SET last_seen_at=CURRENT_TIMESTAMP WHERE token_hash=?').bind(hash).run();
-        return row;
-      }
-    }catch{}
+    const row=await db.prepare(`
+      SELECT a.id account_id,a.member_id,a.username,a.role,a.account_status,p.display_name,p.avatar_url
+      FROM member_accounts a
+      JOIN article_admin_sessions s ON s.account_id=a.id
+      LEFT JOIN member_profiles p ON p.member_id=a.member_id
+      WHERE s.token_hash=? AND datetime(s.expires_at)>datetime('now')
+      LIMIT 1
+    `).bind(hash).first();
+    if(row&&row.account_status==='active'&&['admin','editor','reviewer'].includes(String(row.role||'').toLowerCase())){
+      await db.prepare('UPDATE article_admin_sessions SET last_seen_at=CURRENT_TIMESTAMP WHERE token_hash=?').bind(hash).run();
+      return row;
+    }
     return null;
   }catch(e){
     console.error('article auth session error:',e);
@@ -56,8 +51,7 @@ export async function onRequest({request,env}){
     const action=new URL(request.url).searchParams.get('action')||'me';
 
     if(request.method==='GET'&&action==='me'){
-      // Articles Admin is intentionally authenticated ONLY through its own session.
-      // Do not bridge or inherit the general/system admin session here.
+      // Dedicated Articles Admin session only. General/system admin sessions are not accepted.
       const admin=await authenticateArticleAdmin(request,articleDb);
       if(!admin)return json({success:false,authenticated:false},401);
       return json({success:true,authenticated:true,admin:{account_id:admin.account_id,member_id:admin.member_id,username:admin.username,role:admin.role,display_name:admin.display_name||admin.username,avatar_url:admin.avatar_url||null}});
