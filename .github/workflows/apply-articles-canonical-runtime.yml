@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'database/migrations/2026-08-28-articles-canonical-identity.sql'
+      - 'database/migrations/2026-09-02-articles-identity.sql'
       - '.github/workflows/apply-articles-canonical-runtime.yml'
 
 permissions:
@@ -19,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Enforce canonical identity in Articles API Worker
+      - name: Enforce canonical article identity in Articles API Worker
         shell: python
         run: |
           from pathlib import Path
@@ -27,53 +28,31 @@ jobs:
           worker = Path('workers/articles-api/worker.js')
           text = worker.read_text(encoding='utf-8')
 
-          old = "async function ensureSlugColumn(db){try{await db.prepare('ALTER TABLE articles ADD COLUMN slug TEXT').run();}catch(e){if(!String(e?.message||e).toLowerCase().includes('duplicate column'))throw e;}}"
-          new = """async function ensureCanonicalColumns(db){
-            for(const [column,type] of [['slug','TEXT'],['canonical_path','TEXT']]){
+          start = text.find('async function ensureCanonicalColumns(db){')
+          end = text.find('async function ensureEditorialSchema(db)', start)
+          if start < 0 or end < 0:
+              raise SystemExit('Could not locate canonical identity helper')
+
+          helper = """async function ensureCanonicalColumns(db){
+            for(const [column,type] of [['slug','TEXT'],['canonical_path','TEXT'],['article_code','TEXT']]){
               try{await db.prepare(`ALTER TABLE articles ADD COLUMN ${column} ${type}`).run();}
               catch(e){if(!String(e?.message||e).toLowerCase().includes('duplicate column'))throw e;}
             }
-            await db.prepare(\"UPDATE articles SET slug=COALESCE(NULLIF(trim(slug),''),'article-'||id), canonical_path=COALESCE(NULLIF(trim(canonical_path),''),'/articles/'||COALESCE(NULLIF(trim(slug),''),'article-'||id)) WHERE slug IS NULL OR trim(slug)='' OR canonical_path IS NULL OR trim(canonical_path)=''\").run();
+            await db.prepare(\"UPDATE articles SET slug=COALESCE(NULLIF(trim(slug),''),'article-'||id), canonical_path=COALESCE(NULLIF(trim(canonical_path),''),'/articles/'||COALESCE(NULLIF(trim(slug),''),'article-'||id)), article_code=COALESCE(NULLIF(trim(article_code),''),'ML-ART-'||printf('%08d',id)) WHERE slug IS NULL OR trim(slug)='' OR canonical_path IS NULL OR trim(canonical_path)='' OR article_code IS NULL OR trim(article_code)=''\").run();
             try{await db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_slug_unique ON articles(slug)').run();}catch(e){console.warn('slug unique index:',e?.message||e);}
             try{await db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_canonical_path_unique ON articles(canonical_path)').run();}catch(e){console.warn('canonical path unique index:',e?.message||e);}
-          }"""
-          if old in text:
-              text = text.replace(old, new, 1)
-          elif 'async function ensureCanonicalColumns(db)' not in text:
-              raise SystemExit('Could not find ensureSlugColumn helper')
-
+            try{await db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_article_code_unique ON articles(article_code)').run();}catch(e){console.warn('article code unique index:',e?.message||e);}
+            try{await db.prepare(`CREATE TRIGGER IF NOT EXISTS articles_article_code_after_insert
+              AFTER INSERT ON articles
+              FOR EACH ROW
+              WHEN NEW.article_code IS NULL OR trim(NEW.article_code)=''
+              BEGIN
+                UPDATE articles SET article_code='ML-ART-'||printf('%08d',NEW.id) WHERE id=NEW.id;
+              END`).run();}catch(e){console.warn('article code trigger:',e?.message||e);}
+          }
+          """
+          text = text[:start] + helper + text[end:]
           text = text.replace('await ensureSlugColumn(env.DB);', 'await ensureCanonicalColumns(env.DB);')
-
-          old_insert = "INSERT INTO articles (title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,slug) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
-          new_insert = "INSERT INTO articles (title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,slug,canonical_path) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
-          if old_insert in text:
-              text = text.replace(old_insert, new_insert, 1)
-              old_bind = "b.image_url,b.status||'pending',articleSlug).run()"
-              new_bind = "b.image_url,b.status||'pending',articleSlug,'/articles/'+articleSlug).run()"
-              if old_bind not in text:
-                  raise SystemExit('POST bind pattern not found')
-              text = text.replace(old_bind, new_bind, 1)
-
-          old_update = "UPDATE articles SET title_ar=?,title_en=?,excerpt_ar=?,excerpt_en=?,content_ar=?,content_en=?,author_name=?,author_email=?,category=?,image_url=?,status=?,slug=?,updated_at=CURRENT_TIMESTAMP WHERE id=?"
-          new_update = "UPDATE articles SET title_ar=?,title_en=?,excerpt_ar=?,excerpt_en=?,content_ar=?,content_en=?,author_name=?,author_email=?,category=?,image_url=?,status=?,slug=?,canonical_path=?,updated_at=CURRENT_TIMESTAMP WHERE id=?"
-          if old_update in text:
-              text = text.replace(old_update, new_update, 1)
-              old_bind = "b.category,b.image_url,b.status,articleSlug,p[1]).run()"
-              new_bind = "b.category,b.image_url,b.status,articleSlug,'/articles/'+articleSlug,p[1]).run()"
-              if old_bind not in text:
-                  raise SystemExit('PUT bind pattern not found')
-              text = text.replace(old_bind, new_bind, 1)
-
-          old_status = "UPDATE articles SET status=?,slug=?,updated_at=CURRENT_TIMESTAMP WHERE id=?"
-          new_status = "UPDATE articles SET status=?,slug=?,canonical_path=?,updated_at=CURRENT_TIMESTAMP WHERE id=?"
-          if old_status in text:
-              text = text.replace(old_status, new_status, 1)
-              old_bind = "b.status,articleSlug,p[1]).run()"
-              new_bind = "b.status,articleSlug,'/articles/'+articleSlug,p[1]).run()"
-              if old_bind not in text:
-                  raise SystemExit('PATCH status bind pattern not found')
-              text = text.replace(old_bind, new_bind, 1)
-
           worker.write_text(text, encoding='utf-8')
 
       - name: Commit Worker changes
@@ -82,5 +61,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add workers/articles-api/worker.js
           git diff --cached --quiet && exit 0
-          git commit -m "fix(articles): enforce persisted canonical identity"
+          git commit -m "fix(articles): add stable unique article code"
           git push
