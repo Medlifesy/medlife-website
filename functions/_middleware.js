@@ -6,6 +6,7 @@ export async function onRequest(context) {
     if (!contentType.includes('text/html')) return response;
 
     const path = new URL(context.request.url).pathname.toLowerCase();
+    const isArticlesLibrary = path === '/articles' || path === '/articles/' || path.endsWith('/articles.html');
     const isArticlesAdmin = path === '/articles-admin' || path === '/articles-admin/' || path.endsWith('/articles-admin.html');
     const isArticleReader = path === '/article-reader-v5.html' || path.startsWith('/articles/');
     const isSupportPage = path === '/support' || path === '/support/' || path === '/support.html';
@@ -34,10 +35,11 @@ export async function onRequest(context) {
       return new Response(html,{status:response.status,statusText:response.statusText,headers});
     }
 
-    if (!isArticleReader && !isSupportPage && !isContactPage) return response;
+    if (!isArticlesLibrary && !isArticleReader && !isSupportPage && !isContactPage) return response;
 
     let html = await response.text();
     const tags = [];
+    if (isArticlesLibrary) tags.push('<script src="/articles-library-canonical.js?v=20260901-1" defer></script>');
     if (isArticleReader) tags.push('<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>');
     if (isSupportPage) tags.push('<script src="/site-nav.js?v=20260831-support1" defer></script>');
     if (isContactPage) {
@@ -63,8 +65,12 @@ export async function onRequest(context) {
       tags.push('<script src="/contact-ui-final-fix.js?v=20260831-contact-ui-final-fix" defer></script>');
     }
     const marker = tags.join('');
-    if (marker && tags.some(src => !html.includes(src.match(/(?:src|href)="([^"]+)/)?.[1] || ''))) {
-      html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
+    if (marker) {
+      const alreadyHasAll = tags.every(tag => {
+        const src = tag.match(/(?:src|href)="([^"]+)/)?.[1] || '';
+        return src && html.includes(src);
+      });
+      if (!alreadyHasAll) html = html.includes('</body>') ? html.replace('</body>', `${marker}</body>`) : `${html}${marker}`;
     }
 
     const headers = new Headers(response.headers);
