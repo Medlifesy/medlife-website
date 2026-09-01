@@ -1,10 +1,9 @@
 const NAVY = '#12203A';
-const NAVY_2 = '#182A49';
+const NAVY_2 = '#1A3152';
 const CREAM = '#FBFAF8';
-const PINK = '#E92850';
-const SOFT_BLUE = '#8FB7CF';
 const WHITE = '#FFFFFF';
-const INK = '#0B1426';
+const PINK = '#E92850';
+const BLUE = '#78A8C2';
 
 function esc(value) {
   return String(value ?? '')
@@ -24,241 +23,257 @@ function hash(value) {
   return h >>> 0;
 }
 
-function wrapArabic(text, maxChars = 25, maxLines = 3) {
+function wrapArabic(text, maxChars = 31, maxLines = 3) {
   const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return ['مقال طبي'];
+
   const lines = [];
-  let line = '';
+  let current = '';
   for (const word of words) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (candidate.length > maxChars && line) {
-      lines.push(line);
-      line = word;
+    const candidate = current ? `${current} ${word}` : word;
+    if (candidate.length > maxChars && current) {
+      lines.push(current);
+      current = word;
       if (lines.length === maxLines - 1) break;
     } else {
-      line = candidate;
+      current = candidate;
     }
   }
-  if (line && lines.length < maxLines) lines.push(line);
+  if (current && lines.length < maxLines) lines.push(current);
+
+  if (lines.length === maxLines && words.join(' ') !== lines.join(' ')) {
+    const joined = lines[maxLines - 1];
+    lines[maxLines - 1] = `${joined}…`;
+  }
   return lines.length ? lines : ['مقال طبي'];
 }
 
 function themeFor(category) {
   const key = String(category || '').toLowerCase();
   if (key.includes('مرأة') || key.includes('نسائية') || key.includes('نساء') || key.includes('تنظيم الأسرة')) {
-    return { accent: '#D96A86', type: 'women', label: 'صحة المرأة' };
+    return { accent: '#E58AA3', type: 'women', label: 'صحة المرأة' };
   }
   if (key.includes('طفل') || key.includes('أطفال') || key.includes('طب الأطفال')) {
-    return { accent: '#6BAFC6', type: 'child', label: 'صحة الطفل' };
+    return { accent: '#82B9CF', type: 'child', label: 'صحة الطفل' };
   }
   if (key.includes('قلب') || key.includes('cardio')) {
-    return { accent: '#E26979', type: 'heart', label: 'صحة القلب' };
+    return { accent: '#F07A92', type: 'heart', label: 'صحة القلب' };
   }
   if (key.includes('صدر') || key.includes('تنفس') || key.includes('رئة')) {
-    return { accent: '#72A9C6', type: 'lungs', label: 'الجهاز التنفسي' };
+    return { accent: '#7EB5D1', type: 'lungs', label: 'الجهاز التنفسي' };
   }
   if (key.includes('طوارئ') || key.includes('إسعاف') || key.includes('emergency')) {
-    return { accent: '#F07C67', type: 'emergency', label: 'الطوارئ والإسعاف' };
+    return { accent: '#F29A72', type: 'emergency', label: 'الطوارئ والإسعاف' };
   }
   if (key.includes('بحث') || key.includes('تشخيص') || key.includes('تحاليل') || key.includes('diagn')) {
-    return { accent: '#7399C9', type: 'research', label: 'التشخيص والبحث الطبي' };
+    return { accent: '#8BB1D7', type: 'research', label: 'التشخيص والبحث الطبي' };
   }
   if (key.includes('تعليم') || key.includes('تثقيف') || key.includes('education')) {
-    return { accent: '#9A8CC1', type: 'education', label: 'التعليم والتثقيف الطبي' };
+    return { accent: '#9A8BC6', type: 'education', label: 'التعليم والتثقيف الطبي' };
   }
-  return { accent: SOFT_BLUE, type: 'medical', label: 'المكتبة الطبية' };
+  return { accent: BLUE, type: 'medical', label: 'المكتبة الطبية' };
 }
 
 function motif(theme, seed) {
-  const flip = (seed & 1) ? 1 : -1;
-  const common = `fill="none" stroke="${theme.accent}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"`;
+  const a = theme.accent;
+  const angle = (seed % 12) - 6;
+  const line = `fill="none" stroke="${a}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"`;
 
   if (theme.type === 'women') {
-    return `<g transform="translate(1315 485) scale(${flip} 1)" opacity=".92">
-      <circle r="176" fill="${theme.accent}" opacity=".08"/>
-      <circle r="144" ${common} opacity=".55"/>
-      <path d="M0-118c-72 0-112 56-112 118 0 78 72 104 112 140 40-36 112-62 112-140 0-62-40-118-112-118z" ${common}/>
-      <path d="M0-82v132M-48-24h96M-26 76c12 13 40 13 52 0" ${common}/>
-      <circle cx="0" cy="0" r="194" fill="none" stroke="${WHITE}" stroke-width="2" opacity=".16"/>
+    return `<g transform="translate(1320 472) rotate(${angle})" opacity=".92">
+      <circle r="190" fill="${a}" opacity=".08"/>
+      <circle r="154" ${line} opacity=".26"/>
+      <path d="M0-122c-67 0-108 49-108 111 0 73 63 100 108 140 45-40 108-67 108-140 0-62-41-111-108-111z" ${line}/>
+      <path d="M0-88v119M-46-18h92M-27 73c9 10 45 10 54 0" ${line} opacity=".85"/>
     </g>`;
   }
-
   if (theme.type === 'child') {
-    return `<g transform="translate(1315 485) scale(${flip} 1)" opacity=".92">
-      <circle r="176" fill="${theme.accent}" opacity=".08"/>
-      <circle cx="-62" cy="-42" r="45" ${common}/>
-      <circle cx="62" cy="-42" r="45" ${common}/>
-      <path d="M-136 94c22-56 82-70 136 0 54-70 114-56 136 0" ${common}/>
-      <path d="M-24-132q24-30 48 0" ${common} opacity=".75"/>
-      <circle cx="0" cy="0" r="194" fill="none" stroke="${WHITE}" stroke-width="2" opacity=".16"/>
+    return `<g transform="translate(1320 472) rotate(${angle})" opacity=".92">
+      <circle r="188" fill="${a}" opacity=".08"/>
+      <circle cx="-61" cy="-48" r="43" ${line}/>
+      <circle cx="61" cy="-48" r="43" ${line}/>
+      <path d="M-133 91c17-51 78-66 133 0 55-66 116-51 133 0" ${line}/>
+      <path d="M-24-130q24-31 48 0" ${line} opacity=".8"/>
     </g>`;
   }
-
   if (theme.type === 'heart') {
-    return `<g transform="translate(1315 485) scale(${flip} 1)" opacity=".92">
-      <circle r="176" fill="${theme.accent}" opacity=".08"/>
-      <path d="M0 150C-34 116-144 50-144-36c0-58 40-96 86-96 30 0 48 15 58 42 10-27 28-42 58-42 46 0 86 38 86 96 0 86-110 152-144 188z" ${common}/>
-      <path d="M-101 8h36l23-40 30 92 25-52h63" ${common}/>
-      <circle cx="0" cy="0" r="194" fill="none" stroke="${WHITE}" stroke-width="2" opacity=".16"/>
+    return `<g transform="translate(1320 472) rotate(${angle})" opacity=".92">
+      <circle r="190" fill="${a}" opacity=".08"/>
+      <path d="M0 151C-30 117-141 53-141-31c0-57 37-94 83-94 30 0 48 14 58 40 10-26 28-40 58-40 46 0 83 37 83 94 0 84-111 148-141 182z" ${line}/>
+      <path d="M-101 2h31l24-38 28 91 24-52h61" ${line}/>
     </g>`;
   }
-
   if (theme.type === 'lungs') {
-    return `<g transform="translate(1315 485) scale(${flip} 1)" opacity=".92">
-      <circle r="176" fill="${theme.accent}" opacity=".08"/>
-      <path d="M0-142v284M-12-56C-104-96-150-26-150 54c0 64 45 108 98 78 30-18 40-49 40-86zM12-56c92-40 150 30 150 110 0 64-45 108-98 78-30-18-40-49-40-86z" ${common}/>
-      <path d="M0-92-58-43M0-92l58 49" ${common} opacity=".76"/>
-      <circle cx="0" cy="0" r="194" fill="none" stroke="${WHITE}" stroke-width="2" opacity=".16"/>
+    return `<g transform="translate(1320 472) rotate(${angle})" opacity=".92">
+      <circle r="188" fill="${a}" opacity=".08"/>
+      <path d="M0-138v274M-11-58C-98-93-146-31-146 47c0 63 42 107 93 82 31-15 42-49 42-87zM11-58C98-93 146-31 146 47c0 63-42 107-93 82-31-15-42-49-42-87z" ${line}/>
+      <path d="M0-92-52-48M0-92l52 44" ${line} opacity=".75"/>
     </g>`;
   }
-
   if (theme.type === 'emergency') {
-    return `<g transform="translate(1315 485) scale(${flip} 1)" opacity=".92">
-      <circle r="176" fill="${theme.accent}" opacity=".08"/>
-      <rect x="-126" y="-126" width="252" height="252" rx="58" ${common}/>
-      <path d="M0-74v148M-74 0h148" stroke="${theme.accent}" stroke-width="22" stroke-linecap="round"/>
-      <circle cx="0" cy="0" r="194" fill="none" stroke="${WHITE}" stroke-width="2" opacity=".16"/>
+    return `<g transform="translate(1320 472) rotate(${angle})" opacity=".92">
+      <circle r="190" fill="${a}" opacity=".08"/>
+      <rect x="-125" y="-125" width="250" height="250" rx="56" ${line}/>
+      <path d="M0-72v144M-72 0h144" stroke="${a}" stroke-width="22" stroke-linecap="round"/>
     </g>`;
   }
-
   if (theme.type === 'research') {
-    return `<g transform="translate(1315 485) scale(${flip} 1)" opacity=".92">
-      <circle r="176" fill="${theme.accent}" opacity=".08"/>
-      <circle r="104" ${common}/>
-      <circle r="48" ${common} opacity=".68"/>
-      <path d="M74 74l112 112" ${common}/>
-      <path d="M-82 10h38l22-48 30 96 27-48h62" ${common} opacity=".74"/>
-      <circle cx="0" cy="0" r="194" fill="none" stroke="${WHITE}" stroke-width="2" opacity=".16"/>
+    return `<g transform="translate(1320 472) rotate(${angle})" opacity=".92">
+      <circle r="188" fill="${a}" opacity=".08"/>
+      <circle r="112" ${line}/>
+      <circle r="52" ${line} opacity=".6"/>
+      <path d="M82 82l102 102" ${line}/>
+      <path d="M-84 12h34l22-45 29 92 26-47h59" ${line} opacity=".72"/>
     </g>`;
   }
-
   if (theme.type === 'education') {
-    return `<g transform="translate(1315 485) scale(${flip} 1)" opacity=".92">
-      <circle r="176" fill="${theme.accent}" opacity=".08"/>
-      <path d="M-138-72q82-40 138 10v160q-54-44-138-12zM138-72Q56-112 0-62v160q54-44 138-12z" ${common}/>
-      <path d="M0-54v150" ${common} opacity=".72"/>
-      <path d="M-92-34h48M92-34H44M-92 14h52M92 14H40" ${common} opacity=".56"/>
-      <circle cx="0" cy="0" r="194" fill="none" stroke="${WHITE}" stroke-width="2" opacity=".16"/>
+    return `<g transform="translate(1320 472) rotate(${angle})" opacity=".92">
+      <circle r="188" fill="${a}" opacity=".08"/>
+      <path d="M-137-74q83-43 137 9v158q-54-42-137-9zM137-74Q54-117 0-65v158q54-42 137-9z" ${line}/>
+      <path d="M0-57v145" ${line} opacity=".7"/>
+      <path d="M-92-31h50M92-31H42M-92 16h47M92 16H43" ${line} opacity=".5"/>
     </g>`;
   }
-
-  return `<g transform="translate(1315 485) scale(${flip} 1)" opacity=".92">
-    <circle r="176" fill="${theme.accent}" opacity=".08"/>
-    <circle r="112" ${common}/>
-    <path d="M0-86v172M-86 0h172" stroke="${theme.accent}" stroke-width="18" stroke-linecap="round"/>
-    <circle cx="0" cy="0" r="194" fill="none" stroke="${WHITE}" stroke-width="2" opacity=".16"/>
+  return `<g transform="translate(1320 472) rotate(${angle})" opacity=".92">
+    <circle r="188" fill="${a}" opacity=".08"/>
+    <circle r="127" ${line}/>
+    <path d="M0-90v180M-90 0h180" stroke="${a}" stroke-width="18" stroke-linecap="round"/>
+    <circle r="158" fill="none" stroke="${a}" stroke-width="2" opacity=".35" stroke-dasharray="3 14"/>
   </g>`;
 }
 
-function particles(theme, seed) {
-  return Array.from({ length: 14 }, (_, i) => {
-    const x = 930 + ((seed + i * 137) % 570);
-    const y = 130 + ((seed + i * 61) % 620);
-    const r = 1.8 + ((seed + i * 3) % 3);
-    const opacity = 0.14 + (((seed + i) % 5) * 0.035);
-    return `<circle cx="${x}" cy="${y}" r="${r}" fill="${theme.accent}" opacity="${opacity.toFixed(2)}"/>`;
-  }).join('');
+function toBase64(bytes) {
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
 }
 
-function logoMarkup() {
-  return `<g>
-    <rect x="610" y="58" width="380" height="118" rx="59" fill="${WHITE}" opacity=".98"/>
-    <image href="/logo.PNG" x="650" y="68" width="300" height="98" preserveAspectRatio="xMidYMid meet"/>
+async function logoDataUri(request) {
+  try {
+    const logoUrl = new URL('/logo.PNG', request.url);
+    const response = await fetch(logoUrl.toString(), {
+      cf: { cacheTtl: 86400, cacheEverything: true }
+    });
+    if (!response.ok) return '';
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    return `data:image/png;base64,${toBase64(bytes)}`;
+  } catch {
+    return '';
+  }
+}
+
+function logoBlock(dataUri) {
+  if (!dataUri) {
+    return `<g transform="translate(800 78)">
+      <rect x="-188" y="0" width="376" height="96" rx="48" fill="${CREAM}"/>
+      <text x="0" y="63" text-anchor="middle" fill="${NAVY}" font-family="Tahoma, Arial, sans-serif" font-size="34" font-weight="800">MedLife</text>
+    </g>`;
+  }
+  return `<g transform="translate(800 78)">
+    <rect x="-214" y="0" width="428" height="104" rx="52" fill="${CREAM}"/>
+    <image href="${dataUri}" x="-184" y="12" width="368" height="80" preserveAspectRatio="xMidYMid meet"/>
   </g>`;
 }
 
-function svg(article) {
+function svg(article, logoUri) {
   const title = String(article?.title_ar || 'مقال طبي').trim();
   const category = String(article?.category || 'المكتبة الطبية').trim();
   const theme = themeFor(category);
   const seed = hash(`${article?.id || ''}:${title}:${category}`);
-  const lines = wrapArabic(title, 24 + (seed % 3), 3);
-  const titleSize = title.length > 74 ? 48 : title.length > 52 ? 54 : 60;
-  const titleStartY = lines.length === 1 ? 500 : lines.length === 2 ? 456 : 410;
-  const titleText = lines.map((line, i) => {
-    const dy = i === 0 ? 0 : Math.round(titleSize * 1.13);
-    return `<tspan x="800" dy="${dy}">${esc(line)}</tspan>`;
-  }).join('');
+  const lines = wrapArabic(title, 31 + (seed % 5), 3);
+
+  let titleSize = 62;
+  if (title.length > 65) titleSize = 56;
+  if (title.length > 90) titleSize = 50;
+  if (title.length > 115) titleSize = 46;
+
+  const titleY = 370 - ((lines.length - 1) * 34);
+  const titleText = lines
+    .map((line, index) => `<tspan x="800" dy="${index === 0 ? 0 : Math.round(titleSize * 1.22)}">${esc(line)}</tspan>`)
+    .join('');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="${esc(title)}">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="${NAVY}"/>
-      <stop offset="0.55" stop-color="${NAVY_2}"/>
-      <stop offset="1" stop-color="#254C63"/>
+      <stop offset="0.62" stop-color="${NAVY_2}"/>
+      <stop offset="1" stop-color="#0D1B31"/>
     </linearGradient>
-    <radialGradient id="halo" cx="82%" cy="50%" r="55%">
-      <stop offset="0" stop-color="${theme.accent}" stop-opacity=".22"/>
+    <radialGradient id="glow" cx="82%" cy="34%" r="58%">
+      <stop offset="0" stop-color="${theme.accent}" stop-opacity=".25"/>
       <stop offset="1" stop-color="${theme.accent}" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${WHITE}" stop-opacity=".11"/>
+      <stop offset="1" stop-color="${WHITE}" stop-opacity=".035"/>
+    </linearGradient>
     <filter id="blur"><feGaussianBlur stdDeviation="34"/></filter>
-    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#06101E" flood-opacity=".28"/>
-    </filter>
   </defs>
 
   <rect width="1600" height="900" fill="url(#bg)"/>
-  <rect width="1600" height="900" fill="url(#halo)"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
 
-  <g opacity=".17">
-    <circle cx="1295" cy="115" r="210" fill="${theme.accent}" filter="url(#blur)"/>
-    <circle cx="1440" cy="790" r="170" fill="${SOFT_BLUE}" filter="url(#blur)"/>
+  <circle cx="1385" cy="205" r="205" fill="${theme.accent}" opacity=".055" filter="url(#blur)"/>
+  <circle cx="270" cy="790" r="170" fill="${BLUE}" opacity=".045" filter="url(#blur)"/>
+
+  <path d="M0 770C275 680 500 747 730 671c228-75 410-159 870-94V900H0Z" fill="#091427" opacity=".36"/>
+
+  <g opacity=".12">
+    <path d="M0 214H1600M0 286H1600M0 358H1600M0 430H1600M0 502H1600M0 574H1600M0 646H1600" stroke="${WHITE}" stroke-width="1"/>
   </g>
 
-  <g opacity=".45">${particles(theme, seed)}</g>
+  ${logoBlock(logoUri)}
 
-  <g opacity=".10" stroke="${WHITE}" fill="none">
-    <path d="M0 710C230 630 380 725 610 640c210-78 402-92 624-10 150 56 252 56 366 8" stroke-width="2"/>
-    <path d="M0 770C240 690 395 785 620 704c225-80 395-98 620-15 160 60 250 56 360 20" stroke-width="1"/>
+  <g transform="translate(800 203)">
+    <rect x="-250" y="0" width="500" height="54" rx="27" fill="${theme.accent}" opacity=".14" stroke="${theme.accent}" stroke-width="1" stroke-opacity=".38"/>
+    <text x="0" y="36" text-anchor="middle" fill="${CREAM}" opacity=".9" font-family="Tahoma, Arial, sans-serif" font-size="22" font-weight="700" direction="rtl">${esc(theme.label)}</text>
   </g>
 
-  ${logoMarkup()}
-
-  <g filter="url(#shadow)">
-    <rect x="190" y="276" width="1220" height="360" rx="56" fill="#FFFFFF" fill-opacity=".055" stroke="#FFFFFF" stroke-opacity=".15"/>
-  </g>
-
-  <rect x="430" y="310" width="740" height="8" rx="4" fill="${theme.accent}" opacity=".92"/>
-
-  <text x="800" y="372" text-anchor="middle" fill="${CREAM}" opacity=".78" font-family="Arial, Tahoma, sans-serif" font-size="23" font-weight="700" letter-spacing="1.2" direction="rtl">${esc(theme.label)}</text>
-
-  <text x="800" y="${titleStartY}" text-anchor="middle" fill="${WHITE}" font-family="Arial, Tahoma, sans-serif" font-size="${titleSize}" font-weight="700" direction="rtl" unicode-bidi="bidi-override" textLength="0">
-    ${titleText}
-  </text>
-
-  <g transform="translate(800 704)">
-    <rect x="-184" y="-31" width="368" height="62" rx="31" fill="${WHITE}" fill-opacity=".075" stroke="${WHITE}" stroke-opacity=".12"/>
-    <circle cx="-142" cy="0" r="8" fill="${PINK}"/>
-    <circle cx="-112" cy="0" r="5" fill="${SOFT_BLUE}" opacity=".82"/>
-    <text x="150" y="8" text-anchor="end" fill="${CREAM}" opacity=".76" font-family="Arial, Tahoma, sans-serif" font-size="17" font-weight="600" direction="ltr">MEDLIFE MEDICAL LIBRARY</text>
+  <g transform="translate(800 270)">
+    <rect x="-560" y="0" width="1120" height="330" rx="50" fill="url(#panel)" stroke="${WHITE}" stroke-width="1" stroke-opacity=".12"/>
+    <rect x="-8" y="-18" width="16" height="368" rx="8" fill="${PINK}" opacity=".92"/>
+    <text x="0" y="${titleY}" text-anchor="middle" fill="${WHITE}" font-family="Tahoma, Arial, sans-serif" font-size="${titleSize}" font-weight="800" direction="rtl">
+      ${titleText}
+    </text>
+    <rect x="-108" y="250" width="216" height="4" rx="2" fill="${theme.accent}" opacity=".9"/>
+    <text x="0" y="292" text-anchor="middle" fill="${CREAM}" opacity=".56" font-family="Tahoma, Arial, sans-serif" font-size="17">MEDLIFE MEDICAL LIBRARY</text>
   </g>
 
   ${motif(theme, seed)}
 
-  <text x="800" y="824" text-anchor="middle" fill="${WHITE}" opacity=".34" font-family="Arial, Tahoma, sans-serif" font-size="16" letter-spacing="2" direction="ltr">HEALTH · KNOWLEDGE · COMMUNITY</text>
+  <g opacity=".74">
+    <circle cx="1320" cy="472" r="245" fill="none" stroke="${WHITE}" stroke-width="1" opacity=".16"/>
+    <circle cx="1320" cy="472" r="282" fill="none" stroke="${theme.accent}" stroke-width="2" opacity=".10" stroke-dasharray="4 18"/>
+  </g>
+
+  <g transform="translate(800 782)">
+    <circle cx="-140" cy="0" r="4" fill="${PINK}"/>
+    <text x="-120" y="7" fill="${CREAM}" opacity=".46" font-family="Arial, sans-serif" font-size="15" letter-spacing="2">HEALTH · KNOWLEDGE · COMMUNITY</text>
+  </g>
 </svg>`;
 }
 
 export async function onRequestGet({ request, env }) {
-  const url = new URL(request.url);
-  const id = Number(url.searchParams.get('id'));
+  const id = Number(new URL(request.url).searchParams.get('id'));
   if (!env.DB || !Number.isInteger(id) || id <= 0) {
     return new Response('Not found', { status: 404 });
   }
 
-  const article = await env.DB
-    .prepare("SELECT id,title_ar,category,status FROM articles WHERE id=? AND LOWER(TRIM(status))='published' LIMIT 1")
-    .bind(id)
-    .first();
+  const article = await env.DB.prepare(
+    "SELECT id,title_ar,category,status FROM articles WHERE id=? AND status='published' LIMIT 1"
+  ).bind(id).first();
 
-  if (!article) {
-    return new Response('Not found', { status: 404 });
-  }
+  if (!article) return new Response('Not found', { status: 404 });
 
-  return new Response(svg(article), {
+  const logoUri = await logoDataUri(request);
+  return new Response(svg(article, logoUri), {
     headers: {
       'content-type': 'image/svg+xml; charset=UTF-8',
-      'cache-control': 'public, max-age=0, must-revalidate',
+      'cache-control': 'public, max-age=3600, must-revalidate',
       'x-content-type-options': 'nosniff'
     }
   });
