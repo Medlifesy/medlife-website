@@ -13,6 +13,26 @@ function publicArticle(row){
   return safe;
 }
 
+function createPublicPath(){
+  return `article-${crypto.randomUUID().replaceAll('-', '').slice(0, 20)}`;
+}
+
+async function ensurePublicPath(db, row){
+  if(row?.canonical_path) return row.canonical_path;
+  let path = createPublicPath();
+  for(let attempt=0; attempt<5; attempt++){
+    const exists = await db.prepare('SELECT id FROM articles WHERE canonical_path=? LIMIT 1').bind(path).first();
+    if(!exists){
+      await db.prepare('UPDATE articles SET canonical_path=?, updated_at=? WHERE id=? AND (canonical_path IS NULL OR canonical_path=?)')
+        .bind(path, new Date().toISOString(), row.id, '')
+        .run();
+      return path;
+    }
+    path = createPublicPath();
+  }
+  throw new Error('تعذر إنشاء المسار الدائم للمقال.');
+}
+
 function summary(rows){
   return {
     total: rows.length,
@@ -33,21 +53,34 @@ export async function onRequest({request,env}){
 
   try{
     if(request.method==='GET'){
-      // Public readers may access published articles without an admin session.
       if(Number.isInteger(id)&&id>0){
         const row=admin
           ? await db.prepare('SELECT * FROM articles WHERE id=? LIMIT 1').bind(id).first()
           : await db.prepare("SELECT * FROM articles WHERE id=? AND status='published' LIMIT 1").bind(id).first();
-        return row
-          ? json({success:true,article:admin?row:publicArticle(row)})
-          : json({success:false,error:'المقال غير موجود.'},404);
+        if(!row)return json({success:false,error:'المقال غير موجود.'},404);
+        if(admin)return json({success:true,article:row});
+        const canonical_path=await ensurePublicPath(db,row);
+        return json({success:true,article:publicArticle({...row,canonical_path})});
       }
 
       const rows=admin
         ? ((await db.prepare('SELECT * FROM articles ORDER BY created_at DESC').all()).results||[])
         : ((await db.prepare("SELECT * FROM articles WHERE status='published' ORDER BY COALESCE(published_at, created_at) DESC").all()).results||[]);
 
-      const visibleRows=admin?rows:rows.map(publicArticle);
+      if(!admin){
+        for(const row of rows){
+          await ensurePublicPath(db,row);
+        }
+      }
+
+      const visibleRows=admin?rows:rows.map((row)=>publicArticle(row));
+      if(!admin){
+        for(const row of visibleRows){
+          if(!row.canonical_path){
+            row.canonical_path = rows.find((candidate)=>candidate.id===row.id)?.canonical_path || null;
+          }
+        }
+      }
       return json({success:true,articles:visibleRows,summary:summary(rows)});
     }
 
@@ -70,7 +103,7 @@ export async function onRequest({request,env}){
       const slug=(body.slug||'').trim();
       const author_member_id=body.author_member_id||null;
       const rejection_reason=(body.rejection_reason||'').trim();
-      const canonical_path=(body.canonical_path||'').trim();
+      const canonical_path=(body.canonical_path||'').trim() || createPublicPath();
 
       const result=await db.prepare(`
         INSERT INTO articles
@@ -79,7 +112,7 @@ export async function onRequest({request,env}){
       `).bind(
         title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,slug,author_member_id,rejection_reason,canonical_path,now,now
       ).run();
-      return json({success:true,id:result.meta?.last_row_id});
+      return json({success:true,id:result.meta?.last_row_id,canonical_path});
     }
 
     if(request.method==='PUT'){
@@ -104,7 +137,7 @@ export async function onRequest({request,env}){
         slug:(body.slug??current.slug??'').trim(),
         author_member_id:body.author_member_id??current.author_member_id??null,
         rejection_reason:(body.rejection_reason??current.rejection_reason??'').trim(),
-        canonical_path:(body.canonical_path??current.canonical_path??'').trim(),
+        canonical_path:(body.canonical_path??current.canonical_path??'').trim() || current.canonical_path || createPublicPath(),
         updated_at:now
       };
 
@@ -115,7 +148,7 @@ export async function onRequest({request,env}){
       `).bind(
         fields.title_ar,fields.title_en,fields.excerpt_ar,fields.excerpt_en,fields.content_ar,fields.content_en,fields.author_name,fields.author_email,fields.category,fields.image_url,fields.status,fields.slug,fields.author_member_id,fields.rejection_reason,fields.canonical_path,fields.updated_at,id
       ).run();
-      return json({success:true,id});
+      return json({success:true,id,canonical_path:fields.canonical_path});
     }
 
     if(request.method==='DELETE'){
