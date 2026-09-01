@@ -12,9 +12,8 @@
 /submit-article /submit-article-v6 200
 /submit-article/ /submit-article-v6 200
 
-# Canonical general administration entrypoint.
-/admin /admin.html 200
-/admin/ /admin.html 200
+# General administration is served directly by admin.html.
+# Do not rewrite /admin to avoid a canonical redirect loop.
 
 /admin-members /admin-members-v3 301
 /admin-members/ /admin-members-v3 301
