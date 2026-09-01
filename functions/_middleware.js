@@ -13,9 +13,13 @@ export async function onRequest(context) {
 
     if (isArticlesAdmin) {
       let html = await response.text();
-      const styleTag = '<link rel="stylesheet" href="/articles-admin-layout.css?v=20260901-1">';
+      const styleTag = '<link rel="stylesheet" href="/articles-admin-layout.css?v=20260901-2">';
+      const scriptTag = '<script src="/articles-admin-actions.js?v=20260901-1" defer></script>';
       if (!html.includes('/articles-admin-layout.css')) {
         html = html.includes('</head>') ? html.replace('</head>', `${styleTag}</head>`) : `${styleTag}${html}`;
+      }
+      if (!html.includes('/articles-admin-actions.js')) {
+        html = html.includes('</body>') ? html.replace('</body>', `${scriptTag}</body>`) : `${html}${scriptTag}`;
       }
       const headers = new Headers(response.headers);
       headers.delete('content-length');
