@@ -113,6 +113,7 @@ export async function onRequest({request,env}){
       const author_name=(body.author_name||'').trim();
       const author_email=(body.author_email||'').trim();
       const category=(body.category||'').trim();
+      const image_url=String(body.image_url||'').trim();
       const status=(body.status||'draft').trim();
       const slug=(body.slug||'').trim();
       const author_member_id=body.author_member_id||null;
@@ -124,15 +125,15 @@ export async function onRequest({request,env}){
         (title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,slug,author_member_id,rejection_reason,canonical_path,created_at,updated_at)
         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
       `).bind(
-        title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,
-        status==='published' ? (String(body.image_url||'').trim() || FALLBACK_COVER(result?.meta?.last_row_id)) : String(body.image_url||'').trim(),
-        status,slug,author_member_id,rejection_reason,canonical_path,now,now
+        title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,slug,author_member_id,rejection_reason,canonical_path,now,now
       ).run();
-      const insertedId = Number(result.meta?.last_row_id);
-      if(status==='published' && insertedId>0 && !String(body.image_url||'').trim()){
-        await db.prepare('UPDATE articles SET image_url=?, updated_at=? WHERE id=?').bind(FALLBACK_COVER(insertedId),new Date().toISOString(),insertedId).run();
-      }
-      return json({success:true,id:insertedId,canonical_path});
+
+      const insertedId=Number(result.meta?.last_row_id);
+      const finalImageUrl=status.toLowerCase()==='published' && insertedId>0 && !image_url
+        ? await normalizePublishedCover(db,insertedId,status,'')
+        : image_url;
+
+      return json({success:true,id:insertedId,canonical_path,image_url:finalImageUrl});
     }
 
     if(request.method==='PUT'){
