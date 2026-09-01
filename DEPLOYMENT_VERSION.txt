@@ -1,3 +1,3 @@
 MedLife deployment marker
-UI redesign commit: f0d76ee52618caece9ce09d43f04f57131dbad7c
+UI redesign commit: 9803919ad4e2ae0ae4c422023e77f52638c7b4e8
 Updated: 2026-09-01
