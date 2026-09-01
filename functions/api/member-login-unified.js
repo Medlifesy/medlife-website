@@ -1,5 +1,5 @@
 import { issueAdminSession, ADMIN_SESSION_COOKIE, ensureAdminTables } from './_admin-auth.js';
-import { verifyPassword, json } from './_auth.js';
+import { verifyPassword, json, ensureAuthTables } from './_auth.js';
 
 const SESSION_COOKIE = 'medlife_member_session';
 const SESSION_DAYS = 30;
@@ -8,31 +8,23 @@ export async function onRequest({ request, env }) {
   if (request.method === 'OPTIONS') return json({ success: true });
   if (request.method !== 'POST') return json({ success: false, error: 'Method not allowed.' }, 405);
 
-  // The account creation flow stores members and member_accounts in TEAM_DB.
-  // Login must use the same database instead of falling back to article/content DB bindings.
   const db = env.TEAM_DB || env.MEMBERS_DB || env.DB;
   if (!db) return json({ success: false, error: 'Database binding is not configured.' }, 500);
 
   try {
+    // Bring the legacy members schema up to the columns used by the authentication layer.
+    await ensureAuthTables(db);
+    await ensureMemberAccounts(db);
+
     const body = await request.json().catch(() => ({}));
     const identifier = String(body.identifier || body.username || body.email || '').trim().toLowerCase();
     const password = String(body.password || '');
-    if (!identifier || !password) {
-      return json({ success: false, error: 'يرجى إدخال البريد الإلكتروني أو اسم المستخدم وكلمة المرور.' }, 400);
-    }
+    if (!identifier || !password) return json({ success: false, error: 'يرجى إدخال البريد الإلكتروني أو اسم المستخدم وكلمة المرور.' }, 400);
 
     const account = await db.prepare(`
-      SELECT
-        a.id AS account_id,
-        a.member_id,
-        a.username,
-        a.password_hash AS account_password_hash,
-        a.account_status,
-        a.role,
-        m.full_name,
-        m.email,
-        m.status,
-        m.account_email
+      SELECT a.id AS account_id, a.member_id, a.username,
+             a.password_hash AS account_password_hash, a.account_status, a.role,
+             m.full_name, m.email, m.status, m.account_email
       FROM member_accounts a
       INNER JOIN members m ON m.id = a.member_id
       WHERE lower(COALESCE(a.username,'')) = ?
@@ -42,12 +34,8 @@ export async function onRequest({ request, env }) {
     `).bind(identifier, identifier, identifier).first();
 
     if (!account) return json({ success: false, error: 'بيانات الدخول غير صحيحة.' }, 401);
-    if (!(account.status === 'active' || account.status === 'approved')) {
-      return json({ success: false, error: 'عضويتك لم تُعتمد بعد من الإدارة.' }, 403);
-    }
-    if (account.account_status !== 'active') {
-      return json({ success: false, error: 'حسابك غير مفعل حالياً.' }, 403);
-    }
+    if (account.status !== 'active') return json({ success: false, error: 'عضويتك لم تُعتمد بعد من الإدارة.' }, 403);
+    if (account.account_status !== 'active') return json({ success: false, error: 'حسابك غير مفعل حالياً.' }, 403);
     if (!account.account_password_hash || !(await verifyPassword(password, account.account_password_hash))) {
       return json({ success: false, error: 'بيانات الدخول غير صحيحة.' }, 401);
     }
@@ -62,7 +50,6 @@ export async function onRequest({ request, env }) {
     const adminRole = mapAdminRole(account.role);
     let redirect = '/members.html';
     let adminToken = null;
-
     if (adminRole) {
       await ensureAdminTables(db);
       await ensureRoutingTables(db);
@@ -72,21 +59,30 @@ export async function onRequest({ request, env }) {
       redirect = redirectForRole(adminRole);
     }
 
-    const response = json({
-      success: true,
-      member: { id: account.member_id, full_name: account.full_name, email: account.email },
-      redirect
-    });
+    const response = json({ success: true, member: { id: account.member_id, full_name: account.full_name, email: account.email }, redirect });
     const headers = new Headers(response.headers);
     headers.append('Set-Cookie', `${SESSION_COOKIE}=${encodeURIComponent(token)}; Max-Age=${SESSION_DAYS * 86400}; Path=/; HttpOnly; Secure; SameSite=Lax`);
-    if (adminToken) {
-      headers.append('Set-Cookie', `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(adminToken)}; Max-Age=${7 * 86400}; Path=/; HttpOnly; Secure; SameSite=Lax`);
-    }
+    if (adminToken) headers.append('Set-Cookie', `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(adminToken)}; Max-Age=${7 * 86400}; Path=/; HttpOnly; Secure; SameSite=Lax`);
     return new Response(response.body, { status: response.status, headers });
   } catch (error) {
     console.error('unified member login error:', error?.message || error);
     return json({ success: false, error: 'حدث خطأ أثناء تنفيذ تسجيل الدخول.' }, 500);
   }
+}
+
+async function ensureMemberAccounts(db) {
+  await db.prepare(`CREATE TABLE IF NOT EXISTS member_accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id INTEGER NOT NULL UNIQUE,
+    username TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    password_salt TEXT,
+    role TEXT NOT NULL DEFAULT 'member',
+    account_status TEXT NOT NULL DEFAULT 'active',
+    last_login_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`).run();
 }
 
 async function ensureSessionTable(db) {
@@ -106,9 +102,7 @@ async function ensureRoutingTables(db) {
   await db.prepare(`CREATE TABLE IF NOT EXISTS medlife_admin_role_permissions (role_key TEXT NOT NULL,permission_key TEXT NOT NULL,PRIMARY KEY(role_key,permission_key))`).run();
   await db.prepare(`CREATE TABLE IF NOT EXISTS medlife_admin_user_roles (member_id INTEGER NOT NULL,role_key TEXT NOT NULL,PRIMARY KEY(member_id,role_key))`).run();
   const roles = [['system_admin','مدير النظام'],['content_manager','مدير المحتوى'],['content_editor','محرر المحتوى'],['medical_reviewer','مراجع طبي'],['members_manager','مدير الأعضاء'],['support_manager','مدير الدعم'],['complaints_manager','مدير الشكاوى']];
-  for (const [key, name] of roles) {
-    await db.prepare(`INSERT OR IGNORE INTO medlife_admin_roles(role_key,name) VALUES(?,?)`).bind(key, name).run();
-  }
+  for (const [key, name] of roles) await db.prepare(`INSERT OR IGNORE INTO medlife_admin_roles(role_key,name) VALUES(?,?)`).bind(key, name).run();
   await db.prepare(`INSERT OR IGNORE INTO medlife_admin_permissions(permission_key,name) VALUES('*','جميع الصلاحيات')`).run();
   await db.prepare(`INSERT OR IGNORE INTO medlife_admin_role_permissions(role_key,permission_key) VALUES('system_admin','*')`).run();
 }
@@ -126,7 +120,7 @@ function mapAdminRole(role) {
 }
 
 function redirectForRole(role) {
-  if (role === 'system_admin') return '/admin-system.html';
+  if (role === 'system_admin') return '/admin.html';
   if (['content_manager','content_editor','medical_reviewer'].includes(role)) return '/articles-admin';
   if (role === 'members_manager') return '/members-admin';
   if (role === 'support_manager') return '/support-admin';
@@ -135,15 +129,7 @@ function redirectForRole(role) {
 }
 
 function randomToken() {
-  const b = new Uint8Array(32);
-  crypto.getRandomValues(b);
-  return bytesToHex(b);
+  const b = new Uint8Array(32); crypto.getRandomValues(b); return bytesToHex(b);
 }
-
-async function sha256(value) {
-  return bytesToHex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))));
-}
-
-function bytesToHex(bytes) {
-  return [...bytes].map(x => x.toString(16).padStart(2, '0')).join('');
-}
+async function sha256(value) { return bytesToHex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)))); }
+function bytesToHex(bytes) { return [...bytes].map(x => x.toString(16).padStart(2, '0')).join(''); }
