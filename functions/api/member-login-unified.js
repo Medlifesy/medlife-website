@@ -1,4 +1,4 @@
-import { issueAdminSession, ADMIN_SESSION_COOKIE, ensureAdminTables } from './_admin-auth.js';
+import { ADMIN_SESSION_COOKIE, ensureAdminTables } from './_admin-auth.js';
 import { verifyPassword, json } from './_auth.js';
 
 const SESSION_COOKIE = 'medlife_member_session';
