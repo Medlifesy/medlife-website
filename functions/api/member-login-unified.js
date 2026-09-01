@@ -1,5 +1,5 @@
 import { issueAdminSession, ADMIN_SESSION_COOKIE, ensureAdminTables } from './_admin-auth.js';
-import { verifyPassword, json, ensureAuthTables } from './_auth.js';
+import { verifyPassword, json, ensureAuthTables, hashPassword } from './_auth.js';
 
 const SESSION_COOKIE = 'medlife_member_session';
 const SESSION_DAYS = 30;
@@ -12,7 +12,6 @@ export async function onRequest({ request, env }) {
   if (!db) return json({ success: false, error: 'Database binding is not configured.' }, 500);
 
   try {
-    // Bring the legacy members schema up to the columns used by the authentication layer.
     await ensureAuthTables(db);
     await ensureMemberAccounts(db);
 
@@ -24,30 +23,68 @@ export async function onRequest({ request, env }) {
     const account = await db.prepare(`
       SELECT a.id AS account_id, a.member_id, a.username,
              a.password_hash AS account_password_hash, a.account_status, a.role,
-             m.full_name, m.email, m.status, m.account_email
-      FROM member_accounts a
-      INNER JOIN members m ON m.id = a.member_id
+             m.full_name, m.email, m.status, m.account_email,
+             m.password_hash AS legacy_password_hash,
+             m.medlife_role AS legacy_role
+      FROM members m
+      LEFT JOIN member_accounts a ON a.member_id = m.id
       WHERE lower(COALESCE(a.username,'')) = ?
          OR lower(COALESCE(m.email,'')) = ?
          OR lower(COALESCE(m.account_email,'')) = ?
+      ORDER BY CASE WHEN a.id IS NOT NULL THEN 0 ELSE 1 END
       LIMIT 1
     `).bind(identifier, identifier, identifier).first();
 
     if (!account) return json({ success: false, error: 'بيانات الدخول غير صحيحة.' }, 401);
     if (account.status !== 'active') return json({ success: false, error: 'عضويتك لم تُعتمد بعد من الإدارة.' }, 403);
-    if (account.account_status !== 'active') return json({ success: false, error: 'حسابك غير مفعل حالياً.' }, 403);
-    if (!account.account_password_hash || !(await verifyPassword(password, account.account_password_hash))) {
-      return json({ success: false, error: 'بيانات الدخول غير صحيحة.' }, 401);
+    if (account.account_id && account.account_status !== 'active') return json({ success: false, error: 'حسابك غير مفعل حالياً.' }, 403);
+
+    let valid = false;
+    if (account.account_id && account.account_password_hash) {
+      valid = await verifyPassword(password, account.account_password_hash);
     }
+
+    if (!valid && account.legacy_password_hash) {
+      valid = await verifyPassword(password, account.legacy_password_hash);
+    }
+
+    if (!valid) return json({ success: false, error: 'بيانات الدخول غير صحيحة.' }, 401);
+
+    let accountId = account.account_id;
+
+    if (!accountId) {
+      const username = await createUsername(db, account.email || account.account_email, account.member_id);
+      const passwordHash = account.legacy_password_hash || await hashPassword(password);
+      const role = normalizeAccountRole(account.legacy_role);
+
+      const result = await db.prepare(`
+        INSERT INTO member_accounts (
+          member_id, username, password_hash, password_salt, role, account_status
+        ) VALUES (?, ?, ?, NULL, ?, 'active')
+      `).bind(account.member_id, username, passwordHash, role).run();
+
+      accountId = result.meta?.last_row_id;
+      if (!accountId) {
+        const created = await db.prepare('SELECT id FROM member_accounts WHERE member_id=? LIMIT 1')
+          .bind(account.member_id).first();
+        accountId = created?.id;
+      }
+    }
+
+    await db.prepare(`
+      UPDATE member_accounts
+      SET account_status='active',
+          last_login_at=CURRENT_TIMESTAMP,
+          updated_at=CURRENT_TIMESTAMP
+      WHERE id=?
+    `).bind(accountId).run();
 
     await ensureSessionTable(db);
     const token = randomToken();
     await db.prepare(`INSERT INTO member_sessions_v2(id,token_hash,member_id,expires_at) VALUES(?,?,?,datetime('now','+30 days'))`)
       .bind(randomToken(), await sha256(token), account.member_id).run();
-    await db.prepare(`UPDATE member_accounts SET last_login_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP WHERE id=?`)
-      .bind(account.account_id).run();
 
-    const adminRole = mapAdminRole(account.role);
+    const adminRole = mapAdminRole(account.role || normalizeAccountRole(account.legacy_role));
     let redirect = '/members.html';
     let adminToken = null;
     if (adminRole) {
@@ -107,6 +144,11 @@ async function ensureRoutingTables(db) {
   await db.prepare(`INSERT OR IGNORE INTO medlife_admin_role_permissions(role_key,permission_key) VALUES('system_admin','*')`).run();
 }
 
+function normalizeAccountRole(role) {
+  const r = String(role || '').toLowerCase();
+  return r === 'admin' || r === 'administrator' ? 'admin' : r || 'member';
+}
+
 function mapAdminRole(role) {
   const r = String(role || '').toLowerCase();
   if (['admin','administrator','medical_director','general_team_supervisor','system_admin'].includes(r)) return 'system_admin';
@@ -126,6 +168,17 @@ function redirectForRole(role) {
   if (role === 'support_manager') return '/support-admin';
   if (role === 'complaints_manager') return '/complaints-admin';
   return '/members.html';
+}
+
+async function createUsername(db, email, memberId) {
+  let base = String(email || `member${memberId}`).split('@')[0].replace(/[^a-z0-9._-]/gi, '-').toLowerCase().slice(0, 25);
+  if (base.length < 4) base = `member${memberId}`;
+  let username = base;
+  let counter = 1;
+  while (await db.prepare('SELECT id FROM member_accounts WHERE username=? LIMIT 1').bind(username).first()) {
+    username = `${base.slice(0, 30)}-${counter++}`;
+  }
+  return username.slice(0, 40);
 }
 
 function randomToken() {
