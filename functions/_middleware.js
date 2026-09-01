@@ -13,13 +13,19 @@ export async function onRequest(context) {
 
     if (isArticlesAdmin) {
       let html = await response.text();
-      const styleTag = '<link rel="stylesheet" href="/articles-admin-layout.css?v=20260901-2">';
-      const scriptTag = '<script src="/articles-admin-actions.js?v=20260901-1" defer></script>';
+      const styleTag = '<link rel="stylesheet" href="/articles-admin-layout.css?v=20260901-3">';
+      const scriptTags = [
+        '<script src="/articles-admin-actions.js?v=20260901-1" defer></script>',
+        '<script src="/articles-admin-ai-cover.js?v=20260901-2" defer></script>'
+      ];
       if (!html.includes('/articles-admin-layout.css')) {
         html = html.includes('</head>') ? html.replace('</head>', `${styleTag}</head>`) : `${styleTag}${html}`;
       }
-      if (!html.includes('/articles-admin-actions.js')) {
-        html = html.includes('</body>') ? html.replace('</body>', `${scriptTag}</body>`) : `${html}${scriptTag}`;
+      for (const tag of scriptTags) {
+        const marker = tag.match(/(?:src|href)="([^"]+)/)?.[1] || '';
+        if (marker && !html.includes(marker)) {
+          html = html.includes('</body>') ? html.replace('</body>', `${tag}</body>`) : `${html}${tag}`;
+        }
       }
       const headers = new Headers(response.headers);
       headers.delete('content-length');
