@@ -18,7 +18,8 @@ export async function onRequest(context) {
       const scriptTags = [
         '<script src="/articles-admin-actions.js?v=20260901-1" defer></script>',
         '<script src="/articles-admin-ai-cover.js?v=20260901-4" defer></script>',
-        '<script src="/articles-admin-canonical-panel.js?v=20260901-2" defer></script>'
+        '<script src="/articles-admin-canonical-panel.js?v=20260901-2" defer></script>',
+        '<script src="/articles-admin-auth-fix.js?v=20260902-1" defer></script>'
       ];
       if (!html.includes('/articles-admin-layout.css')) {
         html = html.includes('</head>') ? html.replace('</head>', `${styleTag}</head>`) : `${styleTag}${html}`;
