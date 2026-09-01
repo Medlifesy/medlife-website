@@ -12,11 +12,16 @@ export async function onRequest(context) {
     const isContactPage = path === '/contact' || path === '/contact/' || path === '/contact.html';
 
     if (isArticlesAdmin) {
+      let html = await response.text();
+      const styleTag = '<link rel="stylesheet" href="/articles-admin-layout.css?v=20260901-1">';
+      if (!html.includes('/articles-admin-layout.css')) {
+        html = html.includes('</head>') ? html.replace('</head>', `${styleTag}</head>`) : `${styleTag}${html}`;
+      }
       const headers = new Headers(response.headers);
       headers.delete('content-length');
       headers.set('cache-control','no-store, no-cache, must-revalidate, max-age=0');
       headers.set('pragma','no-cache');
-      return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+      return new Response(html,{status:response.status,statusText:response.statusText,headers});
     }
 
     if (!isArticleReader && !isSupportPage && !isContactPage) return response;
@@ -26,8 +31,6 @@ export async function onRequest(context) {
     if (isArticleReader) tags.push('<script src="/article-reader-rich-content.js?v=20260828-1" defer></script>');
     if (isSupportPage) tags.push('<script src="/site-nav.js?v=20260831-support1" defer></script>');
     if (isContactPage) {
-      // Hide the legacy Contact shell before first paint. contact-page-v8 removes these nodes
-      // and replaces them with the final UI, so users never see a legacy->new flash.
       const earlyStyle = '<style id="medlife-contact-no-flash">body>header.hero,body>main.wrap{visibility:hidden!important;opacity:0!important}</style>';
       html = html.includes('</head>') ? html.replace('</head>', `${earlyStyle}</head>`) : `${earlyStyle}${html}`;
       tags.push('<script src="/site-nav.js?v=20260831-contact-final10" defer></script>');
