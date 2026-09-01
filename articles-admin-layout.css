@@ -50,6 +50,9 @@ body{background:var(--studio-bg);color:#26344d}
 #appView .rich{min-height:470px;padding:18px;font-size:14px;background:#fff}
 #appView .bar{position:sticky;bottom:0;background:rgba(255,255,255,.98);z-index:5;margin-top:14px;padding:12px 0 0;border-top:1px solid var(--studio-line)}
 #appView .bar-left,#appView .bar-right{gap:6px}
+#appView .btn.danger{background:#fff1f3;border-color:#f0b8c1;color:#a32936}
+#appView .bar #unpublishBtn{background:#fff7e8;border-color:#efd39a;color:#8a5a00}
+#appView .bar #publishBottomBtn{background:var(--studio-red);border-color:var(--studio-red);color:#fff}
 #appView .side-block{padding:14px}
 #appView .side-block h3{font-size:11px}
 #appView .info-row{padding:7px 0;font-size:9px}
