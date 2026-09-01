@@ -17,7 +17,7 @@ export async function onRequest(context) {
       const styleTag = '<link rel="stylesheet" href="/articles-admin-layout.css?v=20260901-3">';
       const scriptTags = [
         '<script src="/articles-admin-actions.js?v=20260901-1" defer></script>',
-        '<script src="/articles-admin-ai-cover.js?v=20260901-3" defer></script>',
+        '<script src="/articles-admin-ai-cover.js?v=20260901-4" defer></script>',
         '<script src="/articles-admin-canonical-panel.js?v=20260901-2" defer></script>'
       ];
       if (!html.includes('/articles-admin-layout.css')) {
