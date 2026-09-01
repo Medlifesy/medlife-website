@@ -52,6 +52,9 @@ export async function authenticateAdmin(request, db) {
       s.member_id,
       m.full_name,
       m.email,
+      m.medlife_role,
+      m.org_role,
+      m.status AS member_status,
       a.username,
       a.account_status,
       a.role AS account_role,
@@ -62,6 +65,7 @@ export async function authenticateAdmin(request, db) {
     WHERE s.token_hash = ?
       AND datetime(s.expires_at) > datetime('now')
       AND a.account_status = 'active'
+      AND lower(COALESCE(m.status,'active')) = 'active'
     LIMIT 1
   `).bind(tokenHash).first();
 
@@ -96,7 +100,9 @@ export async function loginAdmin(request, db) {
       a.role,
       m.full_name,
       m.email,
-      m.member_status
+      m.status AS member_status,
+      m.medlife_role,
+      m.org_role
     FROM member_accounts a
     JOIN members m ON m.id = a.member_id
     WHERE lower(a.username) = ?
@@ -105,7 +111,7 @@ export async function loginAdmin(request, db) {
   `).bind(identifier, identifier).first();
 
   if (!account) return json({ success: false, error: 'بيانات الدخول غير صحيحة.' }, 401);
-  if (account.member_status !== 'active') return json({ success: false, error: 'عضويتك غير مفعلة حالياً.' }, 403);
+  if (String(account.member_status || 'active').toLowerCase() !== 'active') return json({ success: false, error: 'عضويتك غير مفعلة حالياً.' }, 403);
   if (account.account_status !== 'active') return json({ success: false, error: 'حسابك غير مفعل حالياً.' }, 403);
   if (account.role !== 'admin') return json({ success: false, error: 'هذا الحساب لا يملك صلاحية الإدارة.' }, 403);
   if (!(await verifyPassword(password, account.password_hash))) return json({ success: false, error: 'بيانات الدخول غير صحيحة.' }, 401);
