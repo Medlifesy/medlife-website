@@ -19,16 +19,22 @@ function createPublicPath(){
 
 async function ensurePublicPath(db, row){
   if(row?.canonical_path) return row.canonical_path;
-  let path = createPublicPath();
   for(let attempt=0; attempt<5; attempt++){
+    const path = createPublicPath();
     const exists = await db.prepare('SELECT id FROM articles WHERE canonical_path=? LIMIT 1').bind(path).first();
-    if(!exists){
-      await db.prepare('UPDATE articles SET canonical_path=?, updated_at=? WHERE id=? AND (canonical_path IS NULL OR canonical_path=?)')
-        .bind(path, new Date().toISOString(), row.id, '')
-        .run();
+    if(exists) continue;
+    const result = await db.prepare('UPDATE articles SET canonical_path=?, updated_at=? WHERE id=? AND (canonical_path IS NULL OR canonical_path=?)')
+      .bind(path, new Date().toISOString(), row.id, '')
+      .run();
+    if(result.meta?.changes){
+      row.canonical_path = path;
       return path;
     }
-    path = createPublicPath();
+    const latest = await db.prepare('SELECT canonical_path FROM articles WHERE id=? LIMIT 1').bind(row.id).first();
+    if(latest?.canonical_path) {
+      row.canonical_path = latest.canonical_path;
+      return latest.canonical_path;
+    }
   }
   throw new Error('تعذر إنشاء المسار الدائم للمقال.');
 }
@@ -59,8 +65,8 @@ export async function onRequest({request,env}){
           : await db.prepare("SELECT * FROM articles WHERE id=? AND status='published' LIMIT 1").bind(id).first();
         if(!row)return json({success:false,error:'المقال غير موجود.'},404);
         if(admin)return json({success:true,article:row});
-        const canonical_path=await ensurePublicPath(db,row);
-        return json({success:true,article:publicArticle({...row,canonical_path})});
+        await ensurePublicPath(db,row);
+        return json({success:true,article:publicArticle(row)});
       }
 
       const rows=admin
@@ -68,19 +74,10 @@ export async function onRequest({request,env}){
         : ((await db.prepare("SELECT * FROM articles WHERE status='published' ORDER BY COALESCE(published_at, created_at) DESC").all()).results||[]);
 
       if(!admin){
-        for(const row of rows){
-          await ensurePublicPath(db,row);
-        }
+        for(const row of rows) await ensurePublicPath(db,row);
       }
 
-      const visibleRows=admin?rows:rows.map((row)=>publicArticle(row));
-      if(!admin){
-        for(const row of visibleRows){
-          if(!row.canonical_path){
-            row.canonical_path = rows.find((candidate)=>candidate.id===row.id)?.canonical_path || null;
-          }
-        }
-      }
+      const visibleRows=rows.map(publicArticle);
       return json({success:true,articles:visibleRows,summary:summary(rows)});
     }
 
