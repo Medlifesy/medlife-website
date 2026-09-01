@@ -1,0 +1,60 @@
+/* MedLife Article Studio — workspace layout refinement */
+:root{--studio-navy:#12203a;--studio-red:#e51f45;--studio-bg:#f7f2ea;--studio-line:#e5e0d7;--studio-muted:#66748b;--studio-paper:#fff;--studio-soft:#eef2f7}
+body{background:var(--studio-bg);color:#26344d}
+#appView .site-header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.97);border-bottom:1px solid var(--studio-line);box-shadow:0 3px 16px rgba(18,32,58,.04)}
+#appView .header-in{min-height:74px;gap:18px;padding:8px 0}
+#appView .brand{margin-left:auto;gap:12px}
+#appView .brand img{width:50px;height:50px}
+#appView .brand-title{font-size:16px;color:var(--studio-navy)}
+#appView .brand-sub{font-size:9px}
+#appView .nav{display:none}
+#appView .actions{margin-right:auto;display:flex;gap:6px;align-items:center}
+#appView .actions .btn{padding:8px 12px;border-radius:8px;font-size:10px}
+#appView .actions #logoutBtn{color:#596577;background:#fff}
+#appView .app{padding:24px 0 48px}
+#appView .topline{align-items:center;margin-bottom:14px;padding:0 2px}
+#appView .topline h1{font-size:25px;letter-spacing:-.2px;color:var(--studio-navy)}
+#appView .topline p{font-size:10px;color:var(--studio-muted)}
+#appView .session{gap:8px;padding:8px 11px;background:#fff;border:1px solid var(--studio-line);border-radius:9px;color:var(--studio-muted);white-space:nowrap}
+#appView .session #userText{font-weight:800;color:var(--studio-navy)}
+#appView .session #dirtyText{color:var(--studio-red);font-weight:700}
+#appView .stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+#appView .stat{padding:11px 13px;border-radius:12px;box-shadow:0 4px 16px rgba(18,32,58,.035);display:flex;align-items:center;justify-content:space-between;gap:10px}
+#appView .stat span{font-size:9px}
+#appView .stat b{font-size:23px;margin:0;color:var(--studio-navy)}
+#appView .workspace{grid-template-columns:300px minmax(0,1fr) 270px;gap:12px;align-items:stretch}
+#appView .workspace>.panel{border-radius:13px;box-shadow:0 7px 22px rgba(18,32,58,.045);border-color:var(--studio-line)}
+#appView .workspace>.panel:nth-child(1){min-height:620px}
+#appView .workspace>.panel:nth-child(2){min-height:620px}
+#appView .workspace>.panel:nth-child(3){min-height:620px}
+#appView .panel-head{padding:12px 14px;background:linear-gradient(to bottom,#fff,#fcfcfb)}
+#appView .panel-head h2{font-size:13px}
+#appView .panel-body{padding:11px 12px}
+#appView .search{margin-bottom:8px;background:#fbfcfd}
+#appView .filter-row{gap:4px;margin-bottom:0}
+#appView .filter{padding:5px 8px;font-size:8px}
+#appView .article-list{max-height:610px}
+#appView .article-item{padding:12px 13px;transition:background .15s ease}
+#appView .article-item.active{border-right:3px solid var(--studio-red);padding-right:10px}
+#appView .article-item-title{font-size:10px;line-height:1.75}
+#appView .article-item-meta{font-size:8px}
+#appView .form{padding:17px}
+#appView .form-head{position:sticky;top:74px;z-index:4;background:#fff;padding:0 0 12px;margin:-1px 0 13px;border-bottom:1px solid var(--studio-line)}
+#appView .form-head h2{font-size:19px}
+#appView .grid{gap:11px}
+#appView .field label{font-size:9px}
+#appView .field input,#appView .field select,#appView .field textarea{padding:9px 10px;border-radius:8px;background:#fff}
+#appView .editor{border-radius:9px}
+#appView .editor-tools{padding:7px;background:#fafbfd}
+#appView .editor-tools button{padding:5px 8px}
+#appView .rich{min-height:470px;padding:18px;font-size:14px;background:#fff}
+#appView .bar{position:sticky;bottom:0;background:rgba(255,255,255,.98);z-index:5;margin-top:14px;padding:12px 0 0;border-top:1px solid var(--studio-line)}
+#appView .bar-left,#appView .bar-right{gap:6px}
+#appView .side-block{padding:14px}
+#appView .side-block h3{font-size:11px}
+#appView .info-row{padding:7px 0;font-size:9px}
+#appView .canonical{font-size:8px;line-height:1.65}
+#appView .status-note{font-size:8px;line-height:1.7}
+#appView .empty{padding:54px 18px;font-size:10px}
+@media(max-width:1180px){#appView .workspace{grid-template-columns:260px minmax(0,1fr)}#appView .workspace>.panel:nth-child(3){grid-column:1/-1;min-height:auto}#appView .workspace>.panel:nth-child(1),#appView .workspace>.panel:nth-child(2){min-height:560px}}
+@media(max-width:780px){#appView .header-in{min-height:68px;flex-wrap:wrap;padding:8px 0}#appView .brand{margin-left:auto}#appView .actions{width:100%;justify-content:flex-start;overflow:auto;padding-bottom:2px}#appView .actions .btn{white-space:nowrap}#appView .topline{flex-direction:column;align-items:stretch}#appView .session{width:100%;justify-content:space-between}#appView .stats{grid-template-columns:repeat(2,1fr)}#appView .workspace{grid-template-columns:1fr}#appView .workspace>.panel:nth-child(1),#appView .workspace>.panel:nth-child(2),#appView .workspace>.panel:nth-child(3){min-height:auto}#appView .article-list{max-height:290px}#appView .form-head{position:static}#appView .bar{position:static}}
