@@ -53,7 +53,6 @@ export async function authenticateAdmin(request, db) {
       m.full_name,
       m.email,
       m.medlife_role,
-      m.org_role,
       m.status AS member_status,
       a.username,
       a.account_status,
@@ -101,8 +100,7 @@ export async function loginAdmin(request, db) {
       m.full_name,
       m.email,
       m.status AS member_status,
-      m.medlife_role,
-      m.org_role
+      m.medlife_role
     FROM member_accounts a
     JOIN members m ON m.id = a.member_id
     WHERE lower(a.username) = ?
@@ -131,6 +129,7 @@ export async function loginAdmin(request, db) {
       full_name: account.full_name,
       email: account.email,
       username: account.username,
+      medlife_role: account.medlife_role || null,
       role: adminRole || 'system_admin'
     }
   });
