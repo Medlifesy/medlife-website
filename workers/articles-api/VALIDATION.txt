@@ -1,0 +1,1 @@
+Temporary validation marker for the safe article API fix branch. No runtime behavior.
