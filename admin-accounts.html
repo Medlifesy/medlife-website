@@ -7,29 +7,28 @@
 <title>الحسابات الإدارية | MedLife</title>
 <link rel="icon" href="/logo.PNG">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/admin-ui.css">
 <style>
 .accounts-page .admin-main{padding-top:10px}
-.accounts-page .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:16px}
-.accounts-page .page-head-copy{min-width:0}
+.accounts-page .page-intro{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:16px}
 .accounts-page .admin-page-title{margin:0}
-.accounts-page .security-strip{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 15px;background:var(--ml-soft-red);border:1px solid #ffd4dc;border-radius:14px;color:#8e1635;font-size:10px;font-weight:800;line-height:1.8}
-.accounts-page .security-strip strong{color:var(--ml-red-dark)}
-.accounts-page .workspace-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(290px,.75fr);gap:16px;margin-top:16px;align-items:start}
+.accounts-page .security-strip{margin-top:12px;padding:11px 14px;background:var(--ml-soft-red);border:1px solid #ffd4dc;border-radius:13px;color:#8e1635;font-size:10px;font-weight:800;line-height:1.8}
+.accounts-page .workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,.65fr);gap:16px;margin-top:16px;align-items:start}
 .accounts-page .admin-section{margin-top:0}
-.accounts-page .section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
-.accounts-page .section-heading h2{margin:0}
+.accounts-page .section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.accounts-page .section-heading h2{margin:0;color:var(--ml-navy);font-size:19px}
+.accounts-page .section-heading p{margin:5px 0 0;color:var(--ml-muted);font-size:10px}
 .accounts-page .section-kicker{color:var(--ml-red);font-size:10px;font-weight:900;white-space:nowrap}
-.accounts-page .form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.accounts-page .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .accounts-page .full{grid-column:1/-1}
 .accounts-page .field label{display:block;color:var(--ml-navy);font-size:11px;font-weight:900;margin-bottom:7px}
 .accounts-page .field input,.accounts-page .field select{width:100%;height:49px;padding:0 13px;border:1px solid var(--ml-line);border-radius:12px;background:#fff;color:var(--ml-navy);font:inherit;font-size:12px;outline:none;transition:.2s}
 .accounts-page .field input:focus,.accounts-page .field select:focus{border-color:var(--ml-red);box-shadow:0 0 0 4px rgba(229,31,69,.08)}
 .accounts-page .helper{margin-top:6px;color:var(--ml-muted);font-size:9px;line-height:1.8}
 .accounts-page .password-wrap{position:relative}
-.accounts-page .password-wrap input{padding-left:88px}
+.accounts-page .password-wrap input{padding-left:76px}
 .accounts-page .password-hint{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ml-muted);font-size:9px;font-weight:800;pointer-events:none}
 .accounts-page .actions{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:18px;padding-top:18px;border-top:1px solid var(--ml-line)}
 .accounts-page .actions-left{display:flex;align-items:center;gap:12px;min-width:0}
@@ -39,30 +38,30 @@
 .accounts-page .msg.ok{color:var(--ml-success)}
 .accounts-page .msg.err{color:var(--ml-red-dark)}
 .accounts-page .msg.loading{color:var(--ml-muted)}
-.accounts-page .role-card{background:linear-gradient(160deg,#fff,#fbfaf7);border:1px solid var(--ml-line);border-radius:18px;padding:20px}
-.accounts-page .role-card h3{margin:0;color:var(--ml-navy);font-size:16px}
-.accounts-page .role-card p{margin:7px 0 15px;color:var(--ml-muted);font-size:10px;line-height:1.9}
+.accounts-page .side-card{background:linear-gradient(160deg,#fff,#fbfaf7);border:1px solid var(--ml-line);border-radius:18px;padding:20px}
+.accounts-page .side-card h3{margin:0;color:var(--ml-navy);font-size:16px}
+.accounts-page .side-card p{margin:7px 0 15px;color:var(--ml-muted);font-size:10px;line-height:1.9}
 .accounts-page .role-preview{padding:13px 14px;border-radius:13px;background:var(--ml-soft-navy);border:1px solid #dae2ed}
-.accounts-page .role-preview-label{display:block;color:var(--ml-muted);font-size:9px;font-weight:800;margin-bottom:4px}
-.accounts-page .role-preview-name{display:block;color:var(--ml-navy);font-size:14px;font-weight:900}
-.accounts-page .role-preview-desc{margin-top:6px;color:var(--ml-ink);font-size:9px;line-height:1.8}
-.accounts-page .principles{margin-top:12px}
-.accounts-page .principles div{padding:10px 0;border-bottom:1px solid var(--ml-line);color:var(--ml-ink);font-size:10px;line-height:1.8}
-.accounts-page .principles div:last-child{border-bottom:0;padding-bottom:0}
-.accounts-page .principles b{display:block;color:var(--ml-navy);font-size:10px;margin-bottom:2px}
-.accounts-page .accounts-section{margin-top:16px}
-.accounts-page .table-wrap{overflow:auto;margin-top:4px;border:1px solid var(--ml-line);border-radius:14px}
-.accounts-page .table{width:100%;border-collapse:collapse;min-width:640px}
+.accounts-page .preview-label{display:block;color:var(--ml-muted);font-size:9px;font-weight:800;margin-bottom:4px}
+.accounts-page .preview-name{display:block;color:var(--ml-navy);font-size:14px;font-weight:900}
+.accounts-page .preview-desc{margin-top:6px;color:var(--ml-ink);font-size:9px;line-height:1.8}
+.accounts-page .steps{margin-top:12px}
+.accounts-page .step{padding:10px 0;border-bottom:1px solid var(--ml-line);font-size:10px;line-height:1.8}
+.accounts-page .step:last-child{border-bottom:0}
+.accounts-page .step b{display:block;color:var(--ml-navy);font-size:10px;margin-bottom:2px}
+.accounts-page .accounts-list{margin-top:16px}
+.accounts-page .table-wrap{overflow:auto;border:1px solid var(--ml-line);border-radius:14px}
+.accounts-page .table{width:100%;border-collapse:collapse;min-width:650px}
 .accounts-page .table th,.accounts-page .table td{padding:12px 11px;border-bottom:1px solid var(--ml-line);text-align:right;font-size:10px;white-space:nowrap}
 .accounts-page .table tr:last-child td{border-bottom:0}
 .accounts-page .table th{color:var(--ml-muted);font-weight:800;background:#fbfaf7}
 .accounts-page .table td{color:var(--ml-ink);background:#fff}
 .accounts-page .table td b{color:var(--ml-navy)}
 .accounts-page .status-pill{display:inline-flex;align-items:center;min-height:26px;padding:4px 9px;border-radius:999px;background:#effaf6;color:var(--ml-success);font-size:9px;font-weight:900}
-.accounts-page .loading{color:var(--ml-muted)!important;text-align:center!important}
-.accounts-page .empty-state{padding:24px!important;text-align:center!important;color:var(--ml-muted)!important}
-@media(max-width:900px){.accounts-page .workspace-grid{grid-template-columns:1fr}.accounts-page .role-card{order:-1}}
-@media(max-width:700px){.accounts-page .page-head{align-items:stretch;flex-direction:column}.accounts-page .form{grid-template-columns:1fr}.accounts-page .full{grid-column:auto}.accounts-page .actions{align-items:stretch;flex-direction:column}.accounts-page .actions-left{flex-direction:column;align-items:stretch}.accounts-page .actions .admin-button{width:100%}.accounts-page .table th,.accounts-page .table td{font-size:9px}}
+.accounts-page .loading,.accounts-page .empty-state{text-align:center!important;color:var(--ml-muted)!important}
+.accounts-page .empty-state{padding:24px!important}
+@media(max-width:900px){.accounts-page .workspace{grid-template-columns:1fr}.accounts-page .side-card{order:-1}}
+@media(max-width:700px){.accounts-page .page-intro{align-items:stretch;flex-direction:column}.accounts-page .form-grid{grid-template-columns:1fr}.accounts-page .full{grid-column:auto}.accounts-page .actions{align-items:stretch;flex-direction:column}.accounts-page .actions-left{align-items:stretch;flex-direction:column}.accounts-page .actions .admin-button{width:100%}}
 </style>
 </head>
 <body>
@@ -79,40 +78,43 @@
 
 <main class="admin-main">
 <div class="admin-container">
-<div class="page-head">
-<div class="page-head-copy">
+<div class="page-intro">
 <section class="admin-page-title">
 <div class="admin-eyebrow">الإدارة المركزية</div>
-<h1>الحسابات الإدارية</h1>
-<p>إدارة حسابات الدخول والأدوار الممنوحة لأعضاء المؤسسة.</p>
+<h1>إضافة حساب إداري</h1>
+<p>أضف الشخص إلى المؤسسة وأنشئ له حساب الدخول والدور الإداري من خطوة واحدة.</p>
 </section>
 </div>
-</div>
 
-<div class="security-strip"><strong>صلاحيات الإدارة:</strong> إنشاء الحسابات ومنح الأدوار متاحان لمدير النظام فقط.</div>
+<div class="security-strip">هذه الصفحة مخصصة لمدير النظام فقط.</div>
 
-<div class="workspace-grid">
+<div class="workspace">
 <section class="admin-section" id="new-admin-account">
 <div class="section-heading">
-<div><h2>إنشاء حساب جديد</h2><p>اختر عضوًا موجودًا وأنشئ له حساب دخول ودورًا إداريًا محددًا.</p></div>
-<span class="section-kicker">حساب إداري</span>
+<div><h2>بيانات العضو والحساب</h2><p>العضو غير مطلوب أن يكون موجودًا مسبقًا؛ سيتم إنشاء سجله تلقائيًا مع الحساب.</p></div>
+<span class="section-kicker">حساب جديد</span>
 </div>
 
-<div class="form">
+<div class="form-grid">
 <div class="field full">
-<label for="member">العضو</label>
-<select id="member"><option>جارٍ تحميل الأعضاء...</option></select>
-<div class="helper">الحساب يرتبط مباشرة بالعضو المحدد في بيانات المؤسسة.</div>
-</div>
-
-<div class="field">
-<label for="role">الدور الإداري</label>
-<select id="role"><option>جارٍ تحميل الأدوار...</option></select>
+<label for="full_name">الاسم الكامل</label>
+<input id="full_name" type="text" autocomplete="name" placeholder="الاسم الكامل للعضو">
+<div class="helper">سيتم إنشاء سجل عضو جديد بهذا الاسم.</div>
 </div>
 
 <div class="field">
 <label for="email">بريد الدخول</label>
 <input id="email" type="email" autocomplete="email" placeholder="name@medlifesy.org">
+</div>
+
+<div class="field">
+<label for="member_code">رمز العضوية</label>
+<input id="member_code" type="text" placeholder="يُنشأ تلقائيًا عند تركه فارغًا">
+</div>
+
+<div class="field full">
+<label for="role">الدور الإداري</label>
+<select id="role"><option>جارٍ تحميل الأدوار...</option></select>
 </div>
 
 <div class="field">
@@ -131,29 +133,29 @@
 
 <div class="actions">
 <div class="actions-left">
-<button class="admin-button admin-button-primary" id="create" type="button">إنشاء الحساب</button>
+<button class="admin-button admin-button-primary" id="create" type="button">إضافة العضو وإنشاء الحساب</button>
 <span id="msg" class="msg" role="status" aria-live="polite"></span>
 </div>
 </div>
 </section>
 
-<aside class="role-card">
-<h3>ضبط الحساب قبل الإنشاء</h3>
-<p>راجع العضو والدور والبريد قبل اعتماد الحساب.</p>
+<aside class="side-card">
+<h3>معاينة الصلاحية</h3>
+<p>الدور الذي تختاره هنا يحدد نطاق وصول الحساب داخل لوحة الإدارة.</p>
 <div class="role-preview">
-<span class="role-preview-label">الدور المحدد</span>
-<strong class="role-preview-name" id="role-preview-name">—</strong>
-<div class="role-preview-desc" id="role-preview-desc">سيظهر وصف الدور بعد تحميل الأدوار.</div>
+<span class="preview-label">الدور المحدد</span>
+<strong class="preview-name" id="role-preview-name">—</strong>
+<div class="preview-desc" id="role-preview-desc">سيظهر وصف الدور بعد تحميل الأدوار.</div>
 </div>
-<div class="principles">
-<div><b>الحساب</b>يرتبط بعضو موجود ولا ينشئ سجل عضو جديد.</div>
-<div><b>البريد</b>يستخدم لتسجيل الدخول ويرتبط بالحساب الإداري.</div>
-<div><b>الدور</b>يحدد نطاق الوصول داخل لوحة الإدارة.</div>
+<div class="steps">
+<div class="step"><b>01 — العضو</b>ينشأ سجل عضو جديد تلقائيًا.</div>
+<div class="step"><b>02 — الحساب</b>ينشأ حساب دخول إداري فعال مباشرة.</div>
+<div class="step"><b>03 — الدور</b>تُمنح الصلاحية الإدارية التي اخترتها.</div>
 </div>
 </aside>
 </div>
 
-<section class="admin-section accounts-section">
+<section class="admin-section accounts-list">
 <div class="section-heading">
 <div><h2>الحسابات الحالية</h2><p>الحسابات الإدارية المسجلة حاليًا في النظام.</p></div>
 <span class="section-kicker" id="account-count">— حساب</span>
@@ -172,42 +174,77 @@
 </div>
 
 <script>
-const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const apiFetch=(url,options)=>fetch(url,{credentials:'include',cache:'no-store',...options}).then(async r=>{const d=await r.json().catch(()=>({error:'تعذر قراءة استجابة النظام.'}));if(!r.ok)throw Error(d.error||d.detail||'تعذر تنفيذ الطلب.');return d});
-let members=[];
 let roles=[];
+
 async function load(){
-try{
-const [accountData,userData]=await Promise.all([apiFetch('/api/admin-create-account'),apiFetch('/api/admin-core?action=users')]);
-members=accountData.members||[];
-roles=accountData.roles||[];
-$('member').innerHTML=members.map(m=>`<option value="${m.id}" data-email="${esc(m.email||m.account_email||'')}">${esc(m.full_name)} — ${esc(m.member_code||m.email||'')}</option>`).join('')||'<option value="">لا يوجد أعضاء متاحون</option>';
-$('role').innerHTML=roles.map(r=>`<option value="${esc(r.key)}">${esc(r.name)}</option>`).join('')||'<option value="">لا توجد أدوار متاحة</option>';
-sync();syncRolePreview();renderAccounts(userData.users||[])
-}catch(e){$('msg').className='msg err';$('msg').textContent=e.message}
+  try{
+    const [accountData,userData]=await Promise.all([
+      apiFetch('/api/admin-create-account'),
+      apiFetch('/api/admin-core?action=users')
+    ]);
+    roles=accountData.roles||[];
+    $('role').innerHTML=roles.map(r=>`<option value="${esc(r.key)}">${esc(r.name)}</option>`).join('')||'<option value="">لا توجد أدوار متاحة</option>';
+    syncRolePreview();
+    renderAccounts(userData.users||[]);
+  }catch(e){
+    $('msg').className='msg err';
+    $('msg').textContent=e.message;
+  }
 }
-function sync(){const o=$('member').selectedOptions[0];if(o)$('email').value=o.dataset.email||''}
-function syncRolePreview(){const key=$('role').value;const role=roles.find(r=>String(r.key)===String(key));$('role-preview-name').textContent=role?.name||'—';$('role-preview-desc').textContent=role?.description||'يحدد هذا الدور الصلاحيات المتاحة للحساب.'}
+
+function syncRolePreview(){
+  const key=$('role').value;
+  const role=roles.find(r=>String(r.key)===String(key));
+  $('role-preview-name').textContent=role?.name||'—';
+  $('role-preview-desc').textContent=role?.description||'صلاحيات إدارية محددة حسب الدور.';
+}
+
 function renderAccounts(users){
-$('account-count').textContent=`${users.length} حساب`;
-$('rows').innerHTML=users.map(u=>`<tr><td><b>${esc(u.full_name)}</b></td><td>${esc(u.account_email||'—')}</td><td>${esc(u.roles||'—')}</td><td><span class="status-pill">${esc(u.account_status||'—')}</span></td></tr>`).join('')||'<tr><td colspan="4" class="empty-state">لا توجد حسابات إدارية مسجلة حاليًا.</td></tr>'
+  $('account-count').textContent=`${users.length} حساب`;
+  $('rows').innerHTML=users.map(u=>`<tr><td><b>${esc(u.full_name)}</b></td><td>${esc(u.account_email||'—')}</td><td>${esc(u.roles||'—')}</td><td><span class="status-pill">${esc(u.account_status||'—')}</span></td></tr>`).join('')||'<tr><td colspan="4" class="empty-state">لا توجد حسابات إدارية مسجلة حاليًا.</td></tr>';
 }
-$('member').onchange=sync;
+
 $('role').onchange=syncRolePreview;
+
 $('create').onclick=async()=>{
-const msg=$('msg');msg.className='msg loading';msg.textContent='جارٍ إنشاء الحساب...';
-if(!$('member').value){msg.className='msg err';msg.textContent='يرجى اختيار عضو.';return}
-if(!$('role').value){msg.className='msg err';msg.textContent='يرجى اختيار الدور الإداري.';return}
-if($('password').value.length<8){msg.className='msg err';msg.textContent='كلمة المرور يجب أن تكون 8 محارف على الأقل.';return}
-if($('password').value!==$('confirm').value){msg.className='msg err';msg.textContent='كلمتا المرور غير متطابقتين.';return}
-try{
-const d=await apiFetch('/api/admin-create-account',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({member_id:Number($('member').value),role_key:$('role').value,password:$('password').value,account_email:$('email').value.trim()})});
-msg.className='msg ok';msg.textContent=d.message||'تم إنشاء الحساب بنجاح.';$('password').value='';$('confirm').value='';
-const users=await apiFetch('/api/admin-core?action=users');renderAccounts(users.users||[])
-}catch(e){msg.className='msg err';msg.textContent=e.message}
+  const msg=$('msg');
+  msg.className='msg loading';
+  msg.textContent='جارٍ إضافة العضو وإنشاء الحساب...';
+  const fullName=$('full_name').value.trim();
+  const email=$('email').value.trim();
+  const code=$('member_code').value.trim();
+  const role=$('role').value;
+  const password=$('password').value;
+  const confirm=$('confirm').value;
+
+  if(fullName.length<2){msg.className='msg err';msg.textContent='يرجى إدخال الاسم الكامل.';return;}
+  if(!/^\S+@\S+\.\S+$/.test(email)){msg.className='msg err';msg.textContent='يرجى إدخال بريد إلكتروني صالح.';return;}
+  if(!role){msg.className='msg err';msg.textContent='يرجى اختيار الدور الإداري.';return;}
+  if(password.length<8){msg.className='msg err';msg.textContent='كلمة المرور يجب أن تكون 8 محارف على الأقل.';return;}
+  if(password!==confirm){msg.className='msg err';msg.textContent='كلمتا المرور غير متطابقتين.';return;}
+
+  try{
+    const d=await apiFetch('/api/admin-create-account',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name:fullName,email,member_code:code,role_key:role,password})});
+    msg.className='msg ok';
+    msg.textContent=d.message||'تم إنشاء الحساب بنجاح.';
+    $('full_name').value='';
+    $('email').value='';
+    $('member_code').value='';
+    $('password').value='';
+    $('confirm').value='';
+    const users=await apiFetch('/api/admin-core?action=users');
+    renderAccounts(users.users||[]);
+  }catch(e){
+    msg.className='msg err';
+    msg.textContent=e.message;
+  }
 };
+
 load();
-if(location.hash==='#new-admin-account')document.getElementById('new-admin-account')?.scrollIntoView({behavior:'smooth',block:'start'});
+if(location.hash==='#new-admin-account') $('new-admin-account')?.scrollIntoView({behavior:'smooth',block:'start'});
 </script>
 </body>
 </html>
