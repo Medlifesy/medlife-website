@@ -1,8 +1,8 @@
 import { issueAdminSession, ADMIN_SESSION_COOKIE, ensureAdminTables } from './_admin-auth.js';
+import { verifyPassword as verifyAuthPassword } from './_auth.js';
 
 const SESSION_COOKIE = "medlife_member_session";
 const SESSION_DAYS = 30;
-const PBKDF2_ITERATIONS = 100000;
 
 export async function onRequest(context) {
     const { request, env } = context;
@@ -41,18 +41,55 @@ async function login(request, db) {
     const identifier = String(body.identifier || body.username || body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
     if (!identifier || !password) return json({success:false, error:"يرجى إدخال البريد الإلكتروني أو اسم المستخدم وكلمة المرور."},400);
-    const member = await db.prepare(`SELECT id,membership_number,full_name,email,account_email,password_hash,account_status,status,member_code,medlife_role,cell,field_location,governorate,join_date,volunteer_certificate FROM members WHERE lower(COALESCE(account_email,''))=? OR lower(COALESCE(email,''))=? OR lower(COALESCE(member_code,''))=? LIMIT 1`).bind(identifier,identifier,identifier).first();
+
+    const member = await db.prepare(`
+        SELECT
+            m.id,m.membership_number,m.full_name,m.email,m.account_email,
+            m.password_hash AS legacy_password_hash,m.account_status,m.status,
+            m.member_code,m.medlife_role,
+            a.id AS account_id,a.username AS account_username,
+            a.password_hash AS account_password_hash,a.password_salt,
+            a.account_status AS member_account_status,a.role AS account_role
+        FROM members m
+        LEFT JOIN member_accounts a ON a.member_id=m.id
+        WHERE lower(COALESCE(m.account_email,''))=?
+           OR lower(COALESCE(m.email,''))=?
+           OR lower(COALESCE(m.member_code,''))=?
+           OR lower(COALESCE(a.username,''))=?
+        ORDER BY CASE WHEN a.id IS NOT NULL THEN 0 ELSE 1 END
+        LIMIT 1
+    `).bind(identifier,identifier,identifier,identifier).first();
+
     if (!member) return json({success:false, error:"بيانات الدخول غير صحيحة."},401);
     if (!(member.status === "active" || member.status === "approved")) return json({success:false, error:"عضويتك لم تُعتمد بعد من الإدارة."},403);
     if (member.account_status && member.account_status !== "active") return json({success:false, error:"حسابك غير مفعل حالياً."},403);
-    const stored = parseStoredPassword(member.password_hash);
-    if (!stored) return json({success:false, error:"لم يتم إنشاء كلمة مرور لهذا الحساب بعد."},401);
-    const candidate = await hashPassword(password, stored.salt, stored.iterations);
-    if (!timingSafeEqual(candidate,stored.hash)) return json({success:false, error:"بيانات الدخول غير صحيحة."},401);
+    if (member.member_account_status && member.member_account_status !== "active") return json({success:false, error:"حسابك غير مفعل حالياً."},403);
+
+    let valid = false;
+
+    if (member.account_id && member.account_password_hash) {
+        try {
+            valid = await verifyAuthPassword(password, member.account_password_hash);
+        } catch (error) {
+            console.error("account password verification error:", error);
+        }
+    }
+
+    if (!valid && member.legacy_password_hash) {
+        try {
+            valid = await verifyAuthPassword(password, member.legacy_password_hash);
+        } catch (error) {
+            console.error("legacy password verification error:", error);
+        }
+    }
+
+    if (!valid) return json({success:false, error:"بيانات الدخول غير صحيحة."},401);
+
     const session = await createSession(db, member.id);
     const profile = await getMember(db, member.id);
-    const redirect = await resolveRedirect(db,member.id);
-    const adminToken = await hasAdminRole(db,member.id) ? await issueAdminSession(db,member.id) : null;
+    const redirect = await resolveRedirect(db,member.id,member.account_role);
+    const adminToken = await hasAdminRole(db,member.id,member.account_role) ? await issueAdminSession(db,member.id) : null;
+
     return withCookies(json({success:true,member:profile,redirect}), session, adminToken);
 }
 
@@ -68,12 +105,42 @@ async function ensureAdminRoutingSchema(db){
     await db.prepare(`INSERT OR IGNORE INTO medlife_admin_role_permissions(role_key,permission_key) VALUES('system_admin','*')`).run();
 }
 
-async function hasAdminRole(db,memberId){
-    try{const row=await db.prepare(`SELECT 1 FROM medlife_admin_user_roles WHERE member_id=? LIMIT 1`).bind(memberId).first();return !!row}catch{return false}
+function legacyRoleToSystemRole(role){
+    const map={
+        admin:'system_admin',
+        administrator:'system_admin',
+        medical_director:'medical_reviewer',
+        general_team_supervisor:'system_admin',
+        advisor:'medical_reviewer',
+        editor:'content_editor',
+        reviewer:'medical_reviewer',
+        content_manager:'content_manager',
+        content_editor:'content_editor',
+        medical_reviewer:'medical_reviewer',
+        members_manager:'members_manager',
+        support_manager:'support_manager',
+        complaints_manager:'complaints_manager'
+    };
+    return map[String(role||'').toLowerCase()] || null;
 }
 
-async function resolveRedirect(db, memberId) {
+async function ensureLegacyRoleMapping(db,memberId,accountRole){
+    const mapped=legacyRoleToSystemRole(accountRole);
+    if(!mapped) return;
+    await db.prepare(`INSERT OR IGNORE INTO medlife_admin_user_roles(member_id,role_key) VALUES(?,?)`).bind(memberId,mapped).run();
+}
+
+async function hasAdminRole(db,memberId,accountRole){
+    try{
+        await ensureLegacyRoleMapping(db,memberId,accountRole);
+        const row=await db.prepare(`SELECT 1 FROM medlife_admin_user_roles WHERE member_id=? LIMIT 1`).bind(memberId).first();
+        return !!row;
+    }catch{return false}
+}
+
+async function resolveRedirect(db, memberId, accountRole) {
     try {
+        await ensureLegacyRoleMapping(db,memberId,accountRole);
         const roles = await db.prepare(`SELECT role_key FROM medlife_admin_user_roles WHERE member_id=?`).bind(memberId).all();
         const keys = new Set((roles.results || []).map(r => r.role_key));
         if (keys.has("system_admin")) return "/admin-system.html";
@@ -90,19 +157,15 @@ async function resolveRedirect(db, memberId) {
     return "/members.html";
 }
 
-async function me(request,db){const memberId=await authenticatedMemberId(request,db);if(!memberId)return json({success:false,authenticated:false},401);return json({success:true,authenticated:true,member:await getMember(db,memberId),redirect:await resolveRedirect(db,memberId)})}
+async function me(request,db){const memberId=await authenticatedMemberId(request,db);if(!memberId)return json({success:false,authenticated:false},401);return json({success:true,authenticated:true,member:await getMember(db,memberId),redirect:await resolveRedirect(db,memberId,null)})}
 async function logout(request,db){const token=getCookie(request,SESSION_COOKIE);if(token){await ensureSchema(db);await db.prepare(`DELETE FROM member_sessions_v2 WHERE token_hash=?`).bind(await sha256Hex(token)).run();}const response=json({success:true});const h=new Headers(response.headers);h.append("Set-Cookie",`${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax`);h.append("Set-Cookie",`${ADMIN_SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax`);return new Response(response.body,{status:response.status,headers:h})}
 async function ensureSchema(db){await db.prepare(`CREATE TABLE IF NOT EXISTS member_sessions_v2(id TEXT PRIMARY KEY,token_hash TEXT NOT NULL UNIQUE,member_id INTEGER NOT NULL,expires_at DATETIME NOT NULL,created_at DATETIME DEFAULT CURRENT_TIMESTAMP,last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP)`).run()}
 async function createSession(db,memberId){await ensureSchema(db);const token=randomToken();await db.prepare(`INSERT INTO member_sessions_v2(id,token_hash,member_id,expires_at) VALUES(?,?,?,datetime('now','+30 days'))`).bind(token,await sha256Hex(token),memberId).run();return token}
 async function authenticatedMemberId(request,db){const token=getCookie(request,SESSION_COOKIE);if(!token)return null;await ensureSchema(db);const hash=await sha256Hex(token);const row=await db.prepare(`SELECT member_id FROM member_sessions_v2 WHERE token_hash=? AND datetime(expires_at)>datetime('now') LIMIT 1`).bind(hash).first();if(!row)return null;await db.prepare(`UPDATE member_sessions_v2 SET last_seen_at=CURRENT_TIMESTAMP WHERE token_hash=?`).bind(hash).run();return row.member_id}
 async function getMember(db,id){return await db.prepare(`SELECT id,membership_number,full_name,mother_name,national_id,email,account_email,phone,gender,education_level,study_year,university,resident_specialty,residency_year,residency_hospital,address,governorate,medlife_role,cell,field_location,join_date,volunteer_certificate,status,account_status,member_code FROM members WHERE id=? LIMIT 1`).bind(id).first()}
-function parseStoredPassword(stored){const parts=String(stored||"").split("$");if(parts.length!==5||parts[0]!=="pbkdf2"||parts[1]!=="sha256")return null;const iterations=Number(parts[2]);if(!Number.isInteger(iterations)||iterations<10000||iterations>100000)return null;return {iterations,salt:hexToBytes(parts[3]),hash:parts[4].toLowerCase()}}
-async function hashPassword(password,salt,iterations=PBKDF2_ITERATIONS){const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(password),"PBKDF2",false,["deriveBits"]);const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations,hash:"SHA-256"},key,256);return bytesToHex(new Uint8Array(bits))}
-function randomToken(){const b=new Uint8Array(32);crypto.getRandomValues(b);return bytesToHex(b)}
 async function sha256Hex(v){return bytesToHex(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v))))}
+function randomToken(){const b=new Uint8Array(32);crypto.getRandomValues(b);return bytesToHex(b)}
 function bytesToHex(b){return [...b].map(x=>x.toString(16).padStart(2,"0")).join("")}
-function hexToBytes(h){const b=new Uint8Array(h.length/2);for(let i=0;i<b.length;i++)b[i]=parseInt(h.slice(i*2,i*2+2),16);return b}
-function timingSafeEqual(a,b){if(a.length!==b.length)return false;let d=0;for(let i=0;i<a.length;i++)d|=a.charCodeAt(i)^b.charCodeAt(i);return d===0}
 function getCookie(request,name){const raw=request.headers.get("Cookie")||"";for(const p of raw.split(";")){const x=p.trim();if(x.startsWith(name+"="))return decodeURIComponent(x.slice(name.length+1));}return null}
 function withCookies(response,memberToken,adminToken){const h=new Headers(response.headers);h.append("Set-Cookie",`${SESSION_COOKIE}=${encodeURIComponent(memberToken)}; Max-Age=${SESSION_DAYS*86400}; Path=/; HttpOnly; Secure; SameSite=Lax`);if(adminToken)h.append("Set-Cookie",`${ADMIN_SESSION_COOKIE}=${encodeURIComponent(adminToken)}; Max-Age=${7*86400}; Path=/; HttpOnly; Secure; SameSite=Lax`);return new Response(response.body,{status:response.status,headers:h})}
 function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{"Content-Type":"application/json; charset=UTF-8","Cache-Control":"no-store","Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"Content-Type","Access-Control-Allow-Methods":"GET,POST,OPTIONS"}})}
