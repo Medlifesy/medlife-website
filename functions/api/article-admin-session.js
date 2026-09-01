@@ -20,27 +20,13 @@ async function ensureArticleSessionSchema(db){
   await db.prepare(`CREATE TABLE IF NOT EXISTS article_admin_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,account_id INTEGER NOT NULL,member_id INTEGER,token_hash TEXT NOT NULL UNIQUE,expires_at TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run();
 }
 
-async function createBridgeSession(articleDb,admin){
-  if(!articleDb||!admin)return null;
-  await ensureArticleSessionSchema(articleDb);
-  const token=randomToken();
-  const tokenHash=await hashToken(token);
-  const accountId=`${BRIDGE_ACCOUNT_PREFIX}${admin.member_id}`;
-  await articleDb.prepare(`DELETE FROM article_admin_sessions WHERE (account_id=? OR member_id=?) AND datetime(expires_at)<=datetime('now')`).bind(accountId,admin.member_id).run().catch(()=>{});
-  await articleDb.prepare(`DELETE FROM article_admin_sessions WHERE account_id=?`).bind(accountId).run().catch(()=>{});
-  await articleDb.prepare(`INSERT INTO article_admin_sessions(account_id,member_id,token_hash,expires_at,created_at,last_seen_at) VALUES(?,?,?,datetime('now','+7 days'),CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(accountId,admin.member_id,tokenHash).run();
-  return token;
-}
-
 export async function authenticateArticleAdmin(request,db){
   if(!db)return null;
   try{
     await ensureArticleSessionSchema(db);
-
     const token=getCookie(request,COOKIE);
     if(!token)return null;
     const hash=await hashToken(token);
-
     try{
       const row=await db.prepare(`
         SELECT a.id account_id,a.member_id,a.username,a.role,a.account_status,p.display_name,p.avatar_url
@@ -55,17 +41,6 @@ export async function authenticateArticleAdmin(request,db){
         return row;
       }
     }catch{}
-
-    const bridge=await db.prepare(`
-      SELECT account_id,member_id,token_hash,expires_at
-      FROM article_admin_sessions
-      WHERE token_hash=? AND datetime(expires_at)>datetime('now') AND account_id LIKE ?
-      LIMIT 1
-    `).bind(hash,`${BRIDGE_ACCOUNT_PREFIX}%`).first();
-    if(bridge){
-      await db.prepare('UPDATE article_admin_sessions SET last_seen_at=CURRENT_TIMESTAMP WHERE token_hash=?').bind(hash).run();
-      return {account_id:bridge.member_id,member_id:bridge.member_id,username:String(bridge.member_id),role:'admin',display_name:String(bridge.member_id),account_status:'active',avatar_url:null};
-    }
     return null;
   }catch(e){
     console.error('article auth session error:',e);
@@ -81,14 +56,8 @@ export async function onRequest({request,env}){
     const action=new URL(request.url).searchParams.get('action')||'me';
 
     if(request.method==='GET'&&action==='me'){
-      const mainAdmin=await authenticateAdmin(request,teamDb);
-      if(mainAdmin){
-        const token=await createBridgeSession(articleDb,mainAdmin);
-        const response=json({success:true,authenticated:true,admin:{account_id:mainAdmin.member_id,member_id:mainAdmin.member_id,username:mainAdmin.username||mainAdmin.email||String(mainAdmin.member_id),role:'admin',display_name:mainAdmin.full_name||mainAdmin.email||String(mainAdmin.member_id),avatar_url:null}});
-        const headers=new Headers(response.headers);
-        if(token)headers.set('Set-Cookie',cookie(COOKIE,token,DAYS*86400));
-        return new Response(response.body,{status:response.status,headers});
-      }
+      // Articles Admin is intentionally authenticated ONLY through its own session.
+      // Do not bridge or inherit the general/system admin session here.
       const admin=await authenticateArticleAdmin(request,articleDb);
       if(!admin)return json({success:false,authenticated:false},401);
       return json({success:true,authenticated:true,admin:{account_id:admin.account_id,member_id:admin.member_id,username:admin.username,role:admin.role,display_name:admin.display_name||admin.username,avatar_url:admin.avatar_url||null}});
