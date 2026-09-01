@@ -35,6 +35,7 @@
     let activePath = '';
     let lastSyncedId = null;
     let busyRedirect = false;
+    let lastArticleMutation = null;
 
     const normalizePath = (value) => {
       let path = String(value || '').trim();
@@ -55,11 +56,9 @@
       return Number.isInteger(id) && id > 0 ? id : null;
     };
 
-    const currentId = () => {
-      const id = Number(window.state?.current?.id || '');
-      if (Number.isInteger(id) && id > 0) return id;
-      const value = Number(panel.dataset.articleId || '');
-      return Number.isInteger(value) && value > 0 ? value : selectedId();
+    const panelArticleId = () => {
+      const id = Number(panel.dataset.articleId || '');
+      return Number.isInteger(id) && id > 0 ? id : null;
     };
 
     const render = (value) => {
@@ -73,8 +72,7 @@
       }
       if (copyBtn) copyBtn.style.display = url ? '' : 'none';
 
-      const canonicalBlocks = document.querySelectorAll('#sideContent .canonical');
-      canonicalBlocks.forEach((block) => {
+      document.querySelectorAll('#sideContent .canonical').forEach((block) => {
         block.textContent = displayPath || 'سيظهر بعد حفظ المقال.';
       });
     };
@@ -93,10 +91,9 @@
     };
 
     const syncFromSelection = async () => {
-      const id = selectedId() || currentId();
+      const id = selectedId() || panelArticleId();
       if (!id) {
-        const isNew = !panel.classList.contains('hidden') && !document.querySelector('#articleList .article-item.active');
-        if (isNew) applyArticle(null);
+        applyArticle(null);
         return;
       }
 
@@ -126,46 +123,55 @@
     };
 
     const sync = () => {
+      const field = document.getElementById('publicPathField');
       if (panel.classList.contains('hidden')) {
-        const field = document.getElementById('publicPathField');
         if (field) field.style.display = 'none';
         return;
       }
-      const field = document.getElementById('publicPathField');
       if (field) field.style.display = '';
-      const id = selectedId() || currentId();
-      if (id && id !== lastSyncedId) {
-        syncFromSelection();
-      } else if (!id && lastSyncedId !== null) {
-        applyArticle(null);
-      }
+
+      const id = selectedId() || panelArticleId();
+      if (id && id !== lastSyncedId) syncFromSelection();
+      else if (!id && lastSyncedId !== null) applyArticle(null);
+
+      // The built-in side panel still renders the old slug. Replace it visually with canonical_path.
+      const canonical = document.querySelector('#sideContent .canonical');
+      if (canonical) canonical.textContent = activePath ? `/articles/${activePath}` : 'سيظهر بعد حفظ المقال.';
     };
 
     const publishDirect = async (event) => {
-      if (busyRedirect) return;
-      if (typeof window.save !== 'function') return;
+      if (busyRedirect || typeof window.save !== 'function') return;
       const publishButton = event.currentTarget;
+      const articleIdBeforeSave = selectedId() || panelArticleId();
       busyRedirect = true;
       event.preventDefault();
       event.stopImmediatePropagation();
+
       try {
         publishButton.disabled = true;
+        lastArticleMutation = null;
         await window.save('publish');
 
-        const id = Number(window.state?.current?.id || publishButton.dataset.articleId || selectedId() || '');
-        let canonical = '';
+        let id = articleIdBeforeSave;
+        let canonical = normalizePath(lastArticleMutation?.canonical_path || '');
 
-        if (Number.isInteger(id) && id > 0) {
+        if (!id) {
+          const mutationId = Number(lastArticleMutation?.id || '');
+          if (Number.isInteger(mutationId) && mutationId > 0) id = mutationId;
+        }
+
+        if (id && !canonical) {
           try {
             const response = await fetch(`/api/articles?id=${encodeURIComponent(id)}`, { cache: 'no-store', credentials: 'include' });
             if (response.ok) {
               const data = await response.json();
-              canonical = normalizePath(data?.article?.canonical_path || '');
-              if (canonical) {
-                articles = Array.isArray(articles) ? articles : [];
+              const article = data?.article;
+              canonical = normalizePath(article?.canonical_path || '');
+              if (article) {
                 const index = articles.findIndex((item) => Number(item?.id) === id);
-                if (index >= 0) articles[index] = data.article;
-                else articles.push(data.article);
+                if (index >= 0) articles[index] = article;
+                else articles.push(article);
+                applyArticle(article);
               }
             }
           } catch (_) {}
@@ -184,11 +190,10 @@
     };
 
     const attachPublish = () => {
-      const buttons = [
+      [
         document.getElementById('publishBtn'),
         document.getElementById('publishBottomBtn')
-      ].filter(Boolean);
-      buttons.forEach((button) => {
+      ].filter(Boolean).forEach((button) => {
         if (button.dataset.canonicalPublishBound === '1') return;
         button.dataset.canonicalPublishBound = '1';
         button.addEventListener('click', publishDirect, true);
@@ -211,9 +216,13 @@
         const response = await originalFetch(...args);
         try {
           const input = args[0];
-          const url = typeof input === 'string' ? input : input?.url || '';
-          if (String(url).includes('/api/articles')) {
+          const requestUrl = typeof input === 'string' ? input : input?.url || '';
+          const method = String(args[1]?.method || input?.method || 'GET').toUpperCase();
+          if (String(requestUrl).includes('/api/articles')) {
             response.clone().json().then(async (data) => {
+              if (method !== 'GET' && data?.success && (data?.canonical_path || data?.id)) {
+                lastArticleMutation = data;
+              }
               if (Array.isArray(data?.articles)) {
                 articles = data.articles;
                 await syncFromSelection();
@@ -238,16 +247,8 @@
     const observer = new MutationObserver(() => {
       attachPublish();
       sync();
-      const canonical = document.querySelector('#sideContent .canonical');
-      if (canonical && activePath) canonical.textContent = `/articles/${activePath}`;
     });
     observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'data-id'] });
-
-    panel.addEventListener('input', (event) => {
-      if (event.target?.id !== 'title_ar') return;
-      // A title edit must never change the permanent public path.
-      render(activePath);
-    });
 
     render('');
     attachPublish();
