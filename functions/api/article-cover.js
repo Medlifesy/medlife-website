@@ -1,7 +1,8 @@
 const NAVY = '#151D36';
-const NAVY_2 = '#1F2A49';
+const BLUE = '#2D5F8B';
+const SKY = '#78AFC8';
 const RED = '#B21F45';
-const CREAM = '#FFF9F3';
+const CREAM = '#FBF7F2';
 const WHITE = '#FFFFFF';
 
 function esc(value) {
@@ -22,131 +23,79 @@ function hash(value) {
   return h >>> 0;
 }
 
-function wrapArabic(text, maxChars, maxLines = 3) {
-  const words = String(text ?? '').trim().split(/\s+/).filter(Boolean);
+function wrapArabic(text, maxChars = 27, maxLines = 3) {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
   const lines = [];
   let line = '';
   for (const word of words) {
-    const next = line ? `${line} ${word}` : word;
-    if (next.length > maxChars && line) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (candidate.length > maxChars && line) {
       lines.push(line);
       line = word;
       if (lines.length === maxLines - 1) break;
     } else {
-      line = next;
+      line = candidate;
     }
   }
-  if (lines.length < maxLines && line) lines.push(line);
+  if (line && lines.length < maxLines) lines.push(line);
   return lines.length ? lines : ['مقال طبي'];
 }
 
 function themeFor(category) {
   const key = String(category || '').toLowerCase();
   if (key.includes('مرأة') || key.includes('نسائية') || key.includes('نساء') || key.includes('تنظيم الأسرة')) {
-    return { accent: '#D45A78', type: 'women', label: 'WOMEN’S HEALTH' };
+    return { accent: '#C96A83', type: 'women', label: 'صحة المرأة' };
   }
   if (key.includes('طفل') || key.includes('أطفال') || key.includes('طب الأطفال')) {
-    return { accent: '#67B9B1', type: 'child', label: 'PEDIATRICS' };
+    return { accent: '#58A6B8', type: 'child', label: 'صحة الطفل' };
   }
   if (key.includes('قلب') || key.includes('cardio')) {
-    return { accent: '#E26C78', type: 'heart', label: 'CARDIOLOGY' };
+    return { accent: '#D66072', type: 'heart', label: 'صحة القلب' };
   }
-  if (key.includes('رئة') || key.includes('تنفس') || key.includes('صدر')) {
-    return { accent: '#78A9D8', type: 'lungs', label: 'RESPIRATORY HEALTH' };
+  if (key.includes('صدر') || key.includes('تنفس') || key.includes('رئة')) {
+    return { accent: '#6FA8C6', type: 'lungs', label: 'الجهاز التنفسي' };
   }
   if (key.includes('طوارئ') || key.includes('إسعاف') || key.includes('emergency')) {
-    return { accent: '#EF8B69', type: 'emergency', label: 'EMERGENCY CARE' };
+    return { accent: '#E9826A', type: 'emergency', label: 'الطوارئ والإسعاف' };
   }
   if (key.includes('بحث') || key.includes('تشخيص') || key.includes('تحاليل') || key.includes('diagn')) {
-    return { accent: '#6C97DC', type: 'diagnostics', label: 'DIAGNOSTICS & RESEARCH' };
+    return { accent: '#628FC4', type: 'research', label: 'التشخيص والبحث الطبي' };
   }
   if (key.includes('تعليم') || key.includes('تثقيف') || key.includes('education')) {
-    return { accent: '#9D7AB8', type: 'education', label: 'MEDICAL EDUCATION' };
+    return { accent: '#8977B4', type: 'education', label: 'التعليم والتثقيف الطبي' };
   }
-  return { accent: RED, type: 'medical', label: 'MEDLIFE MEDICAL LIBRARY' };
+  return { accent: SKY, type: 'medical', label: 'المكتبة الطبية' };
 }
 
 function motif(theme, seed) {
-  const r = (seed % 28) - 14;
-  const stroke = `fill="none" stroke="${theme.accent}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"`;
-  const centerX = 1200;
-  const centerY = 430;
-
-  if (theme.type === 'women') return `
-    <g transform="translate(${centerX} ${centerY}) rotate(${r})">
-      <circle r="205" fill="${theme.accent}" opacity=".07"/>
-      <circle r="168" ${stroke} opacity=".22"/>
-      <path d="M0-116c-84 0-139 59-139 139 0 75 62 122 139 151 77-29 139-76 139-151 0-80-55-139-139-139Z" ${stroke}/>
-      <path d="M0-79v112M-46-24h92M-25 68c17 15 33 15 50 0" ${stroke} opacity=".82"/>
-    </g>`;
-
-  if (theme.type === 'child') return `
-    <g transform="translate(${centerX} ${centerY}) rotate(${r})">
-      <circle r="204" fill="${theme.accent}" opacity=".07"/>
-      <circle cx="-63" cy="-48" r="45" ${stroke}/>
-      <circle cx="63" cy="-48" r="45" ${stroke}/>
-      <path d="M-141 92c18-62 109-66 141-6 32-60 123-56 141 6" ${stroke}/>
-      <path d="M-18-136q18-27 36 0" ${stroke} opacity=".72"/>
-    </g>`;
-
-  if (theme.type === 'heart') return `
-    <g transform="translate(${centerX} ${centerY}) rotate(${r})">
-      <circle r="210" fill="${theme.accent}" opacity=".07"/>
-      <path d="M0 166c-32-34-151-82-151-194 0-61 43-103 98-103 30 0 45 13 53 37 8-24 23-37 53-37 55 0 98 42 98 103 0 112-119 160-151 194Z" ${stroke}/>
-      <path d="M-113 5h48l27-53 39 103 29-48h43" ${stroke} opacity=".82"/>
-    </g>`;
-
-  if (theme.type === 'lungs') return `
-    <g transform="translate(${centerX} ${centerY}) rotate(${r})">
-      <circle r="208" fill="${theme.accent}" opacity=".07"/>
-      <path d="M0-145v290" ${stroke}/>
-      <path d="M-10-62c-83-43-149 13-149 94 0 75 47 125 105 105 39-13 45-51 44-93Z" ${stroke}/>
-      <path d="M10-62c83-43 149 13 149 94 0 75-47 125-105 105-39-13-45-51-44-93Z" ${stroke}/>
-      <path d="M0-125v60M-67-90l39 43M67-90L28-43" ${stroke} opacity=".65"/>
-    </g>`;
-
-  if (theme.type === 'emergency') return `
-    <g transform="translate(${centerX} ${centerY}) rotate(${r})">
-      <circle r="205" fill="${theme.accent}" opacity=".07"/>
-      <rect x="-122" y="-122" width="244" height="244" rx="52" ${stroke}/>
-      <path d="M0-73v146M-73 0h146" stroke="${theme.accent}" stroke-width="24" stroke-linecap="round"/>
-      <circle r="156" fill="none" stroke="${theme.accent}" stroke-width="3" opacity=".28"/>
-    </g>`;
-
-  if (theme.type === 'diagnostics') return `
-    <g transform="translate(${centerX} ${centerY}) rotate(${r})">
-      <circle r="210" fill="${theme.accent}" opacity=".07"/>
-      <circle r="122" ${stroke}/>
-      <circle r="61" ${stroke} opacity=".65"/>
-      <path d="M87 87l86 86" ${stroke}/>
-      <path d="M-84 10h48l25-46 36 92 27-47h42" ${stroke} opacity=".72"/>
-    </g>`;
-
-  if (theme.type === 'education') return `
-    <g transform="translate(${centerX} ${centerY}) rotate(${r})">
-      <circle r="206" fill="${theme.accent}" opacity=".07"/>
-      <path d="M-137-74c52-21 101-16 137 25v180c-44-28-88-34-137-13Z" ${stroke}/>
-      <path d="M137-74c-52-21-101-16-137 25v180c44-28 88-34 137-13Z" ${stroke}/>
-      <path d="M0-46v177M-91-37h45M91-37h-45M-96 12h48M96 12h-48" ${stroke} opacity=".65"/>
-    </g>`;
-
-  return `
-    <g transform="translate(${centerX} ${centerY}) rotate(${r})">
-      <circle r="208" fill="${theme.accent}" opacity=".07"/>
-      <circle r="128" ${stroke}/>
-      <circle r="161" fill="none" stroke="${theme.accent}" stroke-width="3" opacity=".28"/>
-      <path d="M0-94v188M-94 0h188" stroke="${theme.accent}" stroke-width="22" stroke-linecap="round"/>
-    </g>`;
+  const angle = (seed % 22) - 11;
+  const common = `fill="none" stroke="${theme.accent}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"`;
+  if (theme.type === 'women') {
+    return `<g transform="translate(1260 490) rotate(${angle})"><circle r="170" fill="${theme.accent}" opacity=".10"/><circle r="142" ${common} opacity=".30"/><path d="M0-118c-70 0-110 54-110 116 0 78 70 102 110 138 40-36 110-60 110-138 0-62-40-116-110-116z" ${common}/><path d="M0-86v126M-48-22h96M-30 74c10 12 50 12 60 0" ${common}/></g>`;
+  }
+  if (theme.type === 'child') {
+    return `<g transform="translate(1260 490) rotate(${angle})"><circle r="170" fill="${theme.accent}" opacity=".10"/><circle cx="-62" cy="-45" r="45" ${common}/><circle cx="62" cy="-45" r="45" ${common}/><path d="M-132 88c18-55 82-66 132 0 50-66 114-55 132 0" ${common}/><path d="M-24-132q24-32 48 0" ${common} opacity=".70"/></g>`;
+  }
+  if (theme.type === 'heart') {
+    return `<g transform="translate(1260 490) rotate(${angle})"><circle r="176" fill="${theme.accent}" opacity=".10"/><path d="M0 152C-34 116-142 52-142-34c0-58 38-95 85-95 30 0 47 14 57 41 10-27 27-41 57-41 47 0 85 37 85 95 0 86-108 150-142 186z" ${common}/><path d="M-98 6h34l24-40 32 94 24-52h62" ${common}/></g>`;
+  }
+  if (theme.type === 'lungs') {
+    return `<g transform="translate(1260 490) rotate(${angle})"><circle r="176" fill="${theme.accent}" opacity=".10"/><path d="M0-138v276M-10-58C-104-98-150-30-150 50c0 66 44 110 98 80 30-16 42-48 42-86zM10-58c94-40 140 28 140 108 0 66-44 110-98 80-30-16-42-48-42-86z" ${common}/><path d="M0-92-56-44M0-92l56 48" ${common} opacity=".70"/></g>`;
+  }
+  if (theme.type === 'emergency') {
+    return `<g transform="translate(1260 490) rotate(${angle})"><circle r="170" fill="${theme.accent}" opacity=".10"/><rect x="-122" y="-122" width="244" height="244" rx="52" ${common}/><path d="M0-70v140M-70 0h140" stroke="${theme.accent}" stroke-width="24"/></g>`;
+  }
+  if (theme.type === 'research') {
+    return `<g transform="translate(1260 490) rotate(${angle})"><circle r="172" fill="${theme.accent}" opacity=".10"/><circle r="110" ${common}/><circle r="54" ${common} opacity=".65"/><path d="M78 78l100 100" ${common}/><path d="M-78 10h34l22-46 28 92 28-46h54" ${common} opacity=".70"/></g>`;
+  }
+  if (theme.type === 'education') {
+    return `<g transform="translate(1260 490) rotate(${angle})"><circle r="172" fill="${theme.accent}" opacity=".10"/><path d="M-132-70q82-42 132 10v154q-50-42-132-12zM132-70Q50-112 0-60v154q50-42 132-12z" ${common}/><path d="M0-52v144" ${common} opacity=".68"/><path d="M-88-36h48M88-36H40M-88 10h46M88 10H42" ${common} opacity=".55"/></g>`;
+  }
+  return `<g transform="translate(1260 490) rotate(${angle})"><circle r="172" fill="${theme.accent}" opacity=".10"/><circle r="118" ${common}/><path d="M0-88v176M-88 0h176" stroke="${theme.accent}" stroke-width="20"/><circle r="148" fill="none" stroke="${theme.accent}" stroke-width="3" opacity=".32"/></g>`;
 }
 
-function medlifeMark() {
-  return `
-    <g transform="translate(104 68)">
-      <rect width="286" height="92" rx="46" fill="${WHITE}" opacity=".97"/>
-      <circle cx="48" cy="46" r="28" fill="${RED}"/>
-      <path d="M48 27v38M29 46h38" stroke="${WHITE}" stroke-width="7" stroke-linecap="round"/>
-      <text x="93" y="57" fill="${NAVY}" font-family="Arial, sans-serif" font-size="31" font-weight="800">MedLife</text>
-    </g>`;
+function logo() {
+  return `<g><rect x="84" y="64" width="300" height="98" rx="49" fill="${WHITE}" opacity=".98"/><image href="https://www.medlifesy.org/logo.PNG" x="108" y="76" width="252" height="74" preserveAspectRatio="xMidYMid meet"/></g>`;
 }
 
 function svg(article) {
@@ -154,76 +103,68 @@ function svg(article) {
   const category = String(article?.category || 'المكتبة الطبية').trim();
   const theme = themeFor(category);
   const seed = hash(`${article?.id || ''}:${title}:${category}`);
-  const lines = wrapArabic(title, 27 + (seed % 4), 3);
-  const size = Math.max(42, Math.min(58, 58 - Math.max(0, title.length - 38) * 0.28));
-  const titleText = lines.map((line, i) => `<tspan x="760" dy="${i ? Math.round(size * 1.18) : 0}">${esc(line)}</tspan>`).join('');
+  const lines = wrapArabic(title, 26 + (seed % 4), 3);
+  const titleSize = Math.max(42, Math.min(58, 58 - Math.max(0, title.length - 36) * 0.24));
+  const titleText = lines.map((line, i) => `<tspan x="870" dy="${i ? Math.round(titleSize * 1.18) : 0}">${esc(line)}</tspan>`).join('');
+  const dotCount = 10 + (seed % 7);
+  const dots = Array.from({ length: dotCount }, (_, i) => {
+    const x = 980 + ((seed + i * 83) % 480);
+    const y = 110 + ((seed + i * 47) % 680);
+    const r = 2 + ((seed + i) % 4);
+    return `<circle cx="${x}" cy="${y}" r="${r}" fill="${theme.accent}" opacity=".24"/>`;
+  }).join('');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="${esc(title)}">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="${NAVY}"/>
-      <stop offset=".62" stop-color="${NAVY_2}"/>
-      <stop offset="1" stop-color="${theme.accent}" stop-opacity=".88"/>
+      <stop offset="0.58" stop-color="${BLUE}"/>
+      <stop offset="1" stop-color="#19344F"/>
     </linearGradient>
-    <radialGradient id="glow" cx="76%" cy="32%" r="65%">
-      <stop offset="0" stop-color="${theme.accent}" stop-opacity=".28"/>
+    <radialGradient id="light" cx="78%" cy="36%" r="60%">
+      <stop offset="0" stop-color="${theme.accent}" stop-opacity=".30"/>
       <stop offset="1" stop-color="${theme.accent}" stop-opacity="0"/>
     </radialGradient>
-    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1.2" fill="${WHITE}" opacity=".09"/>
-    </pattern>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${WHITE}" stop-opacity=".13"/>
+      <stop offset="1" stop-color="${WHITE}" stop-opacity=".035"/>
+    </linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="28"/></filter>
   </defs>
-
   <rect width="1600" height="900" fill="url(#bg)"/>
-  <rect width="1600" height="900" fill="url(#glow)"/>
-  <rect width="1600" height="900" fill="url(#dots)"/>
-
-  <path d="M0 760C270 650 430 700 650 640c190-52 350-135 560-116 147 13 260 61 390 5v371H0Z" fill="${NAVY}" opacity=".36"/>
-  <path d="M0 794C255 695 435 736 662 676c206-54 365-130 560-107 150 18 263 57 378 0" fill="none" stroke="${WHITE}" stroke-width="3" opacity=".08"/>
-
-  ${medlifeMark()}
-
-  <g transform="translate(1210 82)">
-    <rect width="286" height="50" rx="25" fill="${theme.accent}" opacity=".17"/>
-    <circle cx="27" cy="25" r="6" fill="${theme.accent}"/>
-    <text x="48" y="32" fill="${WHITE}" font-family="Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="1.2">${esc(theme.label)}</text>
+  <rect width="1600" height="900" fill="url(#light)"/>
+  <g opacity=".7">${dots}</g>
+  <g opacity=".18" filter="url(#soft)"><circle cx="1380" cy="170" r="140" fill="${theme.accent}"/><circle cx="1030" cy="760" r="150" fill="${RED}"/></g>
+  <path d="M0 770C250 680 430 742 660 666c220-74 390-176 620-116 160 42 220 28 320 0V900H0Z" fill="#0F1B30" opacity=".28"/>
+  ${logo()}
+  <g transform="translate(104 218)">
+    <rect width="730" height="448" rx="38" fill="url(#glass)" stroke="${WHITE}" stroke-width="2" opacity=".95"/>
+    <rect width="8" height="448" rx="4" fill="${theme.accent}"/>
+    <text x="682" y="80" text-anchor="end" fill="${CREAM}" opacity=".78" font-family="Arial, sans-serif" font-size="21" font-weight="700">${esc(theme.label)}</text>
+    <text x="682" y="166" text-anchor="end" fill="${WHITE}" font-family="Arial, sans-serif" font-size="${Math.round(titleSize)}" font-weight="800" direction="rtl" unicode-bidi="plaintext">${titleText}</text>
+    <rect x="470" y="342" width="212" height="6" rx="3" fill="${theme.accent}"/>
+    <rect x="566" y="361" width="116" height="6" rx="3" fill="${WHITE}" opacity=".24"/>
+    <text x="682" y="410" text-anchor="end" fill="${CREAM}" opacity=".58" font-family="Arial, sans-serif" font-size="16" letter-spacing="2">MEDLIFE MEDICAL LIBRARY</text>
   </g>
-
   ${motif(theme, seed)}
-
-  <rect x="94" y="246" width="735" height="416" rx="34" fill="${WHITE}" opacity=".06" stroke="${WHITE}" stroke-width="2"/>
-  <rect x="94" y="246" width="8" height="416" rx="4" fill="${theme.accent}"/>
-
-  <text x="772" y="318" text-anchor="end" fill="${CREAM}" opacity=".72" font-family="Arial, sans-serif" font-size="20" font-weight="700" letter-spacing=".8">${esc(theme.label)}</text>
-  <text x="772" y="390" text-anchor="end" fill="${WHITE}" font-family="Arial, sans-serif" font-size="${Math.round(size)}" font-weight="800" direction="rtl">${titleText}</text>
-
-  <rect x="560" y="560" width="212" height="6" rx="3" fill="${theme.accent}" opacity=".9"/>
-  <rect x="666" y="580" width="106" height="6" rx="3" fill="${WHITE}" opacity=".2"/>
-
-  <text x="104" y="816" fill="${WHITE}" font-family="Arial, sans-serif" font-size="16" font-weight="800" letter-spacing="2.2">MEDLIFE MEDICAL LIBRARY</text>
-  <text x="1494" y="816" text-anchor="end" fill="${WHITE}" opacity=".38" font-family="Arial, sans-serif" font-size="16" letter-spacing="1.2">HEALTH · KNOWLEDGE · COMMUNITY</text>
+  <g opacity=".50">
+    <circle cx="1260" cy="490" r="222" fill="none" stroke="${WHITE}" stroke-width="1"/>
+    <circle cx="1260" cy="490" r="250" fill="none" stroke="${theme.accent}" stroke-width="2" opacity=".25" stroke-dasharray="3 14"/>
+  </g>
+  <text x="1510" y="840" text-anchor="end" fill="${WHITE}" opacity=".42" font-family="Arial, sans-serif" font-size="17" letter-spacing="2">HEALTH · KNOWLEDGE · COMMUNITY</text>
 </svg>`;
 }
 
 export async function onRequestGet({ request, env }) {
-  const url = new URL(request.url);
-  const id = Number(url.searchParams.get('id'));
-  if (!env.DB || !Number.isInteger(id) || id <= 0) {
-    return new Response('Not found', { status: 404 });
-  }
-
-  const article = await env.DB.prepare(
-    "SELECT id,title_ar,category,status FROM articles WHERE id=? AND LOWER(TRIM(status))='published' LIMIT 1"
-  ).bind(id).first();
-
+  const id = Number(new URL(request.url).searchParams.get('id'));
+  if (!env.DB || !Number.isInteger(id) || id <= 0) return new Response('Not found', { status: 404 });
+  const article = await env.DB.prepare("SELECT id,title_ar,category,status FROM articles WHERE id=? AND status='published' LIMIT 1").bind(id).first();
   if (!article) return new Response('Not found', { status: 404 });
-
   return new Response(svg(article), {
-    status: 200,
     headers: {
       'content-type': 'image/svg+xml; charset=UTF-8',
-      'cache-control': 'public, max-age=300, must-revalidate',
+      'cache-control': 'public, max-age=3600, must-revalidate',
       'x-content-type-options': 'nosniff'
     }
   });
