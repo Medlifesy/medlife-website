@@ -1,7 +1,8 @@
 const NAVY = '#12203A';
+const NAVY_2 = '#1B3152';
 const CREAM = '#FBFAF8';
 const PINK = '#E92850';
-const WHITE = '#FFFFFF';
+const BLUE = '#78A8C2';
 
 function esc(value) {
   return String(value ?? '')
@@ -27,9 +28,7 @@ async function getLogoDataUri(request) {
     const response = await fetch(logoUrl.toString(), {
       cf: { cacheTtl: 86400, cacheEverything: true }
     });
-
     if (!response.ok) return '';
-
     const bytes = new Uint8Array(await response.arrayBuffer());
     return `data:image/png;base64,${toBase64(bytes)}`;
   } catch {
@@ -37,23 +36,57 @@ async function getLogoDataUri(request) {
   }
 }
 
-function renderCover(title, logoUri) {
-  const aria = esc(title || 'MedLife');
-
-  // Deliberately minimal: the article cover contains only the MedLife logo.
-  // 1600x900 keeps a true 16:9 ratio for article cards and social previews.
+function renderCover(logoUri) {
   const logo = logoUri
-    ? `<image href="${logoUri}" x="505" y="220" width="590" height="460" preserveAspectRatio="xMidYMid meet"/>`
-    : `<text x="800" y="470" text-anchor="middle" fill="${NAVY}" font-family="Arial, Tahoma, sans-serif" font-size="74" font-weight="700">MedLife</text>`;
+    ? `<image href="${logoUri}" x="520" y="255" width="560" height="390" preserveAspectRatio="xMidYMid meet"/>`
+    : `<text x="800" y="468" text-anchor="middle" fill="${NAVY}" font-family="Arial, Tahoma, sans-serif" font-size="72" font-weight="700">MedLife</text>`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="${aria}">
-  <rect width="1600" height="900" rx="34" fill="${CREAM}"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="MedLife">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${NAVY}"/>
+      <stop offset="0.58" stop-color="${NAVY_2}"/>
+      <stop offset="1" stop-color="#0C1A2D"/>
+    </linearGradient>
+    <radialGradient id="pinkGlow" cx="85%" cy="22%" r="42%">
+      <stop offset="0" stop-color="${PINK}" stop-opacity=".34"/>
+      <stop offset="1" stop-color="${PINK}" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blueGlow" cx="8%" cy="88%" r="46%">
+      <stop offset="0" stop-color="${BLUE}" stop-opacity=".24"/>
+      <stop offset="1" stop-color="${BLUE}" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="38"/></filter>
+  </defs>
 
-  <rect x="0" y="0" width="1600" height="20" fill="${NAVY}"/>
-  <rect x="0" y="880" width="1600" height="20" fill="${PINK}"/>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#pinkGlow)"/>
+  <rect width="1600" height="900" fill="url(#blueGlow)"/>
 
-  ${logo}
+  <circle cx="1335" cy="190" r="150" fill="${PINK}" opacity=".10" filter="url(#blur)"/>
+  <circle cx="270" cy="735" r="170" fill="${BLUE}" opacity=".08" filter="url(#blur)"/>
+
+  <g fill="none" stroke-linecap="round">
+    <path d="M-80 700C180 600 375 620 550 720s350 145 690 18 560-135 610-112" stroke="${BLUE}" stroke-width="2" opacity=".24"/>
+    <path d="M-110 748C160 643 375 665 560 765s346 128 672-3 520-150 600-126" stroke="${BLUE}" stroke-width="1" opacity=".16"/>
+    <path d="M980 94c190 28 342 105 482 228" stroke="${PINK}" stroke-width="3" opacity=".32"/>
+    <path d="M1040 56c145 30 294 102 412 199" stroke="${PINK}" stroke-width="1" opacity=".18"/>
+  </g>
+
+  <g transform="translate(800 450)">
+    <circle r="250" fill="${CREAM}" opacity=".035"/>
+    <circle r="215" fill="none" stroke="${CREAM}" stroke-width="1" opacity=".09"/>
+    <circle r="185" fill="none" stroke="${PINK}" stroke-width="2" opacity=".23" stroke-dasharray="3 16"/>
+  </g>
+
+  <rect x="0" y="0" width="1600" height="12" fill="${PINK}" opacity=".9"/>
+  <rect x="0" y="888" width="1600" height="12" fill="${BLUE}" opacity=".55"/>
+
+  <g>
+    <rect x="500" y="240" width="600" height="420" rx="48" fill="${CREAM}" opacity=".06" stroke="${CREAM}" stroke-width="1" stroke-opacity=".13"/>
+    ${logo}
+  </g>
 </svg>`;
 }
 
@@ -65,7 +98,7 @@ export async function onRequestGet({ request, env }) {
   }
 
   const article = await env.DB.prepare(
-    "SELECT id,title_ar FROM articles WHERE id=? AND status='published' LIMIT 1"
+    "SELECT id FROM articles WHERE id=? AND status='published' LIMIT 1"
   ).bind(id).first();
 
   if (!article) {
@@ -74,7 +107,7 @@ export async function onRequestGet({ request, env }) {
 
   const logoUri = await getLogoDataUri(request);
 
-  return new Response(renderCover(article.title_ar, logoUri), {
+  return new Response(renderCover(logoUri), {
     headers: {
       'content-type': 'image/svg+xml; charset=UTF-8',
       'cache-control': 'public, max-age=0, must-revalidate',
