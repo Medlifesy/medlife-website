@@ -14,6 +14,7 @@ function jsonArticle(row){
     category: row.category,
     image_url: row.image_url,
     slug: row.slug,
+    canonical_path: row.canonical_path,
     published_at: row.published_at,
     created_at: row.created_at,
     updated_at: row.updated_at
@@ -21,8 +22,8 @@ function jsonArticle(row){
 }
 
 export async function onRequestGet(context) {
-  const slug = String(context.params.slug || "").trim();
-  if (!slug || slug.includes("/") || slug === "." || slug === "..") {
+  const routeKey = String(context.params.slug || "").trim();
+  if (!routeKey || routeKey.includes("/") || routeKey === "." || routeKey === "..") {
     return new Response("Not found", { status: 404 });
   }
 
@@ -31,12 +32,11 @@ export async function onRequestGet(context) {
   }
 
   try {
-    // Resolve the canonical slug directly from the MedLife article database.
-    // This keeps Arabic/Unicode slugs reliable and avoids path-encoding issues
-    // when calling the external article worker.
+    // Canonical public paths are stored separately from the optional human-readable slug.
+    // Keep the slug fallback so previously published articles remain reachable.
     const article = await context.env.DB
-      .prepare("SELECT * FROM articles WHERE slug = ? AND status = 'published' LIMIT 1")
-      .bind(slug)
+      .prepare("SELECT * FROM articles WHERE status='published' AND (canonical_path = ? OR slug = ?) LIMIT 1")
+      .bind(routeKey, routeKey)
       .first();
 
     if (!article) return new Response("Not found", { status: 404 });
@@ -45,11 +45,12 @@ export async function onRequestGet(context) {
     if (!assetResponse.ok) return assetResponse;
 
     const html = await assetResponse.text();
-    const safeSlug = JSON.stringify(slug);
+    const safeRoute = JSON.stringify(article.canonical_path || routeKey);
     const safeArticle = JSON.stringify(jsonArticle(article));
-    const bootstrap = `<script>(function(){const article=${safeArticle};window.__MEDLIFE_ARTICLE__=article;window.__MEDLIFE_ARTICLE_ROUTE__=${safeSlug};})();</script>`;
+    const bootstrap = `<script>(function(){const article=${safeArticle};window.__MEDLIFE_ARTICLE__=article;window.__MEDLIFE_ARTICLE_ROUTE__=${safeRoute};})();</script>`;
     const patched = html.replace(/<head>/i, `<head>${bootstrap}`);
-    const canonical = new URL(`/articles/${encodeURIComponent(article.slug || slug)}`, context.request.url).href;
+    const canonicalKey = article.canonical_path || routeKey;
+    const canonical = new URL(`/articles/${encodeURIComponent(canonicalKey)}`, context.request.url).href;
 
     return new Response(patched, {
       status: 200,
@@ -58,7 +59,7 @@ export async function onRequestGet(context) {
         "cache-control": "no-store",
         "link": `<${canonical}>; rel="canonical"`,
         "x-medlife-article-renderer": "article-reader-v8",
-        "x-medlife-article-route": article.slug || slug,
+        "x-medlife-article-route": canonicalKey,
       },
     });
   } catch(error) {
