@@ -1,6 +1,7 @@
 import { authenticateArticleAdmin, json } from '../article-admin-session.js';
 
 const ADMIN_ERROR = 'تعذر التحقق من جلسة الإدارة.';
+const FALLBACK_COVER = (id) => `/api/article-cover?id=${encodeURIComponent(id)}`;
 
 function publicArticle(row){
   if(!row) return null;
@@ -10,6 +11,9 @@ function publicArticle(row){
     rejection_reason,
     ...safe
   } = row;
+  if(String(safe.status||'').toLowerCase()==='published' && !String(safe.image_url||'').trim() && safe.id){
+    safe.image_url = FALLBACK_COVER(safe.id);
+  }
   return safe;
 }
 
@@ -37,6 +41,17 @@ async function ensurePublicPath(db, row){
     }
   }
   throw new Error('تعذر إنشاء المسار الدائم للمقال.');
+}
+
+async function normalizePublishedCover(db, id, status, imageUrl){
+  const cleanStatus = String(status||'draft').trim().toLowerCase();
+  const cleanImage = String(imageUrl||'').trim();
+  if(cleanStatus !== 'published' || cleanImage || !Number.isInteger(id) || id<=0) return cleanImage;
+  const fallback = FALLBACK_COVER(id);
+  await db.prepare('UPDATE articles SET image_url=?, updated_at=? WHERE id=? AND (image_url IS NULL OR TRIM(image_url)=?)')
+    .bind(fallback, new Date().toISOString(), id, '')
+    .run();
+  return fallback;
 }
 
 function summary(rows){
@@ -74,10 +89,13 @@ export async function onRequest({request,env}){
         : ((await db.prepare("SELECT * FROM articles WHERE status='published' ORDER BY COALESCE(published_at, created_at) DESC").all()).results||[]);
 
       if(!admin){
-        for(const row of rows) await ensurePublicPath(db,row);
+        for(const row of rows){
+          await ensurePublicPath(db,row);
+          await normalizePublishedCover(db,row.id,row.status,row.image_url);
+        }
       }
 
-      const visibleRows=rows.map(publicArticle);
+      const visibleRows=admin ? rows : rows.map(publicArticle);
       return json({success:true,articles:visibleRows,summary:summary(rows)});
     }
 
@@ -95,7 +113,6 @@ export async function onRequest({request,env}){
       const author_name=(body.author_name||'').trim();
       const author_email=(body.author_email||'').trim();
       const category=(body.category||'').trim();
-      const image_url=(body.image_url||'').trim();
       const status=(body.status||'draft').trim();
       const slug=(body.slug||'').trim();
       const author_member_id=body.author_member_id||null;
@@ -107,9 +124,15 @@ export async function onRequest({request,env}){
         (title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,slug,author_member_id,rejection_reason,canonical_path,created_at,updated_at)
         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
       `).bind(
-        title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,slug,author_member_id,rejection_reason,canonical_path,now,now
+        title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,
+        status==='published' ? (String(body.image_url||'').trim() || FALLBACK_COVER(result?.meta?.last_row_id)) : String(body.image_url||'').trim(),
+        status,slug,author_member_id,rejection_reason,canonical_path,now,now
       ).run();
-      return json({success:true,id:result.meta?.last_row_id,canonical_path});
+      const insertedId = Number(result.meta?.last_row_id);
+      if(status==='published' && insertedId>0 && !String(body.image_url||'').trim()){
+        await db.prepare('UPDATE articles SET image_url=?, updated_at=? WHERE id=?').bind(FALLBACK_COVER(insertedId),new Date().toISOString(),insertedId).run();
+      }
+      return json({success:true,id:insertedId,canonical_path});
     }
 
     if(request.method==='PUT'){
@@ -119,6 +142,9 @@ export async function onRequest({request,env}){
       if(!current)return json({success:false,error:'المقال غير موجود.'},404);
 
       const now=new Date().toISOString();
+      const status=(body.status??current.status??'draft').trim();
+      const suppliedImage=String(body.image_url??current.image_url??'').trim();
+      const image_url=await normalizePublishedCover(db,id,status,suppliedImage);
       const fields={
         title_ar:(body.title_ar??current.title_ar??'').trim(),
         title_en:(body.title_en??current.title_en??'').trim(),
@@ -129,8 +155,8 @@ export async function onRequest({request,env}){
         author_name:(body.author_name??current.author_name??'').trim(),
         author_email:(body.author_email??current.author_email??'').trim(),
         category:(body.category??current.category??'').trim(),
-        image_url:(body.image_url??current.image_url??'').trim(),
-        status:(body.status??current.status??'draft').trim(),
+        image_url,
+        status,
         slug:(body.slug??current.slug??'').trim(),
         author_member_id:body.author_member_id??current.author_member_id??null,
         rejection_reason:(body.rejection_reason??current.rejection_reason??'').trim(),
@@ -145,7 +171,7 @@ export async function onRequest({request,env}){
       `).bind(
         fields.title_ar,fields.title_en,fields.excerpt_ar,fields.excerpt_en,fields.content_ar,fields.content_en,fields.author_name,fields.author_email,fields.category,fields.image_url,fields.status,fields.slug,fields.author_member_id,fields.rejection_reason,fields.canonical_path,fields.updated_at,id
       ).run();
-      return json({success:true,id,canonical_path:fields.canonical_path});
+      return json({success:true,id,canonical_path:fields.canonical_path,image_url:fields.image_url});
     }
 
     if(request.method==='DELETE'){
