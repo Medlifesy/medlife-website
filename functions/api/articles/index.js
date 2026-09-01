@@ -70,7 +70,7 @@ export async function onRequest({request,env}){
   const admin=await authenticateArticleAdmin(request,db);
   const url=new URL(request.url);
   const rawId=url.searchParams.get('id');
-  const id=rawId===null||rawId===''?null:Number(rawId);
+  let id=rawId===null||rawId===''?null:Number(rawId);
 
   try{
     if(request.method==='GET'){
@@ -188,31 +188,35 @@ export async function onRequest({request,env}){
     }
 
     if(request.method==='PUT'){
+      const body=await request.json().catch(()=>({}));
+      if(!(Number.isInteger(id)&&id>0)){
+        const bodyId=Number(body.id);
+        if(Number.isInteger(bodyId)&&bodyId>0) id=bodyId;
+      }
       if(!Number.isInteger(id)||id<=0)return json({success:false,error:'معرّف المقال غير صالح.'},400);
-      const body=await request.json();
       const current=await db.prepare('SELECT * FROM articles WHERE id=? LIMIT 1').bind(id).first();
       if(!current)return json({success:false,error:'المقال غير موجود.'},404);
 
       const now=new Date().toISOString();
-      const status=(body.status??current.status??'draft').trim();
+      const status=String(body.status??current.status??'draft').trim();
       const suppliedImage=String(body.image_url??current.image_url??'').trim();
       const image_url=await normalizePublishedCover(db,id,status,suppliedImage);
       const fields={
-        title_ar:(body.title_ar??current.title_ar??'').trim(),
-        title_en:(body.title_en??current.title_en??'').trim(),
-        excerpt_ar:(body.excerpt_ar??current.excerpt_ar??'').trim(),
-        excerpt_en:(body.excerpt_en??current.excerpt_en??'').trim(),
-        content_ar:(body.content_ar??current.content_ar??'').trim(),
-        content_en:(body.content_en??current.content_en??'').trim(),
-        author_name:(body.author_name??current.author_name??'').trim(),
-        author_email:(body.author_email??current.author_email??'').trim(),
-        category:(body.category??current.category??'').trim(),
+        title_ar:String(body.title_ar??current.title_ar??'').trim(),
+        title_en:String(body.title_en??current.title_en??'').trim(),
+        excerpt_ar:String(body.excerpt_ar??current.excerpt_ar??'').trim(),
+        excerpt_en:String(body.excerpt_en??current.excerpt_en??'').trim(),
+        content_ar:String(body.content_ar??current.content_ar??'').trim(),
+        content_en:String(body.content_en??current.content_en??'').trim(),
+        author_name:String(body.author_name??current.author_name??'').trim(),
+        author_email:String(body.author_email??current.author_email??'').trim(),
+        category:String(body.category??current.category??'').trim(),
         image_url,
         status,
-        slug:(body.slug??current.slug??'').trim(),
+        slug:String(body.slug??current.slug??'').trim(),
         author_member_id:body.author_member_id??current.author_member_id??null,
-        rejection_reason:(body.rejection_reason??current.rejection_reason??'').trim(),
-        canonical_path:(body.canonical_path??current.canonical_path??'').trim() || current.canonical_path || createPublicPath(),
+        rejection_reason:String(body.rejection_reason??current.rejection_reason??'').trim(),
+        canonical_path:String(body.canonical_path??current.canonical_path??'').trim() || current.canonical_path || createPublicPath(),
         updated_at:now
       };
 
