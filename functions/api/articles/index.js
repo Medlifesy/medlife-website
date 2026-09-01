@@ -99,6 +99,57 @@ export async function onRequest({request,env}){
       return json({success:true,articles:visibleRows,summary:summary(rows)});
     }
 
+    /* Public article submission: no admin session is required. */
+    if(request.method==='POST' && !admin){
+      const body=await request.json().catch(()=>({}));
+      const now=new Date().toISOString();
+      const title_ar=String(body.title_ar||'').trim();
+      const title_en=String(body.title_en||'').trim();
+      const excerpt_ar=String(body.excerpt_ar||'').trim();
+      const excerpt_en=String(body.excerpt_en||'').trim();
+      const content_ar=String(body.content_ar||'').trim();
+      const content_en=String(body.content_en||'').trim();
+      const author_name=String(body.author_name||'').trim();
+      const author_email=String(body.author_email||'').trim();
+      const category=String(body.category||'').trim();
+      const image_url=String(body.image_url||'').trim();
+      const author_member_id=body.author_member_id||body.member_id||null;
+
+      if(!title_ar || !content_ar || !author_name){
+        return json({success:false,error:'يرجى إدخال عنوان المقال واسم الكاتب والمحتوى الكامل.'},400);
+      }
+
+      const canonical_path=createPublicPath();
+      const slugBase=(title_ar||title_en||'article')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g,'')
+        .replace(/[^\p{L}\p{N}]+/gu,'-')
+        .replace(/^-+|-+$/g,'')
+        .slice(0,80) || `article-${Date.now()}`;
+      const slug=`${slugBase}-${crypto.randomUUID().replaceAll('-','').slice(0,6)}`;
+
+      const result=await db.prepare(`
+        INSERT INTO articles
+        (title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,author_name,author_email,category,image_url,status,slug,author_member_id,rejection_reason,canonical_path,created_at,updated_at)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      `).bind(
+        title_ar,title_en,excerpt_ar,excerpt_en,content_ar,content_en,
+        author_name,author_email,category,image_url,'pending',slug,
+        author_member_id,null,canonical_path,now,now
+      ).run();
+
+      const insertedId=Number(result.meta?.last_row_id);
+      return json({
+        success:true,
+        id:insertedId,
+        status:'pending',
+        slug,
+        canonical_path,
+        message:'تم إرسال المقال بنجاح، وهو الآن قيد المراجعة.'
+      },201);
+    }
+
     if(!admin)return json({success:false,authenticated:false,error:ADMIN_ERROR},401);
 
     if(request.method==='POST'){
