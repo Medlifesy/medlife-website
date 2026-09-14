@@ -2,7 +2,14 @@ import { authenticateAdmin } from './_admin-auth.js';
 
 const COOKIE='medlife_articles_session';
 const DAYS=7;
+const HANDOFF_TTL_SECONDS=120;
 const BRIDGE_ACCOUNT_PREFIX='bridge:';
+const HANDOFF_PREFIX='handoff:';
+const ALLOWED_HANDOFF_ORIGINS=new Set([
+  'https://feature-media-center.medlife-website-eru.pages.dev',
+  'https://medlife.medlifesy.org',
+  'https://www.medlifesy.org'
+]);
 const enc=new TextEncoder();
 
 function bytesToHex(bytes){return Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -17,7 +24,7 @@ export function json(data,status=200,extra={}){return new Response(JSON.stringif
 
 async function ensureArticleSessionSchema(db){
   if(!db)return;
-  await db.prepare(`CREATE TABLE IF NOT EXISTS article_admin_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,account_id INTEGER NOT NULL,member_id INTEGER,token_hash TEXT NOT NULL UNIQUE,expires_at TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run();
+  await db.prepare(`CREATE TABLE IF NOT EXISTS article_admin_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,account_id TEXT NOT NULL,member_id INTEGER,token_hash TEXT NOT NULL UNIQUE,expires_at TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run();
 }
 
 async function createBridgeSession(articleDb,admin){
@@ -32,15 +39,57 @@ async function createBridgeSession(articleDb,admin){
   return token;
 }
 
+function safeReturnUrl(value){
+  try{
+    const url=new URL(String(value||''));
+    if(!ALLOWED_HANDOFF_ORIGINS.has(url.origin))return null;
+    if(url.origin==='https://feature-media-center.medlife-website-eru.pages.dev' && !url.pathname.startsWith('/admin/'))return null;
+    return url.toString();
+  }catch{return null;}
+}
+
+async function startHandoff(request,teamDb,articleDb){
+  const mainAdmin=await authenticateAdmin(request,teamDb);
+  if(!mainAdmin)return json({success:false,error:'جلسة ميدلايف الرئيسية غير صالحة أو منتهية.'},401);
+  const target=safeReturnUrl(new URL(request.url).searchParams.get('return'));
+  if(!target)return json({success:false,error:'وجهة الجلسة غير مسموحة.'},400);
+  await ensureArticleSessionSchema(articleDb);
+  const token=randomToken();
+  const tokenHash=await hashToken(token);
+  const handoffAccount=`${HANDOFF_PREFIX}${mainAdmin.member_id}`;
+  await articleDb.prepare(`DELETE FROM article_admin_sessions WHERE account_id LIKE ? AND datetime(expires_at)<=datetime('now')`).bind(`${HANDOFF_PREFIX}%`).run().catch(()=>{});
+  await articleDb.prepare(`INSERT INTO article_admin_sessions(account_id,member_id,token_hash,expires_at,created_at,last_seen_at) VALUES(?,?,?,datetime('now','+120 seconds'),CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).bind(handoffAccount,mainAdmin.member_id,tokenHash).run();
+  const callback=new URL(target);
+  callback.searchParams.set('admin_handoff',token);
+  return Response.redirect(callback.toString(),302);
+}
+
+async function consumeHandoff(request,articleDb){
+  const url=new URL(request.url);
+  const token=url.searchParams.get('admin_handoff');
+  if(!token)return json({success:false,error:'رمز الجلسة غير موجود.'},400);
+  await ensureArticleSessionSchema(articleDb);
+  const hash=await hashToken(token);
+  const row=await articleDb.prepare(`SELECT id,account_id,member_id FROM article_admin_sessions WHERE token_hash=? AND account_id LIKE ? AND datetime(expires_at)>datetime('now') LIMIT 1`).bind(hash,`${HANDOFF_PREFIX}%`).first();
+  if(!row)return json({success:false,error:'رمز الجلسة غير صالح أو منتهي.'},401);
+  await articleDb.prepare('DELETE FROM article_admin_sessions WHERE id=?').bind(row.id).run();
+  const bridgeAdmin={member_id:row.member_id};
+  const sessionToken=await createBridgeSession(articleDb,bridgeAdmin);
+  const cleanUrl=new URL(url.toString());
+  cleanUrl.searchParams.delete('admin_handoff');
+  cleanUrl.searchParams.set('session_restored','1');
+  const headers=new Headers({'Cache-Control':'no-store'});
+  headers.set('Set-Cookie',cookie(COOKIE,sessionToken,DAYS*86400));
+  return Response.redirect(cleanUrl.toString(),302);
+}
+
 export async function authenticateArticleAdmin(request,db){
   if(!db)return null;
   try{
     await ensureArticleSessionSchema(db);
-
     const token=getCookie(request,COOKIE);
     if(!token)return null;
     const hash=await hashToken(token);
-
     try{
       const row=await db.prepare(`
         SELECT a.id account_id,a.member_id,a.username,a.role,a.account_status,p.display_name,p.avatar_url
@@ -55,7 +104,6 @@ export async function authenticateArticleAdmin(request,db){
         return row;
       }
     }catch{}
-
     const bridge=await db.prepare(`
       SELECT account_id,member_id,token_hash,expires_at
       FROM article_admin_sessions
@@ -79,6 +127,9 @@ export async function onRequest({request,env}){
   if(!teamDb)return json({success:false,error:'Database binding is not configured.'},500);
   try{
     const action=new URL(request.url).searchParams.get('action')||'me';
+    if(request.method==='GET'&&action==='start_handoff')return startHandoff(request,teamDb,articleDb);
+    if(request.method==='GET'&&action==='consume_handoff')return consumeHandoff(request,articleDb);
+    if(request.method==='GET'&&new URL(request.url).searchParams.has('admin_handoff'))return consumeHandoff(request,articleDb);
 
     if(request.method==='GET'&&action==='me'){
       const mainAdmin=await authenticateAdmin(request,teamDb);
@@ -93,7 +144,6 @@ export async function onRequest({request,env}){
       if(!admin)return json({success:false,authenticated:false},401);
       return json({success:true,authenticated:true,admin:{account_id:admin.account_id,member_id:admin.member_id,username:admin.username,role:admin.role,display_name:admin.display_name||admin.username,avatar_url:admin.avatar_url||null}});
     }
-
     if(request.method==='POST'&&action==='logout'){
       const token=getCookie(request,COOKIE);
       if(token){
@@ -106,7 +156,6 @@ export async function onRequest({request,env}){
       headers.set('Set-Cookie',cookie(COOKIE,'',0));
       return new Response(response.body,{status:response.status,headers});
     }
-
     if(request.method==='POST'&&action==='login'){
       const body=await request.json().catch(()=>({}));
       const identifier=String(body.identifier||body.username||'').trim().toLowerCase();
@@ -130,7 +179,6 @@ export async function onRequest({request,env}){
       const headers=new Headers(response.headers);headers.set('Set-Cookie',cookie(COOKIE,token,DAYS*86400));
       return new Response(response.body,{status:response.status,headers});
     }
-
     return json({success:false,error:'Method or action not allowed.'},405);
   }catch(error){
     console.error('article-admin-session error:',error);
