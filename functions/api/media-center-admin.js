@@ -1,0 +1,8 @@
+import { authenticateArticleAdmin, json } from './article-admin-session.js';
+
+async function ensureSchema(db){
+  await db.prepare(`CREATE TABLE IF NOT EXISTS media_posts (id INTEGER PRIMARY KEY AUTOINCREMENT,archive_code TEXT NOT NULL UNIQUE,slug TEXT NOT NULL UNIQUE,title TEXT NOT NULL,summary TEXT,content_html TEXT NOT NULL,category TEXT NOT NULL DEFAULT 'نشاط ميداني',location TEXT,activity_date TEXT,cover_image_url TEXT,status TEXT NOT NULL DEFAULT 'draft',author_name TEXT,created_by INTEGER,published_at TEXT,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run();
+  await db.prepare(`CREATE TABLE IF NOT EXISTS media_post_images (id INTEGER PRIMARY KEY AUTOINCREMENT,post_id INTEGER NOT NULL,image_url TEXT NOT NULL,caption TEXT,sort_order INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`).run();
+}
+export async function onRequest({request,env}){
+  if(!env?.DB)return json({success:false,error:'Database binding DB is not configured.'},500);try{await ensureSchema(env.DB);const user=await authenticateArticleAdmin(request,env.DB);if(!user||!['admin','editor'].includes(String(user.role||'').toLowerCase()))return json({success:false,error:'غير مصرح.'},401);const r=await env.DB.prepare('SELECT * FROM media_posts ORDER BY COALESCE(activity_date,created_at) DESC,id DESC').all();const posts=[];for(const p of(r.results||[])){const imgs=await env.DB.prepare('SELECT id,image_url,caption,sort_order FROM media_post_images WHERE post_id=? ORDER BY sort_order,id').bind(p.id).all();posts.push({...p,images:imgs.results||[]})}return json({success:true,posts})}catch(e){return json({success:false,error:'تعذر تحميل الأرشيف.',detail:String(e?.message||'')},500)}}
