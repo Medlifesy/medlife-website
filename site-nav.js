@@ -3,6 +3,7 @@
     ['index.html', 'الرئيسية', 'home'],
     ['about-medlife.html', 'عن المؤسسة', 'about'],
     ['index.html#programs', 'مجالات العمل', 'programs'],
+    ['media-center.html', 'المركز الإعلامي', 'media'],
     ['articles.html', 'المقالات', 'articles'],
     ['forum-v3.html', 'المنتدى', 'forum'],
     ['gallery.html', 'الصور', 'gallery'],
@@ -20,6 +21,7 @@
     if (home && location.hash === '#homepageGallery') return 'gallery';
     if (home) return 'home';
     if (page === 'about-medlife' || page === 'about-medlife.html') return 'about';
+    if (page === 'media-center' || page === 'media-center.html') return 'media';
     if (page === 'forum-v3' || page === 'forum-v3.html') return 'forum';
     if (page === 'support' || page === 'support.html') return 'support';
     const match = items.find(item => item[0].split('#')[0] === page && !item[0].includes('#'));
