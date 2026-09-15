@@ -1,3 +1,4 @@
-Media Center admin v4 deployment trigger.
-Direct same-origin image upload and formal admin interface.
-2026-09-15T00:00:00Z
+Media Center v3 is now the primary editorial studio.
+Public media center presentation refined.
+Same-origin upload uses media-center-session and media-center-upload; Article admin remains untouched.
+2026-09-15T00:02:00Z
